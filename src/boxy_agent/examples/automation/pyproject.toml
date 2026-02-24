@@ -1,0 +1,30 @@
+[project]
+name = "canonical-automation-email-agent"
+version = "0.1.0"
+description = "Minimal canonical Boxy automation email agent"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.boxy_agent.agent]
+name = "canonical-automation-email-agent"
+description = "Minimal automation agent"
+version = "0.1.0"
+type = "automation"
+module = "automation_agent.agent"
+expected_event_types = ["email.reply_request"]
+
+[tool.boxy_agent.capabilities]
+data_queries = ["gmail.messages"]
+boxy_tools = ["gmail.send_message"]
+builtin_tools = []
+event_emitters = []

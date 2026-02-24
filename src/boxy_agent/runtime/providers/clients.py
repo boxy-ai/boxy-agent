@@ -1,0 +1,100 @@
+"""Client and memory primitives used by runtime providers."""
+
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+
+from boxy_agent.models import DataQueryDescriptor, ToolDescriptor
+from boxy_agent.public_sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
+from boxy_agent.runtime.errors import AgentRuntimeError
+from boxy_agent.types import JsonValue
+
+
+class UnconfiguredClientError(AgentRuntimeError):
+    """Raised when a runtime client is used without a configured implementation."""
+
+
+class UnconfiguredLlmClient(LlmClient):
+    """LLM client placeholder that requires explicit runtime injection."""
+
+    def complete(self, prompt: str, model: str | None = None) -> str:
+        _ = prompt, model
+        raise UnconfiguredClientError("No LLM client configured")
+
+
+class StaticDataQueryClient(DataQueryClient):
+    """Static data query client with explicit canned responses."""
+
+    def __init__(
+        self,
+        *,
+        descriptors: Sequence[DataQueryDescriptor] | None = None,
+        query_results: Mapping[str, Sequence[JsonValue]] | None = None,
+    ) -> None:
+        source_descriptors = descriptors or []
+        self._descriptors = {descriptor.name: descriptor for descriptor in source_descriptors}
+        self._query_results = {name: list(rows) for name, rows in (query_results or {}).items()}
+
+    def list_data_queries(self) -> list[DataQueryDescriptor]:
+        return list(self._descriptors.values())
+
+    def query_data(self, name: str, params: dict[str, JsonValue]) -> list[JsonValue]:
+        _ = params
+        if name not in self._query_results:
+            raise UnconfiguredClientError(f"No data query result configured for '{name}'")
+        return list(self._query_results[name])
+
+
+class StaticToolClient(ToolClient):
+    """Static tool client with explicit canned execution results."""
+
+    def __init__(
+        self,
+        *,
+        descriptors: Sequence[ToolDescriptor] | None = None,
+        execution_results: Mapping[str, JsonValue] | None = None,
+    ) -> None:
+        source_descriptors = descriptors or []
+        self._descriptors = {descriptor.name: descriptor for descriptor in source_descriptors}
+        self._execution_results = dict(execution_results or {})
+
+    def list_tools(self) -> list[ToolDescriptor]:
+        return list(self._descriptors.values())
+
+    def call_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
+        _ = params
+        if name not in self._execution_results:
+            raise UnconfiguredClientError(f"No tool result configured for '{name}'")
+        return self._execution_results[name]
+
+
+class InMemoryMemoryStore(MemoryStore):
+    """Session + persistent memory store using in-memory dictionaries."""
+
+    def __init__(
+        self,
+        *,
+        session_backing: dict[str, JsonValue] | None = None,
+        persistent_backing: dict[str, JsonValue] | None = None,
+    ) -> None:
+        self._session_backing = session_backing if session_backing is not None else {}
+        self._persistent_backing = persistent_backing if persistent_backing is not None else {}
+
+    def get(self, *, scope: str, key: str) -> JsonValue | None:
+        backing = self._backing_for_scope(scope)
+        return backing.get(key)
+
+    def set(self, *, scope: str, key: str, value: JsonValue) -> None:
+        backing = self._backing_for_scope(scope)
+        backing[key] = value
+
+    def delete(self, *, scope: str, key: str) -> None:
+        backing = self._backing_for_scope(scope)
+        backing.pop(key, None)
+
+    def _backing_for_scope(self, scope: str) -> dict[str, JsonValue]:
+        if scope == "session":
+            return self._session_backing
+        if scope == "persistent":
+            return self._persistent_backing
+        raise ValueError("scope must be either 'session' or 'persistent'")

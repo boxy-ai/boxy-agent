@@ -3,10 +3,19 @@ name = "boxy-agent"
 version = "0.1.0"
 description = "Boxy agent component"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = ["jsonschema==4.23.0"]
+
+[project.optional-dependencies]
+packaging = ["build==1.2.2.post1", "setuptools==69.5.1", "wheel==0.45.1"]
+
+[project.scripts]
+boxy-agent = "boxy_agent.cli:main"
 
 [dependency-groups]
 dev = [
+  "build==1.2.2.post1",
+  "setuptools==69.5.1",
+  "wheel==0.45.1",
   "pytest==8.3.3",
   "pyright==1.1.408",
   "ruff==0.14.10",
@@ -19,14 +28,19 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+boxy_agent = ["examples/*/pyproject.toml"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 respect-gitignore = true
+extend-exclude = ["build"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
@@ -54,7 +68,7 @@ pythonVersion = "3.12"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "tests"]
 
 [tool.coverage.run]
 branch = true

@@ -1,0 +1,30 @@
+[project]
+name = "canonical-main-agent"
+version = "0.1.0"
+description = "Minimal canonical Boxy main agent"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.boxy_agent.agent]
+name = "canonical-main-agent"
+description = "Minimal private main agent with observe-plan-act loop"
+version = "0.1.0"
+type = "main"
+module = "main_agent.agent"
+expected_event_types = ["start"]
+
+[tool.boxy_agent.capabilities]
+data_queries = ["gmail.messages"]
+boxy_tools = []
+builtin_tools = []
+event_emitters = []

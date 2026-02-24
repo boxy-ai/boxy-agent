@@ -1,0 +1,29 @@
+[project]
+name = "canonical-data-mining-email-agent"
+version = "0.1.0"
+description = "Minimal canonical Boxy data-mining email agent"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.boxy_agent.agent]
+name = "canonical-data-mining-email-agent"
+description = "Minimal data-mining agent"
+version = "0.1.0"
+type = "data_mining"
+module = "data_mining_agent.agent"
+
+[tool.boxy_agent.capabilities]
+data_queries = ["gmail.messages"]
+boxy_tools = []
+builtin_tools = []
+event_emitters = ["insight.generated"]
