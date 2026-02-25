@@ -3,7 +3,7 @@ name = "boxy-agent"
 version = "0.1.0"
 description = "Boxy agent component"
 requires-python = ">=3.12,<3.13"
-dependencies = ["jsonschema==4.23.0"]
+dependencies = ["jsonschema==4.23.0", "pydantic-monty>=0.0.7"]
 
 [project.optional-dependencies]
 packaging = ["build==1.2.2.post1", "setuptools==69.5.1", "wheel==0.45.1"]

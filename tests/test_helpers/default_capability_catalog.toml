@@ -16,5 +16,11 @@ output_schema = { type = "object", additionalProperties = false, required = ["st
 [[builtin_tools]]
 name = "web_search"
 description = "Search the web."
-input_schema = { type = "object", additionalProperties = false, required = ["query"], properties = { query = { type = "string" } } }
-output_schema = { type = "object", additionalProperties = false, required = ["items"], properties = { items = { type = "array", items = { type = "object" } } } }
+input_schema = { type = "object", additionalProperties = false, required = ["query"], properties = { query = { type = "string", minLength = 1 }, count = { type = "integer", minimum = 1, maximum = 20 } } }
+output_schema = { type = "object", additionalProperties = false, required = ["items"], properties = { items = { type = "array", items = { type = "object", additionalProperties = false, required = ["title", "url", "snippet"], properties = { title = { type = "string" }, url = { type = "string" }, snippet = { type = "string" } } } } } }
+
+[[builtin_tools]]
+name = "python_exec"
+description = "Execute sandboxed Python code."
+input_schema = { type = "object", additionalProperties = false, required = ["code"], properties = { code = { type = "string", minLength = 1 }, timeout_seconds = { type = "number", exclusiveMinimum = 0, maximum = 30 } } }
+output_schema = { type = "object", additionalProperties = false, required = ["result", "stdout", "stderr"], properties = { result = {}, stdout = { type = "string" }, stderr = { type = "string" } } }

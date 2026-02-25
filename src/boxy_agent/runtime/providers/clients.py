@@ -14,6 +14,10 @@ class UnconfiguredClientError(AgentRuntimeError):
     """Raised when a runtime client is used without a configured implementation."""
 
 
+class BuiltinToolError(AgentRuntimeError):
+    """Raised when a built-in tool execution fails."""
+
+
 class UnconfiguredLlmClient(LlmClient):
     """LLM client placeholder that requires explicit runtime injection."""
 

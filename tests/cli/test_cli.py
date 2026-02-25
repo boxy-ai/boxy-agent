@@ -266,6 +266,47 @@ def test_cli_run_with_registry_file_loads_registry_records(
     assert payload["last_output"] == {"ok": True}
 
 
+def test_cli_run_closes_runtime_resources_when_event_parsing_fails(
+    monkeypatch,
+    capsys,
+    tmp_path: Path,
+) -> None:
+    catalog_path = _write_empty_catalog(tmp_path / "catalog.toml")
+    called: dict[str, object] = {"closed": False}
+
+    class FakeRuntime:
+        def run(self, agent_name: str, event: dict[str, object]):  # pragma: no cover
+            _ = agent_name, event
+            raise AssertionError("run should not be called when event parsing fails")
+
+    def fake_runtime_from_args(args, *, capability_catalog):
+        _ = args, capability_catalog
+
+        def close() -> None:
+            called["closed"] = True
+
+        return FakeRuntime(), close
+
+    monkeypatch.setattr("boxy_agent.cli._runtime_from_args", fake_runtime_from_args)
+
+    with pytest.raises(SystemExit) as exc:
+        main(
+            [
+                "run",
+                "--agent",
+                "agent-a",
+                "--capability-catalog",
+                str(catalog_path),
+                "--event-json",
+                "{",
+            ]
+        )
+
+    assert exc.value.code == 1
+    assert called["closed"] is True
+    assert "error:" in capsys.readouterr().err
+
+
 def test_cli_compile_with_capability_catalog(monkeypatch, tmp_path: Path) -> None:
     catalog_path = tmp_path / "catalog.toml"
     catalog_path.write_text("schema_version = 1\n", encoding="utf-8")

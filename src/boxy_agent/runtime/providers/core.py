@@ -8,6 +8,7 @@ from boxy_agent.public_sdk.interfaces import DataQueryClient, LlmClient, MemoryS
 from boxy_agent.runtime.models import EventQueueItem
 from boxy_agent.types import JsonValue
 
+from .builtin_tools import BuiltinToolClient
 from .clients import (
     StaticDataQueryClient,
     StaticToolClient,
@@ -94,7 +95,7 @@ class CoreAgentSdkProvider:
     def builtin_tool_client(self, catalog: CapabilityCatalog) -> ToolClient:
         if self._builtin_tool_client is not None:
             return self._builtin_tool_client
-        return StaticToolClient(descriptors=list(catalog.builtin_tools.values()))
+        return BuiltinToolClient(descriptors=list(catalog.builtin_tools.values()))
 
     def llm_client(self) -> LlmClient:
         if self._llm_client is not None:

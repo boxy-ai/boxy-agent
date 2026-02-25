@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
 from boxy_agent.capabilities import CapabilityCatalog, load_capability_catalog
@@ -50,8 +50,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "list-agents":
             if capability_catalog is None:
                 raise ValueError("capability_catalog is required")
-            runtime = _runtime_from_args(args, capability_catalog=capability_catalog)
-            agents = runtime.list_installed_agents()
+            runtime, close_runtime_resources = _runtime_from_args(
+                args, capability_catalog=capability_catalog
+            )
+            try:
+                agents = runtime.list_installed_agents()
+            finally:
+                close_runtime_resources()
             if args.json:
                 agent_payload: list[dict[str, object]] = []
                 for agent in agents:
@@ -79,9 +84,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "run":
             if capability_catalog is None:
                 raise ValueError("capability_catalog is required")
-            runtime = _runtime_from_args(args, capability_catalog=capability_catalog)
-            event = _load_event_from_args(args)
-            report = runtime.run(agent_name=args.agent, event=event)
+            runtime, close_runtime_resources = _runtime_from_args(
+                args, capability_catalog=capability_catalog
+            )
+            try:
+                event = _load_event_from_args(args)
+                report = runtime.run(agent_name=args.agent, event=event)
+            finally:
+                close_runtime_resources()
             payload: dict[str, JsonValue] = {
                 "session_id": report.session_id,
                 "status": report.status,
@@ -194,15 +204,23 @@ def _runtime_from_args(
     args: argparse.Namespace,
     *,
     capability_catalog: CapabilityCatalog,
-) -> AgentRuntime:
+) -> tuple[AgentRuntime, Callable[[], None]]:
+    close_runtime_resources = _noop_close
+
     if args.registry_file is None:
-        return AgentRuntime(capability_catalog=capability_catalog)
+        runtime = AgentRuntime(capability_catalog=capability_catalog)
+        return runtime, close_runtime_resources
 
     records = _load_registry_records(Path(args.registry_file))
-    return AgentRuntime(
+    runtime = AgentRuntime(
         capability_catalog=capability_catalog,
         agent_registry_loader=lambda: discover_registered_agents(records),
     )
+    return runtime, close_runtime_resources
+
+
+def _noop_close() -> None:
+    pass
 
 
 def _load_registry_records(path: Path) -> list[Mapping[str, object]]:

@@ -50,6 +50,7 @@ from boxy_agent.runtime.models import (
 )
 from boxy_agent.runtime.providers import (
     AgentSdkProvider,
+    BuiltinToolClient,
     InMemoryMemoryStore,
     StaticDataQueryClient,
     StaticToolClient,
@@ -146,7 +147,7 @@ class _RuntimeDefaultSdkProvider:
     def builtin_tool_client(self, catalog: CapabilityCatalog) -> ToolClient:
         if self._builtin_tool_client is not None:
             return self._builtin_tool_client
-        return StaticToolClient(descriptors=list(catalog.builtin_tools.values()))
+        return BuiltinToolClient(descriptors=list(catalog.builtin_tools.values()))
 
     def llm_client(self) -> LlmClient:
         if self._llm_client is not None:

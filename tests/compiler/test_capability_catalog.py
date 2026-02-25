@@ -16,6 +16,7 @@ def test_default_capability_catalog_contains_expected_capabilities() -> None:
     assert "gmail.messages" in catalog.data_queries
     assert "gmail.send_message" in catalog.boxy_tools
     assert "web_search" in catalog.builtin_tools
+    assert "python_exec" in catalog.builtin_tools
 
 
 def test_load_capability_catalog_rejects_invalid_schema(tmp_path: Path) -> None:

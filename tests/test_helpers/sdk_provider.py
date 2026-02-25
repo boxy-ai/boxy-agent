@@ -35,7 +35,12 @@ DEFAULT_BOXY_TOOL_RESULTS: dict[str, JsonValue] = {
 DEFAULT_BUILTIN_TOOL_RESULTS: dict[str, JsonValue] = {
     "web_search": {
         "items": [],
-    }
+    },
+    "python_exec": {
+        "result": None,
+        "stdout": "",
+        "stderr": "",
+    },
 }
 
 
