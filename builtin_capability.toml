@@ -1,0 +1,16 @@
+schema_version = 1
+
+data_queries = []
+boxy_tools = []
+
+[[builtin_tools]]
+name = "web_search"
+description = "Search the web"
+input_schema = { type = "object", properties = { query = { type = "string" } }, required = ["query"] }
+output_schema = { type = "object", properties = { results = { type = "array", items = { type = "object" } } } }
+
+[[builtin_tools]]
+name = "python_exec"
+description = "Execute Python code"
+input_schema = { type = "object", properties = { code = { type = "string" } }, required = ["code"] }
+output_schema = { type = "object", properties = { result = {}, stdout = { type = "string" }, stderr = { type = "string" } } }
