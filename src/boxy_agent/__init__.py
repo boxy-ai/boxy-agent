@@ -47,7 +47,7 @@ __all__ = [
     "list_boxy_tools",
     "list_builtin_tools",
     "list_data_queries",
-    "llm_complete",
+    "llm_chat_complete",
     "emit_event",
     "memory_delete",
     "memory_get",
@@ -63,9 +63,12 @@ __all__ = [
 __version__ = "0.1.0"
 
 
-def llm_complete(exec_ctx: AgentExecutionContext, prompt: str, model: str | None = None) -> str:
-    """Complete a prompt through the configured LLM provider."""
-    return sdk.llm.complete(exec_ctx, prompt, model=model)
+def llm_chat_complete(
+    exec_ctx: AgentExecutionContext,
+    request: dict[str, JsonValue],
+) -> dict[str, JsonValue]:
+    """Complete a chat request through the configured LLM provider."""
+    return sdk.llm.chat_complete(exec_ctx, request)
 
 
 def list_data_queries(exec_ctx: AgentExecutionContext) -> list[DataQueryDescriptor]:

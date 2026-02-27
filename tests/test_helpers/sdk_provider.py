@@ -48,8 +48,8 @@ class MockLlmClient(LlmClient):
     def __init__(self, *, static_response: str = "mock-llm-response") -> None:
         self._static_response = static_response
 
-    def complete(self, prompt: str, model: str | None = None) -> str:
-        return f"{self._static_response}::{model or 'default'}::{prompt}"
+    def chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        return {"mock": request, "text": self._static_response}
 
 
 def default_data_query_client(

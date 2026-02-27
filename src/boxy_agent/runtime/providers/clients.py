@@ -21,8 +21,8 @@ class BuiltinToolError(AgentRuntimeError):
 class UnconfiguredLlmClient(LlmClient):
     """LLM client placeholder that requires explicit runtime injection."""
 
-    def complete(self, prompt: str, model: str | None = None) -> str:
-        _ = prompt, model
+    def chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        _ = request
         raise UnconfiguredClientError("No LLM client configured")
 
 

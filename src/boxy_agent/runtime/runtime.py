@@ -179,6 +179,7 @@ class _SessionState:
 @dataclass(kw_only=True)
 class _ContextRuntimeBindings:
     agent_name: str
+    session_id: str
     agent_type: AgentType
     capabilities: AgentCapabilities
     capability_catalog: CapabilityCatalog
@@ -193,8 +194,15 @@ class _ContextRuntimeBindings:
     list_agents_callback: Callable[[], list[InstalledAgent]] | None = None
     delegate_callback: Callable[[str, AgentEvent], DelegateResult] | None = None
 
-    def llm_complete(self, prompt: str, model: str | None = None) -> str:
-        return self.llm_client.complete(prompt, model=model)
+    def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        chat_complete = getattr(self.llm_client, "chat_complete", None)
+        if not callable(chat_complete):
+            raise RuntimeError("Configured LLM client must implement chat_complete(request)")
+        chat_complete_fn = cast(
+            Callable[[dict[str, JsonValue]], dict[str, JsonValue]],
+            chat_complete,
+        )
+        return chat_complete_fn(request)
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:
         return _filter_descriptors(
@@ -230,7 +238,7 @@ class _ContextRuntimeBindings:
             params=params,
             kind="boxy tool",
             descriptor=descriptor,
-            call=self.boxy_tool_client.call_tool,
+            call=self._call_boxy_tool_with_actor_scope,
         )
 
     def list_builtin_tools(self) -> list[ToolDescriptor]:
@@ -356,6 +364,24 @@ class _ContextRuntimeBindings:
             label=f"{kind} output '{name}'",
         )
         return result
+
+    def _call_boxy_tool_with_actor_scope(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+    ) -> JsonValue:
+        scoped_call = getattr(self.boxy_tool_client, "call_tool_with_actor", None)
+        if callable(scoped_call):
+            scoped_call_fn = cast(
+                Callable[..., JsonValue],
+                scoped_call,
+            )
+            return scoped_call_fn(
+                name,
+                params,
+                actor_principal=f"agent:{self.agent_name}:session:{self.session_id}",
+            )
+        return self.boxy_tool_client.call_tool(name, params)
 
 
 class AgentRuntime:
@@ -562,6 +588,7 @@ class AgentRuntime:
 
         bindings_kwargs = {
             "agent_name": target.installed.name,
+            "session_id": session_state.session_id,
             "agent_type": target.installed.agent_type,
             "capabilities": target.installed.capabilities,
             "capability_catalog": self._capability_catalog,

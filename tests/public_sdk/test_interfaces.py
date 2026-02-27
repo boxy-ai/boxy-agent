@@ -30,8 +30,8 @@ class _FakeBindings:
         self.terminated: list[str | None] = []
         self.emitted_events: list[models.AgentEvent] = []
 
-    def llm_complete(self, prompt: str, model: str | None = None) -> str:
-        return f"hello::{model or 'default'}::{prompt}"
+    def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        return {"echo": request}
 
     def list_data_queries(self):
         return [data_query_registry()["gmail.messages"]]
@@ -122,7 +122,7 @@ def test_context_routes_calls_through_sdk_helpers() -> None:
         "params": {"query": "boxy"},
     }
 
-    assert llm.complete(context, "Summarize") == "hello::default::Summarize"
+    assert llm.chat_complete(context, {"messages": []}) == {"echo": {"messages": []}}
 
     memory.set(context, "k", {"v": 1})
     assert memory.get(context, "k") == {"v": 1}

@@ -61,6 +61,7 @@ class PrivateAgentExecutionContext(AgentExecutionContext):
 def _private_runtime_bindings(exec_ctx: AgentExecutionContext) -> PrivateRuntimeBindings:
     bindings = runtime_bindings(exec_ctx)
     if not hasattr(bindings, "list_agents") or not hasattr(bindings, "delegate_to_agent"):
+        # Deferred import avoids private runtime dependency at module import time.
         from boxy_agent.runtime.errors import DelegationError
 
         raise DelegationError("This execution context does not support private delegation APIs")

@@ -56,7 +56,7 @@ def test_unconfigured_llm_client_rejects_usage() -> None:
     client = UnconfiguredLlmClient()
 
     with pytest.raises(UnconfiguredClientError, match="No LLM client configured"):
-        client.complete("hello")
+        client.chat_complete({"messages": []})
 
 
 class _FakePythonExecutor:

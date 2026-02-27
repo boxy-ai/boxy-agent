@@ -24,8 +24,8 @@ class _FakePrivateBindings:
         self._terminated_result = terminated_result
         self._terminated_reasons = terminated_reasons
 
-    def llm_complete(self, prompt: str, model: str | None = None) -> str:
-        return f"mock::{model or 'default'}::{prompt}"
+    def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        return {"echo": request}
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:
         return []

@@ -38,6 +38,7 @@ class MontyPythonExecutor:
 
     def execute(self, *, code: str, timeout_seconds: float) -> PythonExecutionResult:
         try:
+            # Optional dependency: load lazily so runtimes without Monty can still start.
             import pydantic_monty
         except ImportError as exc:
             raise UnconfiguredClientError(

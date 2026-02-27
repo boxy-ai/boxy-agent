@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from runtime.support import discovered_agent
@@ -18,12 +18,43 @@ from boxy_agent import (
 )
 from boxy_agent.capabilities import CapabilityCatalog, load_capability_catalog_from_text
 from boxy_agent.runtime import AgentRuntime
-from boxy_agent.runtime.errors import CapabilitySchemaError, CapabilityViolationError
+from boxy_agent.runtime.errors import (
+    AgentExecutionError,
+    CapabilitySchemaError,
+    CapabilityViolationError,
+)
 from boxy_agent.runtime.providers import StaticDataQueryClient, StaticToolClient
+from boxy_agent.sdk import llm as llm_sdk
 
 
 def _runtime_with_default_catalog(**kwargs) -> AgentRuntime:
     return AgentRuntime(capability_catalog=default_capability_catalog(), **kwargs)
+
+
+class _ActorAwareToolClient:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str, dict[str, object]]] = []
+
+    def list_tools(self):
+        return []
+
+    def call_tool(self, name: str, params: dict[str, object]) -> dict[str, object]:
+        _ = name, params
+        raise AssertionError("runtime should prefer call_tool_with_actor when available")
+
+    def call_tool_with_actor(
+        self,
+        name: str,
+        params: dict[str, object],
+        *,
+        actor_principal: str,
+    ) -> dict[str, object]:
+        self.calls.append((name, actor_principal, dict(params)))
+        return {"status": "sent", "message_id": "msg-1"}
+
+
+class _LegacyCompleteOnlyLlm:
+    pass
 
 
 def test_runtime_rejects_unauthorized_data_query() -> None:
@@ -318,6 +349,72 @@ def test_runtime_allows_authorized_event_emission() -> None:
     assert report.last_output == {"ok": True}
     queued = runtime.drain_event_queue()
     assert [item.event.type for item in queued] == ["insight.generated"]
+
+
+def test_runtime_scopes_boxy_tool_calls_with_agent_and_session_actor() -> None:
+    tool_client = _ActorAwareToolClient()
+
+    def handle(context):
+        call_boxy_tool(
+            context,
+            "gmail.send_message",
+            {"to": ["a@example.com"], "subject": "Hi", "body": "Hello"},
+        )
+        return AgentResult(output={"ok": True})
+
+    runtime = _runtime_with_default_catalog(
+        agent_registry_loader=lambda: {
+            "main": discovered_agent(
+                name="main",
+                handler=handle,
+                capabilities=AgentCapabilities(
+                    data_queries=frozenset(),
+                    boxy_tools=frozenset({"gmail.send_message"}),
+                    builtin_tools=frozenset(),
+                ),
+            )
+        },
+        boxy_tool_client=tool_client,
+    )
+
+    report = runtime.run("main", {"type": "start"})
+
+    assert report.status == "idle"
+    assert len(tool_client.calls) == 1
+    name, actor_principal, params = tool_client.calls[0]
+    assert name == "gmail.send_message"
+    assert params == {"to": ["a@example.com"], "subject": "Hi", "body": "Hello"}
+    assert actor_principal == f"agent:main:session:{report.session_id}"
+
+
+def test_runtime_chat_complete_requires_chat_complete_implementation() -> None:
+    def handle(context):
+        response = llm_sdk.chat_complete(
+            context,
+            {
+                "model": "gpt-4.1",
+                "messages": [{"role": "user", "content": "hello"}],
+            },
+        )
+        return AgentResult(output=response)
+
+    runtime = _runtime_with_default_catalog(
+        agent_registry_loader=lambda: {
+            "main": discovered_agent(
+                name="main",
+                handler=handle,
+                capabilities=AgentCapabilities(
+                    data_queries=frozenset(),
+                    boxy_tools=frozenset(),
+                    builtin_tools=frozenset(),
+                ),
+            )
+        },
+        llm_client=cast(Any, _LegacyCompleteOnlyLlm()),
+    )
+
+    with pytest.raises(AgentExecutionError, match="chat_complete"):
+        runtime.run("main", {"type": "start"})
 
 
 def test_runtime_rejects_invalid_datetime_format_input() -> None:

@@ -37,8 +37,8 @@ class ToolClient(Protocol):
 class LlmClient(Protocol):
     """Interface for LLM completion calls."""
 
-    def complete(self, prompt: str, model: str | None = None) -> str:
-        """Return a completion string."""
+    def chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        """Return a chat completion payload."""
         ...
 
 
@@ -65,8 +65,8 @@ TerminateCallback = Callable[[str | None], None]
 class RuntimeBindings(Protocol):
     """Opaque runtime-bound capability surface for one execution context invocation."""
 
-    def llm_complete(self, prompt: str, model: str | None = None) -> str:
-        """Complete an LLM prompt."""
+    def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        """Complete an LLM chat request with optional tool-calling payload."""
         ...
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:
