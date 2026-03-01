@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
+import sysconfig
 from pathlib import Path
 
 from support import write_agent_project
@@ -11,7 +13,7 @@ from test_helpers.capabilities import empty_capability_catalog
 from boxy_agent.compiler import package_agent
 
 
-def test_package_install_and_run_in_venv(tmp_path: Path) -> None:
+def test_package_run_in_venv_with_local_sdk_source(tmp_path: Path) -> None:
     project_dir = write_agent_project(
         project_dir=tmp_path / "agent-project",
         distribution_name="sample-agent-e2e",
@@ -53,6 +55,16 @@ def test_package_install_and_run_in_venv(tmp_path: Path) -> None:
 
     python_bin = venv_dir / "bin" / "python"
     repo_agent_dir = Path(__file__).resolve().parents[2]
+    env = dict(os.environ)
+    existing_pythonpath = env.get("PYTHONPATH")
+    repo_src = str(repo_agent_dir / "src")
+    host_site_packages = sysconfig.get_path("purelib")
+    pythonpath_parts = [repo_src]
+    if host_site_packages:
+        pythonpath_parts.append(host_site_packages)
+    if existing_pythonpath:
+        pythonpath_parts.append(existing_pythonpath)
+    env["PYTHONPATH"] = ":".join(pythonpath_parts)
     capability_catalog_path = tmp_path / "catalog.toml"
     capability_catalog_path.write_text(
         """
@@ -65,20 +77,21 @@ builtin_tools = []
         encoding="utf-8",
     )
 
-    subprocess.run([str(python_bin), "-m", "pip", "install", "-q", str(repo_agent_dir)], check=True)
-
     examples_probe = subprocess.run(
         [
             str(python_bin),
             "-c",
             (
-                "from boxy_agent.examples import canonical_main_agent_project_dir;"
-                " print((canonical_main_agent_project_dir() / 'pyproject.toml').exists())"
+                "from boxy_agent.examples import "
+                "canonical_automation_email_agent_project_dir; "
+                "print((canonical_automation_email_agent_project_dir() "
+                "/ 'pyproject.toml').exists())"
             ),
         ],
         check=True,
         text=True,
         capture_output=True,
+        env=env,
     )
     assert examples_probe.stdout.strip() == "True"
 
@@ -114,6 +127,7 @@ builtin_tools = []
         check=True,
         text=True,
         capture_output=True,
+        env=env,
     )
 
     payload = json.loads(run_result.stdout)

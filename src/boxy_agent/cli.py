@@ -116,7 +116,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             created = create_agent_project(
                 project_dir=Path(args.project_dir),
                 requested_type=args.agent_type,
-                internal=args.internal,
                 name=args.name,
                 description=args.description,
             )
@@ -158,11 +157,10 @@ def _build_parser() -> argparse.ArgumentParser:
     event_group.add_argument("--event-file")
 
     create_parser = subparsers.add_parser("create-agent", help="Create a new agent project")
-    create_parser.add_argument("agent_type", help="Agent type: operation, data-mining, or main")
+    create_parser.add_argument("agent_type", help="Agent type: operation or data-mining")
     create_parser.add_argument("--project-dir", required=True)
     create_parser.add_argument("--name")
     create_parser.add_argument("--description")
-    create_parser.add_argument("--internal", action="store_true")
 
     return parser
 

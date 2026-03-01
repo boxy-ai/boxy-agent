@@ -23,12 +23,11 @@ def create_agent_project(
     *,
     project_dir: Path,
     requested_type: str,
-    internal: bool,
     name: str | None = None,
     description: str | None = None,
 ) -> CreatedAgentProject:
     """Create a new Boxy agent project scaffold."""
-    agent_type = _resolve_agent_type(requested_type, internal=internal)
+    agent_type = _resolve_agent_type(requested_type)
     resolved_project_dir = project_dir.resolve()
     project_name = (name or resolved_project_dir.name).strip()
     if not project_name:
@@ -58,18 +57,14 @@ def create_agent_project(
     )
 
 
-def _resolve_agent_type(requested_type: str, *, internal: bool) -> AgentType:
+def _resolve_agent_type(requested_type: str) -> AgentType:
     normalized = requested_type.strip().lower().replace("_", "-")
     mapping: dict[str, AgentType] = {
         "operation": "automation",
         "data-mining": "data_mining",
     }
-    if internal:
-        mapping["main"] = "main"
 
     if normalized not in mapping:
-        if normalized == "main":
-            raise ValueError("Agent type 'main' is internal-only; use --internal to allow it")
         allowed = ", ".join(sorted(mapping))
         raise ValueError(f"Unsupported agent type '{requested_type}'. Supported types: {allowed}")
 
@@ -120,7 +115,7 @@ def _write_pyproject(
         f"type = {_toml_string(agent_type)}",
         f"module = {_toml_string(f'{package_name}.agent')}",
     ]
-    if agent_type in {"automation", "main"}:
+    if agent_type == "automation":
         lines.append('expected_event_types = ["start"]')
     lines.extend(
         [

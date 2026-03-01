@@ -214,18 +214,16 @@ def test_compile_rejects_data_mining_with_boxy_tools(tmp_path: Path) -> None:
         )
 
 
-def test_compile_accepts_main_agent_type(tmp_path: Path) -> None:
+def test_compile_rejects_main_agent_type(tmp_path: Path) -> None:
     metadata = BASE_METADATA.replace('type = "automation"', 'type = "main"')
     project_dir = _make_project(tmp_path, metadata=metadata)
 
-    compiled = compile_agent(
-        project_dir=project_dir,
-        output_dir=tmp_path / "output",
-        capability_catalog=default_capability_catalog(),
-    )
-
-    payload = json.loads(compiled.manifest_path.read_text(encoding="utf-8"))
-    assert payload["type"] == "main"
+    with pytest.raises(MetadataValidationError, match="Unsupported agent type"):
+        compile_agent(
+            project_dir=project_dir,
+            output_dir=tmp_path / "output",
+            capability_catalog=default_capability_catalog(),
+        )
 
 
 def test_compile_supports_injected_capability_catalog(tmp_path: Path) -> None:

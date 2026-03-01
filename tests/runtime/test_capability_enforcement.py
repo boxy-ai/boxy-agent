@@ -53,6 +53,29 @@ class _ActorAwareToolClient:
         return {"status": "sent", "message_id": "msg-1"}
 
 
+class _SessionAwareDataQueryClient:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str, str, dict[str, object]]] = []
+
+    def list_data_queries(self):
+        return []
+
+    def query_data(self, name: str, params: dict[str, object]):
+        _ = name, params
+        raise AssertionError("runtime should prefer query_data_with_session when available")
+
+    def query_data_with_session(
+        self,
+        name: str,
+        params: dict[str, object],
+        *,
+        session_id: str,
+        actor_principal: str,
+    ):
+        self.calls.append((name, session_id, actor_principal, dict(params)))
+        return [{"id": "row-1", "subject": "hello"}]
+
+
 class _LegacyCompleteOnlyLlm:
     pass
 
@@ -78,6 +101,39 @@ def test_runtime_rejects_unauthorized_data_query() -> None:
 
     with pytest.raises(CapabilityViolationError):
         runtime.run("main", {"type": "start"})
+
+
+def test_runtime_passes_session_scope_to_data_query_client_when_supported() -> None:
+    data_client = _SessionAwareDataQueryClient()
+
+    def handle(context):
+        rows = query_data(context, "gmail.messages", {"fts": "alpha"})
+        return AgentResult(output={"rows": rows})
+
+    runtime = _runtime_with_default_catalog(
+        data_client=data_client,
+        agent_registry_loader=lambda: {
+            "main": discovered_agent(
+                name="main",
+                handler=handle,
+                capabilities=AgentCapabilities(
+                    data_queries=frozenset({"gmail.messages"}),
+                    boxy_tools=frozenset(),
+                    builtin_tools=frozenset(),
+                ),
+            )
+        },
+    )
+
+    report = runtime.run("main", {"type": "start"})
+
+    assert report.last_output == {"rows": [{"id": "row-1", "subject": "hello"}]}
+    assert len(data_client.calls) == 1
+    name, session_id, actor_principal, params = data_client.calls[0]
+    assert name == "gmail.messages"
+    assert session_id == report.session_id
+    assert actor_principal == f"agent:main:session:{report.session_id}"
+    assert params == {"fts": "alpha"}
 
 
 def test_runtime_rejects_unauthorized_boxy_tool() -> None:

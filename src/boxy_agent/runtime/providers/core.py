@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from boxy_agent.capabilities import CapabilityCatalog
 from boxy_agent.models import AgentEvent
-from boxy_agent.public_sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.runtime.models import EventQueueItem
+from boxy_agent.sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.types import JsonValue
 
 from .builtin_tools import BuiltinToolClient
@@ -68,8 +68,14 @@ class CoreAgentSdkProvider:
         self._builtin_tool_client = builtin_tool_client
         self._llm_client = llm_client
         self._event_topic = event_topic.strip()
+        self._externally_managed_session_ids: set[str] = set()
 
     def create_session(self, *, agent_name: str, event: AgentEvent) -> str:
+        session_from_event = _session_id_from_event_payload(event)
+        if session_from_event is not None:
+            self._externally_managed_session_ids.add(session_from_event)
+            return session_from_event
+
         metadata: dict[str, JsonValue] = {
             "agent_name": agent_name,
             "event": {
@@ -80,6 +86,8 @@ class CoreAgentSdkProvider:
         return self._core_client.create_session(metadata=metadata)
 
     def close_session(self, session_id: str) -> None:
+        if session_id in self._externally_managed_session_ids:
+            return
         self._core_client.close_session(session_id)
 
     def data_query_client(self, catalog: CapabilityCatalog) -> DataQueryClient:
@@ -128,8 +136,21 @@ def _event_payload(event: EventQueueItem) -> dict[str, JsonValue]:
         },
         "source": event.source,
     }
+    if event.source in {"agent", "connector"}:
+        payload["workflow"] = True
+        payload["trigger_kind"] = "root"
     if event.source_agent is not None:
         payload["source_agent"] = event.source_agent
     if event.session_id is not None:
         payload["session_id"] = event.session_id
     return payload
+
+
+def _session_id_from_event_payload(event: AgentEvent) -> str | None:
+    session_id = event.payload.get("__boxy_session_id")
+    if not isinstance(session_id, str):
+        return None
+    normalized = session_id.strip()
+    if not normalized:
+        return None
+    return normalized

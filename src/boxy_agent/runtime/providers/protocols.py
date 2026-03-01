@@ -6,8 +6,8 @@ from typing import Protocol
 
 from boxy_agent.capabilities import CapabilityCatalog
 from boxy_agent.models import AgentEvent
-from boxy_agent.public_sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.runtime.models import EventQueueItem
+from boxy_agent.sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.types import JsonValue
 
 

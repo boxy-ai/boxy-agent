@@ -10,7 +10,7 @@ from boxy_agent.models import (
     DataQueryDescriptor,
     ToolDescriptor,
 )
-from boxy_agent.public_sdk.interfaces import AgentExecutionContext
+from boxy_agent.sdk.interfaces import AgentExecutionContext
 from boxy_agent.types import JsonValue
 
 __all__ = [

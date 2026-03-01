@@ -9,7 +9,6 @@ from boxy_agent.runtime.errors import (
     AgentRuntimeError,
     CapabilitySchemaError,
     CapabilityViolationError,
-    DelegationError,
     InvalidEventError,
     RegistrationError,
 )
@@ -36,7 +35,6 @@ __all__ = [
     "CapabilityViolationError",
     "CoreAgentSdkProvider",
     "discover_registered_agents",
-    "DelegationError",
     "EventQueueItem",
     "InstalledAgent",
     "InvalidEventError",

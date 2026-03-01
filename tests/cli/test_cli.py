@@ -416,21 +416,6 @@ def test_cli_create_agent_escapes_description_quotes(tmp_path: Path) -> None:
     assert pyproject["tool"]["boxy_agent"]["agent"]["description"] == description
 
 
-def test_cli_create_agent_rejects_main_without_internal(capsys, tmp_path: Path) -> None:
-    with pytest.raises(SystemExit) as exc:
-        main(
-            [
-                "create-agent",
-                "main",
-                "--project-dir",
-                str(tmp_path / "main-agent"),
-            ]
-        )
-
-    assert exc.value.code == 1
-    assert "internal-only" in capsys.readouterr().err
-
-
 def test_cli_create_agent_rejects_unsupported_type(capsys, tmp_path: Path) -> None:
     with pytest.raises(SystemExit) as exc:
         main(
@@ -446,21 +431,16 @@ def test_cli_create_agent_rejects_unsupported_type(capsys, tmp_path: Path) -> No
     assert "Supported types: data-mining, operation" in capsys.readouterr().err
 
 
-def test_cli_create_agent_allows_main_with_internal(tmp_path: Path) -> None:
-    project_dir = tmp_path / "main-agent"
+def test_cli_create_agent_rejects_main_type(capsys, tmp_path: Path) -> None:
+    with pytest.raises(SystemExit) as exc:
+        main(
+            [
+                "create-agent",
+                "main",
+                "--project-dir",
+                str(tmp_path / "main-agent"),
+            ]
+        )
 
-    exit_code = main(
-        [
-            "create-agent",
-            "main",
-            "--project-dir",
-            str(project_dir),
-            "--internal",
-        ]
-    )
-
-    assert exit_code == 0
-    pyproject = tomllib.loads((project_dir / "pyproject.toml").read_text(encoding="utf-8"))
-    agent_table = pyproject["tool"]["boxy_agent"]["agent"]
-    assert agent_table["type"] == "main"
-    assert agent_table["expected_event_types"] == ["start"]
+    assert exc.value.code == 1
+    assert "Supported types: data-mining, operation" in capsys.readouterr().err

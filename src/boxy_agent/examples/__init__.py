@@ -4,14 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-CANONICAL_MAIN_AGENT_NAME = "canonical-main-agent"
 CANONICAL_AUTOMATION_EMAIL_AGENT_NAME = "canonical-automation-email-agent"
 CANONICAL_DATA_MINING_EMAIL_AGENT_NAME = "canonical-data-mining-email-agent"
-
-
-def canonical_main_agent_project_dir() -> Path:
-    """Return the canonical main-agent example project directory."""
-    return Path(__file__).resolve().parent / "main"
 
 
 def canonical_automation_email_agent_project_dir() -> Path:
@@ -27,8 +21,6 @@ def canonical_data_mining_email_agent_project_dir() -> Path:
 __all__ = [
     "CANONICAL_AUTOMATION_EMAIL_AGENT_NAME",
     "CANONICAL_DATA_MINING_EMAIL_AGENT_NAME",
-    "CANONICAL_MAIN_AGENT_NAME",
     "canonical_automation_email_agent_project_dir",
     "canonical_data_mining_email_agent_project_dir",
-    "canonical_main_agent_project_dir",
 ]

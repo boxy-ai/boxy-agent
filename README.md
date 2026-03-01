@@ -2,18 +2,15 @@
 
 `boxy-agent` is the SDK, compiler, and runtime for Boxy agents.
 
-It supports three agent types:
+It supports two public agent types:
 - `automation`
 - `data_mining`
-- `main` (internal/private orchestration)
 
 ## Architecture
 
-Source lives in `src/boxy_agent/` and is split into five layers:
+Source lives in `src/boxy_agent/` and is split into four layers:
 
-- `sdk/`: namespaced helper APIs agent authors call (`llm`, `data_queries`, `boxy_tools`, `memory`, `events`, `tracing`, `control`).
-- `public_sdk/`: canonical public execution context and `@agent_main` decorator contracts.
-- `private_sdk/`: main-agent-only delegation and installed-agent discovery interfaces.
+- `sdk/`: namespaced helper APIs agent authors call (`llm`, `data_queries`, `boxy_tools`, `memory`, `events`, `tracing`, `control`) plus execution context and `@agent_main` contracts.
 - `compiler/`: reads `pyproject.toml`, validates metadata/capabilities, resolves entrypoint, emits compiled manifest, packages wheel.
 - `runtime/`: discovers installed agents, enforces capabilities/schemas at call time, runs one invocation per trigger event, records traces, and manages event queue/memory through providers.
 
@@ -49,7 +46,7 @@ Shared models and capability catalogs are in:
 - Static compilation:
   compiler uses AST analysis instead of importing agent modules, avoiding import-time side effects.
 - Explicit event orchestration:
-  runtime invocation is single-step per event; main-agent delegation is explicit and constrained to automation agents.
+  runtime invocation is single-step per event.
 
 ## CLI
 
@@ -58,6 +55,6 @@ Main commands:
 - `boxy-agent package --project-dir <dir> --output-dir <dir> --capability-catalog <catalog.toml>`
 - `boxy-agent list-agents --registry-file <file> --capability-catalog <catalog.toml>`
 - `boxy-agent run --agent <name> --registry-file <file> --capability-catalog <catalog.toml> --event-json '<json>'`
-- `boxy-agent create-agent <operation|data-mining|main> --project-dir <dir>`
+- `boxy-agent create-agent <operation|data-mining> --project-dir <dir>`
 
 `boxy-agent package` requires packaging dependencies. Install with the `packaging` extra.

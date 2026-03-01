@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from boxy_agent import AgentExecutionContext, AgentResult, agent_main
-from boxy_agent.public_sdk.decorators import get_entrypoint_metadata, is_canonical_entrypoint
+from boxy_agent.sdk.decorators import get_entrypoint_metadata, is_canonical_entrypoint
 
 
 @agent_main

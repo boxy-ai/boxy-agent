@@ -1,4 +1,4 @@
-"""Public data models for the Boxy agent SDK."""
+"""Data models for the Boxy agent SDK."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from typing import Literal, cast
 
 from boxy_agent.types import JsonValue, ensure_json_value
 
-AgentType = Literal["automation", "data_mining", "main"]
+AgentType = Literal["automation", "data_mining"]
 
 
 @dataclass(frozen=True)
@@ -112,7 +112,7 @@ class AgentMetadata:
         _require_non_empty("description", self.description)
         _require_non_empty("version", self.version)
         _require_non_empty("module", self.module)
-        if self.agent_type not in {"automation", "data_mining", "main"}:
+        if self.agent_type not in {"automation", "data_mining"}:
             raise ValueError(f"Unsupported agent_type: {self.agent_type}")
         normalized = tuple(
             _normalize_name(event_type, "expected_event_types")
@@ -181,6 +181,6 @@ def _require_non_empty(label: str, value: str) -> None:
 
 def parse_agent_type(value: str) -> AgentType:
     """Parse and validate an agent type literal."""
-    if value not in {"automation", "data_mining", "main"}:
+    if value not in {"automation", "data_mining"}:
         raise ValueError(f"Unsupported agent type: {value}")
     return cast(AgentType, value)

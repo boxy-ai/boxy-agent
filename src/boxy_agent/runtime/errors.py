@@ -29,7 +29,3 @@ class CapabilitySchemaError(AgentRuntimeError):
 
 class InvalidEventError(AgentRuntimeError):
     """Raised when runtime event input is invalid."""
-
-
-class DelegationError(AgentRuntimeError):
-    """Raised when private delegation fails."""

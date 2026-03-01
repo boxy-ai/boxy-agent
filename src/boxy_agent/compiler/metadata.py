@@ -42,7 +42,10 @@ def load_agent_metadata(
     name = _require_string(agent_table, "name")
     description = _require_string(agent_table, "description")
     version = _require_string(agent_table, "version")
-    agent_type = parse_agent_type(_require_string(agent_table, "type"))
+    try:
+        agent_type = parse_agent_type(_require_string(agent_table, "type"))
+    except ValueError as exc:
+        raise MetadataValidationError(str(exc)) from exc
     module = _require_string(agent_table, "module")
     _validate_module(module)
     expected_event_types = tuple(_optional_string_list(agent_table, "expected_event_types"))
@@ -68,10 +71,8 @@ def load_agent_metadata(
         label="builtin_tools",
     )
 
-    if agent_type in {"automation", "main"} and not expected_event_types:
-        raise MetadataValidationError(
-            "Automation and main agents require non-empty expected_event_types"
-        )
+    if agent_type == "automation" and not expected_event_types:
+        raise MetadataValidationError("Automation agents require non-empty expected_event_types")
     if agent_type == "data_mining" and expected_event_types:
         raise MetadataValidationError("Data mining agents must not declare expected_event_types")
     if agent_type == "data_mining" and boxy_tools:

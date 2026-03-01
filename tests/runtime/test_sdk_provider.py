@@ -189,6 +189,8 @@ def test_core_provider_uses_core_for_sessions_memory_and_events() -> None:
     assert first_payload == {
         "event": {"type": "followup", "description": "", "payload": {"k": "v"}},
         "source": "agent",
+        "workflow": True,
+        "trigger_kind": "root",
         "source_agent": "main",
         "session_id": "core-session-1",
     }
@@ -202,4 +204,6 @@ def test_core_provider_uses_core_for_sessions_memory_and_events() -> None:
             "payload": {"id": "m-1"},
         },
         "source": "connector",
+        "workflow": True,
+        "trigger_kind": "root",
     }

@@ -16,20 +16,8 @@ from boxy_agent.models import (
     AgentCapabilities,
     AgentEvent,
     AgentResult,
-    AgentType,
     DataQueryDescriptor,
     ToolDescriptor,
-)
-from boxy_agent.private_sdk.interfaces import DelegateResult, PrivateAgentExecutionContext
-from boxy_agent.public_sdk.interfaces import (
-    AgentExecutionContext,
-    AgentMainFunction,
-    DataQueryClient,
-    LlmClient,
-    MemoryStore,
-    TerminateCallback,
-    ToolClient,
-    TraceCallback,
 )
 from boxy_agent.runtime.discovery import DiscoveredAgent
 from boxy_agent.runtime.errors import (
@@ -38,7 +26,6 @@ from boxy_agent.runtime.errors import (
     AgentRuntimeError,
     CapabilitySchemaError,
     CapabilityViolationError,
-    DelegationError,
     InvalidEventError,
 )
 from boxy_agent.runtime.models import (
@@ -55,6 +42,16 @@ from boxy_agent.runtime.providers import (
     StaticDataQueryClient,
     StaticToolClient,
     UnconfiguredLlmClient,
+)
+from boxy_agent.sdk.interfaces import (
+    AgentExecutionContext,
+    AgentMainFunction,
+    DataQueryClient,
+    LlmClient,
+    MemoryStore,
+    TerminateCallback,
+    ToolClient,
+    TraceCallback,
 )
 from boxy_agent.types import JsonValue, ensure_json_value
 
@@ -168,8 +165,6 @@ class _RuntimeDefaultSdkProvider:
 
 @dataclass
 class _SessionState:
-    # Delegated subagent calls intentionally share this session so traces/memory/termination
-    # stay in one coherent report for the top-level trigger event.
     session_id: str
     traces: list[TraceRecord]
     terminated_by_agent: bool = False
@@ -180,7 +175,6 @@ class _SessionState:
 class _ContextRuntimeBindings:
     agent_name: str
     session_id: str
-    agent_type: AgentType
     capabilities: AgentCapabilities
     capability_catalog: CapabilityCatalog
     data_client: DataQueryClient
@@ -191,8 +185,6 @@ class _ContextRuntimeBindings:
     trace_callback: TraceCallback
     terminate_callback: TerminateCallback
     emit_event_callback: Callable[[AgentEvent], None]
-    list_agents_callback: Callable[[], list[InstalledAgent]] | None = None
-    delegate_callback: Callable[[str, AgentEvent], DelegateResult] | None = None
 
     def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
         chat_complete = getattr(self.llm_client, "chat_complete", None)
@@ -220,7 +212,7 @@ class _ContextRuntimeBindings:
             params=params,
             kind="data query",
             descriptor=descriptor,
-            call=self.data_client.query_data,
+            call=self._call_data_query_with_session_scope,
         )
         return cast(list[JsonValue], result)
 
@@ -231,7 +223,11 @@ class _ContextRuntimeBindings:
         )
 
     def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
-        self._ensure_capability(name=name, allowed=self.capabilities.boxy_tools, kind="boxy tool")
+        self._ensure_capability(
+            name=name,
+            allowed=self.capabilities.boxy_tools,
+            kind="boxy tool",
+        )
         descriptor = self._require_boxy_tool_descriptor(name)
         return self._call_checked_capability(
             name=name,
@@ -292,23 +288,6 @@ class _ContextRuntimeBindings:
             kind="event emitter",
         )
         self.emit_event_callback(event)
-
-    def list_agents(self) -> list[InstalledAgent]:
-        if self.agent_type != "main" or self.list_agents_callback is None:
-            raise DelegationError("Only main agents can list installed agents for delegation")
-        return self.list_agents_callback()
-
-    def delegate_to_agent(
-        self,
-        agent_name: str,
-        event: AgentEvent,
-    ) -> DelegateResult:
-        if self.agent_type != "main" or self.delegate_callback is None:
-            raise DelegationError("Only main agents can delegate to subagents")
-        result = self.delegate_callback(agent_name, event)
-        if result.terminated:
-            self.terminate("delegated_terminated")
-        return result
 
     def _ensure_capability(self, *, name: str, allowed: frozenset[str], kind: str) -> None:
         if name in allowed:
@@ -382,6 +361,25 @@ class _ContextRuntimeBindings:
                 actor_principal=f"agent:{self.agent_name}:session:{self.session_id}",
             )
         return self.boxy_tool_client.call_tool(name, params)
+
+    def _call_data_query_with_session_scope(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+    ) -> JsonValue:
+        scoped_call = getattr(self.data_client, "query_data_with_session", None)
+        if callable(scoped_call):
+            scoped_call_fn = cast(
+                Callable[..., JsonValue],
+                scoped_call,
+            )
+            return scoped_call_fn(
+                name,
+                params,
+                session_id=self.session_id,
+                actor_principal=f"agent:{self.agent_name}:session:{self.session_id}",
+            )
+        return self.data_client.query_data(name, params)
 
 
 class AgentRuntime:
@@ -468,7 +466,6 @@ class AgentRuntime:
         session_state = _SessionState(session_id=session_id, traces=[])
         try:
             return self._run_agent(
-                discovered=discovered,
                 target=target,
                 initial_event=initial_event,
                 session_state=session_state,
@@ -479,7 +476,6 @@ class AgentRuntime:
     def _run_agent(
         self,
         *,
-        discovered: dict[str, DiscoveredAgent],
         target: DiscoveredAgent,
         initial_event: AgentEvent,
         session_state: _SessionState,
@@ -518,7 +514,6 @@ class AgentRuntime:
                 )
 
                 exec_ctx = self._build_exec_ctx(
-                    discovered=discovered,
                     target=target,
                     event=event,
                     memory_store=memory_store,
@@ -549,7 +544,6 @@ class AgentRuntime:
     def _build_exec_ctx(
         self,
         *,
-        discovered: dict[str, DiscoveredAgent],
         target: DiscoveredAgent,
         event: AgentEvent,
         memory_store: MemoryStore,
@@ -589,7 +583,6 @@ class AgentRuntime:
         bindings_kwargs = {
             "agent_name": target.installed.name,
             "session_id": session_state.session_id,
-            "agent_type": target.installed.agent_type,
             "capabilities": target.installed.capabilities,
             "capability_catalog": self._capability_catalog,
             "data_client": self._data_client,
@@ -602,61 +595,10 @@ class AgentRuntime:
             "emit_event_callback": emit_event_callback,
         }
 
-        exec_ctx_kwargs = {
-            "event": event,
-            "session_id": session_state.session_id,
-            "agent_name": target.installed.name,
-        }
-
-        if target.installed.agent_type == "main":
-
-            def list_agents_callback() -> list[InstalledAgent]:
-                return sorted(
-                    (entry.installed for entry in discovered.values()),
-                    key=lambda item: item.name,
-                )
-
-            def delegate_callback(
-                delegated_agent_name: str,
-                delegated_event: AgentEvent,
-            ) -> DelegateResult:
-                delegated_target = discovered.get(delegated_agent_name)
-                if delegated_target is None:
-                    raise DelegationError(f"Unknown delegated agent: {delegated_agent_name}")
-                if delegated_target.installed.agent_type != "automation":
-                    raise DelegationError(
-                        "Delegation targets must be automation agents. "
-                        f"Agent '{delegated_agent_name}' has type "
-                        f"'{delegated_target.installed.agent_type}'."
-                    )
-                # Delegation reuses the parent session_state to keep one shared trace timeline
-                # and termination signal across main-agent orchestration.
-                delegated_report = self._run_agent(
-                    discovered=discovered,
-                    target=delegated_target,
-                    initial_event=delegated_event,
-                    session_state=session_state,
-                )
-                delegated_terminated = delegated_report.status in {
-                    "terminated_by_agent",
-                    "terminated_by_controller",
-                }
-                return DelegateResult(
-                    output=delegated_report.last_output,
-                    terminated=delegated_terminated,
-                )
-
-            return PrivateAgentExecutionContext(
-                **exec_ctx_kwargs,
-                _runtime=_ContextRuntimeBindings(
-                    **bindings_kwargs,
-                    list_agents_callback=list_agents_callback,
-                    delegate_callback=delegate_callback,
-                ),
-            )
-
         return AgentExecutionContext(
-            **exec_ctx_kwargs,
+            event=event,
+            session_id=session_state.session_id,
+            agent_name=target.installed.name,
             _runtime=_ContextRuntimeBindings(**bindings_kwargs),
         )
 

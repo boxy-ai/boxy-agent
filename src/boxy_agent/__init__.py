@@ -1,4 +1,4 @@
-"""Top-level SDK facade for Boxy agent authors (public and private exports)."""
+"""Top-level SDK facade for Boxy agent authors."""
 
 from __future__ import annotations
 
@@ -16,9 +16,9 @@ from boxy_agent.models import (
     DataQueryDescriptor,
     ToolDescriptor,
 )
-from boxy_agent.private_sdk import DelegateResult, PrivateAgentExecutionContext
-from boxy_agent.public_sdk import AgentExecutionContext, agent_main
 from boxy_agent.runtime import AgentRuntime, EventQueueItem, InstalledAgent, RunReport, TraceRecord
+from boxy_agent.sdk.decorators import agent_main
+from boxy_agent.sdk.interfaces import AgentExecutionContext
 from boxy_agent.types import JsonValue
 
 from . import sdk as sdk
@@ -32,11 +32,9 @@ __all__ = [
     "AgentRuntime",
     "CompiledAgent",
     "DataQueryDescriptor",
-    "DelegateResult",
     "InstalledAgent",
     "EventQueueItem",
     "PackagedAgent",
-    "PrivateAgentExecutionContext",
     "RunReport",
     "ToolDescriptor",
     "TraceRecord",

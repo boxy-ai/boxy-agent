@@ -1,4 +1,4 @@
-"""Public SDK runtime interfaces and canonical execution context object."""
+"""SDK runtime interfaces and canonical execution context object."""
 
 from __future__ import annotations
 

@@ -7,13 +7,13 @@ from test_helpers.capabilities import default_capability_catalog
 
 from boxy_agent.capabilities import CapabilityCatalog
 from boxy_agent.models import AgentEvent
-from boxy_agent.public_sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.runtime.models import EventQueueItem
 from boxy_agent.runtime.providers import (
     InMemoryMemoryStore,
     StaticDataQueryClient,
     StaticToolClient,
 )
+from boxy_agent.sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.types import JsonValue
 
 DEFAULT_QUERY_RESULTS: dict[str, list[JsonValue]] = {

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from boxy_agent.models import AgentCapabilities, AgentType
-from boxy_agent.public_sdk.interfaces import AgentMainFunction
 from boxy_agent.runtime.discovery import DiscoveredAgent
 from boxy_agent.runtime.models import InstalledAgent
+from boxy_agent.sdk.interfaces import AgentMainFunction
 
 
 def discovered_agent(

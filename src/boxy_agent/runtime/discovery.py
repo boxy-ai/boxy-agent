@@ -12,9 +12,9 @@ from types import ModuleType
 from typing import cast
 
 from boxy_agent.models import AgentCapabilities, parse_agent_type
-from boxy_agent.public_sdk.interfaces import AgentMainFunction
 from boxy_agent.runtime.errors import RegistrationError
 from boxy_agent.runtime.models import InstalledAgent
+from boxy_agent.sdk.interfaces import AgentMainFunction
 
 
 @dataclass(frozen=True)

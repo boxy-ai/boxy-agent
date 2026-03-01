@@ -9,8 +9,8 @@ from dataclasses import dataclass
 from typing import Protocol, cast
 
 from boxy_agent.models import ToolDescriptor
-from boxy_agent.public_sdk.interfaces import ToolClient
 from boxy_agent.runtime.providers.clients import BuiltinToolError, UnconfiguredClientError
+from boxy_agent.sdk.interfaces import ToolClient
 from boxy_agent.types import JsonValue, is_json_value
 
 _BRAVE_DEFAULT_RESULT_COUNT = 5

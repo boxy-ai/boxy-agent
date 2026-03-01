@@ -4,12 +4,11 @@ import pytest
 from runtime.support import discovered_agent
 from test_helpers.capabilities import default_capability_catalog
 
-from boxy_agent import AgentCapabilities, AgentEvent, AgentResult, query_data, trace
+from boxy_agent import AgentCapabilities, AgentResult, query_data, trace
 from boxy_agent.runtime import AgentRuntime
 from boxy_agent.runtime.errors import (
     AgentExecutionError,
     AgentNotFoundError,
-    DelegationError,
     InvalidEventError,
 )
 from boxy_agent.runtime.providers import UnconfiguredClientError
@@ -68,26 +67,6 @@ def test_automation_agent_context_has_no_delegation_api() -> None:
 
     report = runtime.run("worker", {"type": "start"})
     assert report.last_output == {"has_delegate": False}
-
-
-def test_main_agent_cannot_delegate_to_non_automation_target() -> None:
-    def main_handle(context):
-        context.delegate_to_agent("miner", AgentEvent(type="subtask"))
-        return AgentResult(output={"ok": True})
-
-    def miner_handle(_context):
-        return AgentResult(output={"ok": True})
-
-    runtime = AgentRuntime(
-        capability_catalog=default_capability_catalog(),
-        agent_registry_loader=lambda: {
-            "main": discovered_agent(name="main", handler=main_handle, agent_type="main"),
-            "miner": discovered_agent(name="miner", handler=miner_handle, agent_type="data_mining"),
-        },
-    )
-
-    with pytest.raises(DelegationError, match="Delegation targets must be automation agents"):
-        runtime.run("main", {"type": "start"})
 
 
 def test_runtime_rejects_queue_event_without_source() -> None:

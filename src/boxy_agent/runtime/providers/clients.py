@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from boxy_agent.models import DataQueryDescriptor, ToolDescriptor
-from boxy_agent.public_sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.runtime.errors import AgentRuntimeError
+from boxy_agent.sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.types import JsonValue
 
 
