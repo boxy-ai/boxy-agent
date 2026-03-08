@@ -162,3 +162,4 @@ def test_project_config_includes_example_pyproject_package_data() -> None:
     )
     patterns = pyproject["tool"]["setuptools"]["package-data"]["boxy_agent"]
     assert "examples/*/pyproject.toml" in patterns
+    assert "builtin_capability.toml" in patterns

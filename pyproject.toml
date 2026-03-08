@@ -38,7 +38,7 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-boxy_agent = ["examples/*/pyproject.toml"]
+boxy_agent = ["examples/*/pyproject.toml", "builtin_capability.toml"]
 
 [tool.ruff]
 line-length = 100
