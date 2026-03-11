@@ -20,8 +20,8 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/boxy-ai/boxy-agent"
-Repository = "https://github.com/boxy-ai/boxy"
-Issues = "https://github.com/boxy-ai/boxy/issues"
+Repository = "https://github.com/boxy-ai/boxy-agent"
+Issues = "https://github.com/boxy-ai/boxy-agent/issues"
 
 [project.optional-dependencies]
 packaging = ["build==1.2.2.post1", "setuptools==69.5.1", "wheel==0.45.1"]
