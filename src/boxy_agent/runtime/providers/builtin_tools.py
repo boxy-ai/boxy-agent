@@ -93,7 +93,15 @@ class BuiltinToolClient(ToolClient):
     def list_tools(self) -> list[ToolDescriptor]:
         return [self._descriptors[name] for name in self._handlers]
 
-    def call_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
+    def call_tool(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+        *,
+        session_id: str,
+        actor_principal: str,
+    ) -> JsonValue:
+        _ = session_id, actor_principal
         if name not in self._descriptors:
             raise UnconfiguredClientError(f"Unknown built-in tool descriptor '{name}'")
 

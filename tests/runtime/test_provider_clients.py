@@ -28,7 +28,12 @@ def test_static_data_query_client_contract() -> None:
     )
 
     assert [item.name for item in client.list_data_queries()] == [DEFAULT_DATA_QUERY_NAME]
-    assert client.query_data(DEFAULT_DATA_QUERY_NAME, {"chat_id": "chat-1"}) == [{"id": "row-1"}]
+    assert client.query_data(
+        DEFAULT_DATA_QUERY_NAME,
+        {"chat_id": "chat-1"},
+        session_id="session-1",
+        actor_principal="agent:test:session:session-1",
+    ) == [{"id": "row-1"}]
 
     with pytest.raises(UnconfiguredClientError, match="No data query result configured"):
         StaticDataQueryClient(
@@ -36,6 +41,8 @@ def test_static_data_query_client_contract() -> None:
         ).query_data(
             DEFAULT_DATA_QUERY_NAME,
             {},
+            session_id="session-1",
+            actor_principal="agent:test:session:session-1",
         )
 
 
@@ -62,6 +69,8 @@ def test_static_tool_client_contract() -> None:
             "message_content": "hello",
             "idempotency_key": "idemp-1",
         },
+        session_id="session-1",
+        actor_principal="agent:test:session:session-1",
     ) == {
         "status": "sent",
         "target_resolved": "chat-1",
@@ -74,6 +83,8 @@ def test_static_tool_client_contract() -> None:
         StaticToolClient(descriptors=[catalog.boxy_tools[DEFAULT_BOXY_TOOL_NAME]]).call_tool(
             DEFAULT_BOXY_TOOL_NAME,
             {},
+            session_id="session-1",
+            actor_principal="agent:test:session:session-1",
         )
 
 
@@ -102,7 +113,12 @@ def test_builtin_tool_client_web_search_contract() -> None:
         UnconfiguredClientError,
         match="web_search is not implemented in boxy-agent runtime; integrate via boxy-cloud",
     ):
-        client.call_tool("web_search", {"query": "boxy"})
+        client.call_tool(
+            "web_search",
+            {"query": "boxy"},
+            session_id="session-1",
+            actor_principal="agent:test:session:session-1",
+        )
 
 
 def test_builtin_tool_client_python_exec_contract() -> None:
@@ -113,7 +129,12 @@ def test_builtin_tool_client_python_exec_contract() -> None:
     )
 
     assert [item.name for item in client.list_tools()] == ["python_exec"]
-    assert client.call_tool("python_exec", {"code": "print('x')"}) == {
+    assert client.call_tool(
+        "python_exec",
+        {"code": "print('x')"},
+        session_id="session-1",
+        actor_principal="agent:test:session:session-1",
+    ) == {
         "result": {"ok": True},
         "stdout": "done",
         "stderr": "",
@@ -128,7 +149,12 @@ def test_builtin_tool_client_web_search_placeholder_validates_count() -> None:
     )
 
     with pytest.raises(ValueError, match="field 'count' must be an integer"):
-        client.call_tool("web_search", {"query": "boxy", "count": "1"})  # type: ignore[arg-type]
+        client.call_tool(  # type: ignore[arg-type]
+            "web_search",
+            {"query": "boxy", "count": "1"},
+            session_id="session-1",
+            actor_principal="agent:test:session:session-1",
+        )
 
 
 def test_builtin_tool_client_filters_unknown_descriptors() -> None:
@@ -142,7 +168,12 @@ def test_builtin_tool_client_filters_unknown_descriptors() -> None:
         UnconfiguredClientError,
         match="No built-in tool implementation configured",
     ):
-        client.call_tool("custom_tool", {})
+        client.call_tool(
+            "custom_tool",
+            {},
+            session_id="session-1",
+            actor_principal="agent:test:session:session-1",
+        )
 
 
 def test_call_monty_run_does_not_retry_on_type_error() -> None:
@@ -191,7 +222,12 @@ def test_builtin_tool_client_truncates_python_outputs() -> None:
         descriptors=[catalog.builtin_tools["python_exec"]],
         python_executor=_LongOutputExecutor(),
     )
-    output = client.call_tool("python_exec", {"code": "print('x')"})
+    output = client.call_tool(
+        "python_exec",
+        {"code": "print('x')"},
+        session_id="session-1",
+        actor_principal="agent:test:session:session-1",
+    )
 
     assert isinstance(output, dict)
     assert isinstance(output["stdout"], str)

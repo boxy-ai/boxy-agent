@@ -43,8 +43,15 @@ class StaticDataQueryClient(DataQueryClient):
     def list_data_queries(self) -> list[DataQueryDescriptor]:
         return list(self._descriptors.values())
 
-    def query_data(self, name: str, params: dict[str, JsonValue]) -> list[JsonValue]:
-        _ = params
+    def query_data(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+        *,
+        session_id: str,
+        actor_principal: str,
+    ) -> list[JsonValue]:
+        _ = params, session_id, actor_principal
         if name not in self._query_results:
             raise UnconfiguredClientError(f"No data query result configured for '{name}'")
         return list(self._query_results[name])
@@ -66,8 +73,15 @@ class StaticToolClient(ToolClient):
     def list_tools(self) -> list[ToolDescriptor]:
         return list(self._descriptors.values())
 
-    def call_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
-        _ = params
+    def call_tool(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+        *,
+        session_id: str,
+        actor_principal: str,
+    ) -> JsonValue:
+        _ = params, session_id, actor_principal
         if name not in self._execution_results:
             raise UnconfiguredClientError(f"No tool result configured for '{name}'")
         return self._execution_results[name]

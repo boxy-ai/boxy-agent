@@ -109,18 +109,7 @@ def _empty_agent_registry_loader() -> dict[str, DiscoveredAgent]:
 class _RuntimeDefaultSdkProvider:
     """Neutral in-process provider used when runtime dependencies are not injected."""
 
-    def __init__(
-        self,
-        *,
-        data_client: DataQueryClient | None = None,
-        boxy_tool_client: ToolClient | None = None,
-        builtin_tool_client: ToolClient | None = None,
-        llm_client: LlmClient | None = None,
-    ) -> None:
-        self._data_client = data_client
-        self._boxy_tool_client = boxy_tool_client
-        self._builtin_tool_client = builtin_tool_client
-        self._llm_client = llm_client
+    def __init__(self) -> None:
         self._session_memory_by_session_id: dict[str, dict[str, JsonValue]] = {}
         self._persistent_memory_by_agent: dict[str, dict[str, JsonValue]] = {}
 
@@ -132,23 +121,15 @@ class _RuntimeDefaultSdkProvider:
         _ = session_id
 
     def data_query_client(self, catalog: CapabilityCatalog) -> DataQueryClient:
-        if self._data_client is not None:
-            return self._data_client
         return StaticDataQueryClient(descriptors=list(catalog.data_queries.values()))
 
     def boxy_tool_client(self, catalog: CapabilityCatalog) -> ToolClient:
-        if self._boxy_tool_client is not None:
-            return self._boxy_tool_client
         return StaticToolClient(descriptors=list(catalog.boxy_tools.values()))
 
     def builtin_tool_client(self, catalog: CapabilityCatalog) -> ToolClient:
-        if self._builtin_tool_client is not None:
-            return self._builtin_tool_client
         return BuiltinToolClient(descriptors=list(catalog.builtin_tools.values()))
 
     def llm_client(self) -> LlmClient:
-        if self._llm_client is not None:
-            return self._llm_client
         return UnconfiguredLlmClient()
 
     def create_memory_store(self, *, agent_name: str, session_id: str) -> MemoryStore:
@@ -187,14 +168,7 @@ class _ContextRuntimeBindings:
     emit_event_callback: Callable[[AgentEvent], None]
 
     def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
-        chat_complete = getattr(self.llm_client, "chat_complete", None)
-        if not callable(chat_complete):
-            raise RuntimeError("Configured LLM client must implement chat_complete(request)")
-        chat_complete_fn = cast(
-            Callable[[dict[str, JsonValue]], dict[str, JsonValue]],
-            chat_complete,
-        )
-        return chat_complete_fn(request)
+        return self.llm_client.chat_complete(request)
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:
         return _filter_descriptors(
@@ -255,7 +229,7 @@ class _ContextRuntimeBindings:
             params=params,
             kind="built-in tool",
             descriptor=descriptor,
-            call=self.builtin_tool_client.call_tool,
+            call=self._call_builtin_tool_with_scope,
         )
 
     def memory_get(self, key: str, *, scope: str = "session") -> JsonValue | None:
@@ -349,37 +323,39 @@ class _ContextRuntimeBindings:
         name: str,
         params: dict[str, JsonValue],
     ) -> JsonValue:
-        scoped_call = getattr(self.boxy_tool_client, "call_tool_with_actor", None)
-        if callable(scoped_call):
-            scoped_call_fn = cast(
-                Callable[..., JsonValue],
-                scoped_call,
-            )
-            return scoped_call_fn(
-                name,
-                params,
-                actor_principal=f"agent:{self.agent_name}:session:{self.session_id}",
-            )
-        return self.boxy_tool_client.call_tool(name, params)
+        return self.boxy_tool_client.call_tool(
+            name,
+            params,
+            session_id=self.session_id,
+            actor_principal=self._actor_principal(),
+        )
 
     def _call_data_query_with_session_scope(
         self,
         name: str,
         params: dict[str, JsonValue],
     ) -> JsonValue:
-        scoped_call = getattr(self.data_client, "query_data_with_session", None)
-        if callable(scoped_call):
-            scoped_call_fn = cast(
-                Callable[..., JsonValue],
-                scoped_call,
-            )
-            return scoped_call_fn(
-                name,
-                params,
-                session_id=self.session_id,
-                actor_principal=f"agent:{self.agent_name}:session:{self.session_id}",
-            )
-        return self.data_client.query_data(name, params)
+        return self.data_client.query_data(
+            name,
+            params,
+            session_id=self.session_id,
+            actor_principal=self._actor_principal(),
+        )
+
+    def _call_builtin_tool_with_scope(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+    ) -> JsonValue:
+        return self.builtin_tool_client.call_tool(
+            name,
+            params,
+            session_id=self.session_id,
+            actor_principal=self._actor_principal(),
+        )
+
+    def _actor_principal(self) -> str:
+        return f"agent:{self.agent_name}:session:{self.session_id}"
 
 
 class AgentRuntime:
@@ -391,30 +367,13 @@ class AgentRuntime:
         agent_registry_loader: AgentRegistryLoader | None = None,
         capability_catalog: CapabilityCatalog,
         sdk_provider: AgentSdkProvider | None = None,
-        data_client: DataQueryClient | None = None,
-        boxy_tool_client: ToolClient | None = None,
-        builtin_tool_client: ToolClient | None = None,
-        llm_client: LlmClient | None = None,
     ) -> None:
-        if sdk_provider is not None and any(
-            value is not None
-            for value in (data_client, boxy_tool_client, builtin_tool_client, llm_client)
-        ):
-            raise ValueError(
-                "sdk_provider cannot be combined with data_client/boxy_tool_client/"
-                "builtin_tool_client/llm_client"
-            )
         if capability_catalog is None:
             raise ValueError("capability_catalog is required")
 
         self._capability_catalog = capability_catalog
         self._agent_registry_loader = agent_registry_loader or _empty_agent_registry_loader
-        self._sdk_provider = sdk_provider or _RuntimeDefaultSdkProvider(
-            data_client=data_client,
-            boxy_tool_client=boxy_tool_client,
-            builtin_tool_client=builtin_tool_client,
-            llm_client=llm_client,
-        )
+        self._sdk_provider = sdk_provider or _RuntimeDefaultSdkProvider()
         self._data_client = self._sdk_provider.data_query_client(self._capability_catalog)
         self._boxy_tool_client = self._sdk_provider.boxy_tool_client(self._capability_catalog)
         self._builtin_tool_client = self._sdk_provider.builtin_tool_client(self._capability_catalog)

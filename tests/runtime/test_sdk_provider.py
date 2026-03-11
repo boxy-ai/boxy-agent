@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pytest
 from runtime.support import discovered_agent
 from test_helpers.capabilities import default_capability_catalog
 from test_helpers.sdk_provider import MockAgentSdkProvider
@@ -15,10 +14,7 @@ from boxy_agent import (
 )
 from boxy_agent.runtime import AgentRuntime
 from boxy_agent.runtime.models import EventQueueItem
-from boxy_agent.runtime.providers import (
-    CoreAgentSdkProvider,
-    StaticDataQueryClient,
-)
+from boxy_agent.runtime.providers import CoreAgentSdkProvider
 from boxy_agent.types import JsonValue
 
 
@@ -126,15 +122,6 @@ def test_runtime_uses_injected_sdk_provider() -> None:
     assert provider.created_sessions == [("main", "start")]
     assert provider.closed_sessions == [report.session_id]
     assert [item.event.type for item in provider.published_events] == ["followup"]
-
-
-def test_runtime_rejects_mixed_sdk_provider_and_legacy_clients() -> None:
-    with pytest.raises(ValueError, match="sdk_provider"):
-        AgentRuntime(
-            capability_catalog=default_capability_catalog(),
-            sdk_provider=MockAgentSdkProvider(),
-            data_client=StaticDataQueryClient(),
-        )
 
 
 def test_core_provider_uses_core_for_sessions_memory_and_events() -> None:

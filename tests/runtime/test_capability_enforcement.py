@@ -10,6 +10,7 @@ from test_helpers.capabilities import (
     DEFAULT_DATA_QUERY_NAME,
     default_capability_catalog,
 )
+from test_helpers.sdk_provider import MockAgentSdkProvider
 
 from boxy_agent import (
     AgentCapabilities,
@@ -34,7 +35,25 @@ from boxy_agent.types import JsonValue
 
 
 def _runtime_with_default_catalog(**kwargs) -> AgentRuntime:
-    return AgentRuntime(capability_catalog=default_capability_catalog(), **kwargs)
+    capability_catalog = kwargs.pop("capability_catalog", default_capability_catalog())
+    data_client = kwargs.pop("data_client", None)
+    boxy_tool_client = kwargs.pop("boxy_tool_client", None)
+    builtin_tool_client = kwargs.pop("builtin_tool_client", None)
+    llm_client = kwargs.pop("llm_client", None)
+    sdk_provider = kwargs.pop("sdk_provider", None)
+    if sdk_provider is None and any(
+        value is not None
+        for value in (data_client, boxy_tool_client, builtin_tool_client, llm_client)
+    ):
+        sdk_provider = MockAgentSdkProvider(
+            data_client=data_client,
+            boxy_tool_client=boxy_tool_client,
+            builtin_tool_client=builtin_tool_client,
+            llm_client=llm_client,
+        )
+    if sdk_provider is not None:
+        kwargs["sdk_provider"] = sdk_provider
+    return AgentRuntime(capability_catalog=capability_catalog, **kwargs)
 
 
 def _default_query_params() -> dict[str, JsonValue]:
@@ -87,40 +106,33 @@ def _default_tool_result() -> dict[str, JsonValue]:
     }
 
 
-class _ActorAwareToolClient:
+class _RecordingToolClient:
     def __init__(self) -> None:
-        self.calls: list[tuple[str, str, dict[str, JsonValue]]] = []
+        self.calls: list[tuple[str, str, str, dict[str, JsonValue]]] = []
 
     def list_tools(self):
         return []
 
-    def call_tool(self, name: str, params: dict[str, JsonValue]) -> dict[str, JsonValue]:
-        _ = name, params
-        raise AssertionError("runtime should prefer call_tool_with_actor when available")
-
-    def call_tool_with_actor(
+    def call_tool(
         self,
         name: str,
         params: dict[str, JsonValue],
         *,
+        session_id: str,
         actor_principal: str,
     ) -> dict[str, JsonValue]:
-        self.calls.append((name, actor_principal, dict(params)))
+        self.calls.append((name, session_id, actor_principal, dict(params)))
         return _default_tool_result()
 
 
-class _SessionAwareDataQueryClient:
+class _RecordingDataQueryClient:
     def __init__(self) -> None:
         self.calls: list[tuple[str, str, str, dict[str, JsonValue]]] = []
 
     def list_data_queries(self):
         return []
 
-    def query_data(self, name: str, params: dict[str, JsonValue]):
-        _ = name, params
-        raise AssertionError("runtime should prefer query_data_with_session when available")
-
-    def query_data_with_session(
+    def query_data(
         self,
         name: str,
         params: dict[str, JsonValue],
@@ -160,7 +172,7 @@ def test_runtime_rejects_unauthorized_data_query() -> None:
 
 
 def test_runtime_passes_session_scope_to_data_query_client_when_supported() -> None:
-    data_client = _SessionAwareDataQueryClient()
+    data_client = _RecordingDataQueryClient()
 
     def handle(context):
         rows = query_data(context, DEFAULT_DATA_QUERY_NAME, _default_query_params())
@@ -384,7 +396,7 @@ output_schema = { type = "object" }
             }
         )
 
-    runtime = AgentRuntime(
+    runtime = _runtime_with_default_catalog(
         capability_catalog=catalog,
         data_client=StaticDataQueryClient(
             descriptors=list(catalog.data_queries.values()),
@@ -464,7 +476,7 @@ def test_runtime_allows_authorized_event_emission() -> None:
 
 
 def test_runtime_scopes_boxy_tool_calls_with_agent_and_session_actor() -> None:
-    tool_client = _ActorAwareToolClient()
+    tool_client = _RecordingToolClient()
 
     def handle(context):
         call_boxy_tool(
@@ -493,10 +505,48 @@ def test_runtime_scopes_boxy_tool_calls_with_agent_and_session_actor() -> None:
 
     assert report.status == "idle"
     assert len(tool_client.calls) == 1
-    name, actor_principal, params = tool_client.calls[0]
+    name, session_id, actor_principal, params = tool_client.calls[0]
     assert name == DEFAULT_BOXY_TOOL_NAME
+    assert session_id == report.session_id
     assert params == _default_tool_params()
     assert actor_principal == f"agent:main:session:{report.session_id}"
+
+
+def test_runtime_passes_session_scope_to_boxy_tool_client_when_supported() -> None:
+    tool_client = _RecordingToolClient()
+
+    def handle(context):
+        result = call_boxy_tool(
+            context,
+            DEFAULT_BOXY_TOOL_NAME,
+            _default_tool_params(),
+        )
+        return AgentResult(output={"result": result})
+
+    runtime = _runtime_with_default_catalog(
+        agent_registry_loader=lambda: {
+            "main": discovered_agent(
+                name="main",
+                handler=handle,
+                capabilities=AgentCapabilities(
+                    data_queries=frozenset(),
+                    boxy_tools=frozenset({DEFAULT_BOXY_TOOL_NAME}),
+                    builtin_tools=frozenset(),
+                ),
+            )
+        },
+        boxy_tool_client=tool_client,
+    )
+
+    report = runtime.run("main", {"type": "start"})
+
+    assert report.last_output == {"result": _default_tool_result()}
+    assert len(tool_client.calls) == 1
+    name, session_id, actor_principal, params = tool_client.calls[0]
+    assert name == DEFAULT_BOXY_TOOL_NAME
+    assert session_id == report.session_id
+    assert actor_principal == f"agent:main:session:{report.session_id}"
+    assert params == _default_tool_params()
 
 
 def test_runtime_chat_complete_requires_chat_complete_implementation() -> None:

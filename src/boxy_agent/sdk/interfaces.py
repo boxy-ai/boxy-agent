@@ -17,7 +17,14 @@ class DataQueryClient(Protocol):
         """List discoverable data queries."""
         ...
 
-    def query_data(self, name: str, params: dict[str, JsonValue]) -> list[JsonValue]:
+    def query_data(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+        *,
+        session_id: str,
+        actor_principal: str,
+    ) -> list[JsonValue]:
         """Execute a Boxy data query."""
         ...
 
@@ -29,7 +36,14 @@ class ToolClient(Protocol):
         """List discoverable tools."""
         ...
 
-    def call_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
+    def call_tool(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+        *,
+        session_id: str,
+        actor_principal: str,
+    ) -> JsonValue:
         """Execute a tool call."""
         ...
 
