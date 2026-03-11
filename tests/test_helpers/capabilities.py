@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from pathlib import Path
 
-from boxy_agent.capabilities import CapabilityCatalog, load_capability_catalog
+from boxy_agent.capabilities import CapabilityCatalog, load_packaged_capability_catalog
 from boxy_agent.models import DataQueryDescriptor, ToolDescriptor
 
-DEFAULT_CAPABILITY_CATALOG_PATH = Path(__file__).with_name("default_capability_catalog.toml")
+DEFAULT_DATA_QUERY_NAME = "whatsapp.chat_context"
+DEFAULT_BOXY_TOOL_NAME = "whatsapp.send_message"
+DEFAULT_BUILTIN_TOOL_NAME = "web_search"
 
 
 @lru_cache(maxsize=1)
 def default_capability_catalog() -> CapabilityCatalog:
-    return load_capability_catalog(DEFAULT_CAPABILITY_CATALOG_PATH)
+    return load_packaged_capability_catalog()
 
 
 @lru_cache(maxsize=1)

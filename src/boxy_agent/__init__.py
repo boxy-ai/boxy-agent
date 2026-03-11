@@ -16,12 +16,12 @@ from boxy_agent.models import (
     DataQueryDescriptor,
     ToolDescriptor,
 )
-from boxy_agent.runtime import AgentRuntime, EventQueueItem, InstalledAgent, RunReport, TraceRecord
 from boxy_agent.sdk.decorators import agent_main
 from boxy_agent.sdk.interfaces import AgentExecutionContext
 from boxy_agent.types import JsonValue
 
 from . import sdk as sdk
+from ._version import __version__
 
 __all__ = [
     "AgentCapabilities",
@@ -29,15 +29,10 @@ __all__ = [
     "AgentEvent",
     "AgentMetadata",
     "AgentResult",
-    "AgentRuntime",
     "CompiledAgent",
     "DataQueryDescriptor",
-    "InstalledAgent",
-    "EventQueueItem",
     "PackagedAgent",
-    "RunReport",
     "ToolDescriptor",
-    "TraceRecord",
     "agent_main",
     "call_boxy_tool",
     "call_builtin_tool",
@@ -57,8 +52,6 @@ __all__ = [
     "trace",
     "__version__",
 ]
-
-__version__ = "0.1.0"
 
 
 def llm_chat_complete(

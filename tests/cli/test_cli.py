@@ -6,31 +6,17 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from test_helpers.capabilities import DEFAULT_DATA_QUERY_NAME
 
 from boxy_agent.cli import main
 from boxy_agent.models import AgentCapabilities
 from boxy_agent.runtime.models import InstalledAgent, RunReport, TraceRecord
 
 
-def _write_empty_catalog(path: Path) -> Path:
-    path.write_text(
-        """
-schema_version = 1
-data_queries = []
-boxy_tools = []
-builtin_tools = []
-""".strip()
-        + "\n",
-        encoding="utf-8",
-    )
-    return path
-
-
-def test_cli_compile_command(monkeypatch, capsys, tmp_path: Path) -> None:
+def test_cli_package_command(monkeypatch, capsys, tmp_path: Path) -> None:
     called: dict[str, object] = {}
-    catalog_path = _write_empty_catalog(tmp_path / "catalog.toml")
 
-    def fake_compile_agent(
+    def fake_package_agent(
         *,
         project_dir: Path,
         output_dir: Path,
@@ -39,41 +25,10 @@ def test_cli_compile_command(monkeypatch, capsys, tmp_path: Path) -> None:
         called["project_dir"] = project_dir
         called["output_dir"] = output_dir
         called["catalog"] = capability_catalog
-        return SimpleNamespace(manifest_path=output_dir / "manifest.json")
-
-    monkeypatch.setattr("boxy_agent.cli.compile_agent", fake_compile_agent)
-
-    exit_code = main(
-        [
-            "compile",
-            "--project-dir",
-            str(tmp_path / "project"),
-            "--output-dir",
-            str(tmp_path / "dist"),
-            "--capability-catalog",
-            str(catalog_path),
-        ]
-    )
-
-    assert exit_code == 0
-    assert called["project_dir"] == (tmp_path / "project")
-    assert called["output_dir"] == (tmp_path / "dist")
-    assert called["catalog"] is not None
-    assert "manifest.json" in capsys.readouterr().out
-
-
-def test_cli_package_command(monkeypatch, capsys, tmp_path: Path) -> None:
-    catalog_path = _write_empty_catalog(tmp_path / "catalog.toml")
-
-    def fake_package_agent(
-        *,
-        project_dir: Path,
-        output_dir: Path,
-        capability_catalog,
-    ):
         return SimpleNamespace(wheel_path=output_dir / "sample.whl")
 
     monkeypatch.setattr("boxy_agent.cli.package_agent", fake_package_agent)
+    monkeypatch.setattr("boxy_agent.cli.load_packaged_capability_catalog", lambda: "catalog")
 
     exit_code = main(
         [
@@ -82,18 +37,17 @@ def test_cli_package_command(monkeypatch, capsys, tmp_path: Path) -> None:
             str(tmp_path / "project"),
             "--output-dir",
             str(tmp_path / "dist"),
-            "--capability-catalog",
-            str(catalog_path),
         ]
     )
 
     assert exit_code == 0
+    assert called["project_dir"] == (tmp_path / "project")
+    assert called["output_dir"] == (tmp_path / "dist")
+    assert called["catalog"] == "catalog"
     assert "sample.whl" in capsys.readouterr().out
 
 
 def test_cli_list_agents_json(monkeypatch, capsys, tmp_path: Path) -> None:
-    catalog_path = _write_empty_catalog(tmp_path / "catalog.toml")
-
     class FakeRuntime:
         def __init__(self, *, capability_catalog=None) -> None:
             self._catalog = capability_catalog
@@ -107,7 +61,7 @@ def test_cli_list_agents_json(monkeypatch, capsys, tmp_path: Path) -> None:
                     agent_type="automation",
                     expected_event_types=("start",),
                     capabilities=AgentCapabilities(
-                        data_queries=frozenset({"gmail.messages"}),
+                        data_queries=frozenset({DEFAULT_DATA_QUERY_NAME}),
                         boxy_tools=frozenset(),
                         builtin_tools=frozenset(),
                     ),
@@ -115,13 +69,12 @@ def test_cli_list_agents_json(monkeypatch, capsys, tmp_path: Path) -> None:
             ]
 
     monkeypatch.setattr("boxy_agent.cli.AgentRuntime", FakeRuntime)
+    monkeypatch.setattr("boxy_agent.cli.load_packaged_capability_catalog", lambda: "catalog")
 
     exit_code = main(
         [
             "list-agents",
             "--json",
-            "--capability-catalog",
-            str(catalog_path),
         ]
     )
 
@@ -134,7 +87,6 @@ def test_cli_list_agents_json(monkeypatch, capsys, tmp_path: Path) -> None:
 def test_cli_run_with_event_inputs(monkeypatch, capsys, tmp_path: Path) -> None:
     event_path = tmp_path / "event.json"
     event_path.write_text('{"type": "start", "payload": {"a": 1}}', encoding="utf-8")
-    catalog_path = _write_empty_catalog(tmp_path / "catalog.toml")
     run_calls: list[dict[str, object]] = []
 
     class FakeRuntime:
@@ -162,14 +114,13 @@ def test_cli_run_with_event_inputs(monkeypatch, capsys, tmp_path: Path) -> None:
             )
 
     monkeypatch.setattr("boxy_agent.cli.AgentRuntime", FakeRuntime)
+    monkeypatch.setattr("boxy_agent.cli.load_packaged_capability_catalog", lambda: "catalog")
 
     exit_code = main(
         [
             "run",
             "--agent",
             "agent-a",
-            "--capability-catalog",
-            str(catalog_path),
             "--event-json",
             '{"type": "start"}',
         ]
@@ -186,8 +137,6 @@ def test_cli_run_with_event_inputs(monkeypatch, capsys, tmp_path: Path) -> None:
             "run",
             "--agent",
             "agent-a",
-            "--capability-catalog",
-            str(catalog_path),
             "--event-file",
             str(event_path),
         ]
@@ -205,7 +154,6 @@ def test_cli_run_with_registry_file_loads_registry_records(
     tmp_path: Path,
 ) -> None:
     registry_path = tmp_path / "registry.json"
-    catalog_path = _write_empty_catalog(tmp_path / "catalog.toml")
     registry_records = [
         {
             "agent_id": "agent-a",
@@ -243,6 +191,7 @@ def test_cli_run_with_registry_file_loads_registry_records(
         fake_discover_registered_agents,
     )
     monkeypatch.setattr("boxy_agent.cli.AgentRuntime", FakeRuntime)
+    monkeypatch.setattr("boxy_agent.cli.load_packaged_capability_catalog", lambda: "catalog")
 
     exit_code = main(
         [
@@ -251,8 +200,6 @@ def test_cli_run_with_registry_file_loads_registry_records(
             "agent-a",
             "--registry-file",
             str(registry_path),
-            "--capability-catalog",
-            str(catalog_path),
             "--event-json",
             '{"type": "start"}',
         ]
@@ -271,7 +218,6 @@ def test_cli_run_closes_runtime_resources_when_event_parsing_fails(
     capsys,
     tmp_path: Path,
 ) -> None:
-    catalog_path = _write_empty_catalog(tmp_path / "catalog.toml")
     called: dict[str, object] = {"closed": False}
 
     class FakeRuntime:
@@ -288,6 +234,7 @@ def test_cli_run_closes_runtime_resources_when_event_parsing_fails(
         return FakeRuntime(), close
 
     monkeypatch.setattr("boxy_agent.cli._runtime_from_args", fake_runtime_from_args)
+    monkeypatch.setattr("boxy_agent.cli.load_packaged_capability_catalog", lambda: "catalog")
 
     with pytest.raises(SystemExit) as exc:
         main(
@@ -295,8 +242,6 @@ def test_cli_run_closes_runtime_resources_when_event_parsing_fails(
                 "run",
                 "--agent",
                 "agent-a",
-                "--capability-catalog",
-                str(catalog_path),
                 "--event-json",
                 "{",
             ]
@@ -307,47 +252,13 @@ def test_cli_run_closes_runtime_resources_when_event_parsing_fails(
     assert "error:" in capsys.readouterr().err
 
 
-def test_cli_compile_with_capability_catalog(monkeypatch, tmp_path: Path) -> None:
-    catalog_path = tmp_path / "catalog.toml"
-    catalog_path.write_text("schema_version = 1\n", encoding="utf-8")
-
-    called: dict[str, object] = {}
-
-    def fake_load_capability_catalog(path: Path):
-        called["catalog_path"] = path
-        return "loaded-catalog"
-
-    def fake_compile_agent(*, project_dir: Path, output_dir: Path, capability_catalog):
-        called["capability_catalog"] = capability_catalog
-        return SimpleNamespace(manifest_path=output_dir / "manifest.json")
-
-    monkeypatch.setattr("boxy_agent.cli.load_capability_catalog", fake_load_capability_catalog)
-    monkeypatch.setattr("boxy_agent.cli.compile_agent", fake_compile_agent)
-
-    exit_code = main(
-        [
-            "compile",
-            "--project-dir",
-            str(tmp_path / "project"),
-            "--output-dir",
-            str(tmp_path / "dist"),
-            "--capability-catalog",
-            str(catalog_path),
-        ]
-    )
-
-    assert exit_code == 0
-    assert called["catalog_path"] == catalog_path
-    assert called["capability_catalog"] == "loaded-catalog"
-
-
-def test_cli_create_agent_generates_operation_project(tmp_path: Path) -> None:
+def test_cli_create_agent_generates_automation_project(tmp_path: Path) -> None:
     project_dir = tmp_path / "email-ops-agent"
 
     exit_code = main(
         [
             "create-agent",
-            "operation",
+            "automation",
             "--project-dir",
             str(project_dir),
         ]
@@ -402,7 +313,7 @@ def test_cli_create_agent_escapes_description_quotes(tmp_path: Path) -> None:
     exit_code = main(
         [
             "create-agent",
-            "operation",
+            "automation",
             "--project-dir",
             str(project_dir),
             "--description",
@@ -416,19 +327,21 @@ def test_cli_create_agent_escapes_description_quotes(tmp_path: Path) -> None:
     assert pyproject["tool"]["boxy_agent"]["agent"]["description"] == description
 
 
-def test_cli_create_agent_rejects_unsupported_type(capsys, tmp_path: Path) -> None:
-    with pytest.raises(SystemExit) as exc:
-        main(
-            [
-                "create-agent",
-                "automation",
-                "--project-dir",
-                str(tmp_path / "automation-agent"),
-            ]
-        )
+def test_cli_create_agent_accepts_operation_alias(tmp_path: Path) -> None:
+    project_dir = tmp_path / "legacy-operation-agent"
 
-    assert exc.value.code == 1
-    assert "Supported types: data-mining, operation" in capsys.readouterr().err
+    exit_code = main(
+        [
+            "create-agent",
+            "operation",
+            "--project-dir",
+            str(project_dir),
+        ]
+    )
+
+    assert exit_code == 0
+    pyproject = tomllib.loads((project_dir / "pyproject.toml").read_text(encoding="utf-8"))
+    assert pyproject["tool"]["boxy_agent"]["agent"]["type"] == "automation"
 
 
 def test_cli_create_agent_rejects_main_type(capsys, tmp_path: Path) -> None:
@@ -443,4 +356,4 @@ def test_cli_create_agent_rejects_main_type(capsys, tmp_path: Path) -> None:
         )
 
     assert exc.value.code == 1
-    assert "Supported types: data-mining, operation" in capsys.readouterr().err
+    assert "Supported types: automation, data-mining" in capsys.readouterr().err

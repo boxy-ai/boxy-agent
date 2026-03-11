@@ -67,6 +67,9 @@ class CoreAgentClient(Protocol):
 class AgentSdkProvider(Protocol):
     """Injectable provider that supplies runtime SDK dependencies."""
 
+    # TODO(boxy-agent): add a bundled mock connector-backed provider for local end-to-end SDK
+    # simulation without a live Boxy Desktop runtime.
+
     def create_session(self, *, agent_name: str, event: AgentEvent) -> str:
         """Create and return a session id."""
         ...

@@ -4,7 +4,12 @@ from typing import Any, cast
 
 import pytest
 from runtime.support import discovered_agent
-from test_helpers.capabilities import default_capability_catalog
+from test_helpers.capabilities import (
+    DEFAULT_BOXY_TOOL_NAME,
+    DEFAULT_BUILTIN_TOOL_NAME,
+    DEFAULT_DATA_QUERY_NAME,
+    default_capability_catalog,
+)
 
 from boxy_agent import (
     AgentCapabilities,
@@ -25,55 +30,106 @@ from boxy_agent.runtime.errors import (
 )
 from boxy_agent.runtime.providers import StaticDataQueryClient, StaticToolClient
 from boxy_agent.sdk import llm as llm_sdk
+from boxy_agent.types import JsonValue
 
 
 def _runtime_with_default_catalog(**kwargs) -> AgentRuntime:
     return AgentRuntime(capability_catalog=default_capability_catalog(), **kwargs)
 
 
+def _default_query_params() -> dict[str, JsonValue]:
+    return {"chat_id": "chat-1"}
+
+
+def _default_query_rows() -> list[dict[str, JsonValue]]:
+    return [
+        {
+            "chat_id": "chat-1",
+            "before_ts_ms": None,
+            "before_message_id": None,
+            "next_before_ts_ms": None,
+            "next_before_message_id": None,
+            "has_more": False,
+            "count": 1,
+            "messages": [
+                {
+                    "chat_id": "chat-1",
+                    "message_id": "msg-1",
+                    "from_me": False,
+                    "sender_id": "contact-1",
+                    "push_name": "Alex",
+                    "timestamp_ms": 1,
+                    "text": "hello",
+                    "upsert_type": "notify",
+                    "source_event_id": 1,
+                    "ingested_at": "2026-01-01T00:00:00Z",
+                }
+            ],
+        }
+    ]
+
+
+def _default_tool_params() -> dict[str, JsonValue]:
+    return {
+        "target": "chat-1",
+        "message_content": "Hello",
+        "idempotency_key": "idemp-1",
+    }
+
+
+def _default_tool_result() -> dict[str, JsonValue]:
+    return {
+        "status": "sent",
+        "target_resolved": "chat-1",
+        "message_ref": "msg-1",
+        "sent_at": "2026-01-01T00:00:00Z",
+        "details": {},
+    }
+
+
 class _ActorAwareToolClient:
     def __init__(self) -> None:
-        self.calls: list[tuple[str, str, dict[str, object]]] = []
+        self.calls: list[tuple[str, str, dict[str, JsonValue]]] = []
 
     def list_tools(self):
         return []
 
-    def call_tool(self, name: str, params: dict[str, object]) -> dict[str, object]:
+    def call_tool(self, name: str, params: dict[str, JsonValue]) -> dict[str, JsonValue]:
         _ = name, params
         raise AssertionError("runtime should prefer call_tool_with_actor when available")
 
     def call_tool_with_actor(
         self,
         name: str,
-        params: dict[str, object],
+        params: dict[str, JsonValue],
         *,
         actor_principal: str,
-    ) -> dict[str, object]:
+    ) -> dict[str, JsonValue]:
         self.calls.append((name, actor_principal, dict(params)))
-        return {"status": "sent", "message_id": "msg-1"}
+        return _default_tool_result()
 
 
 class _SessionAwareDataQueryClient:
     def __init__(self) -> None:
-        self.calls: list[tuple[str, str, str, dict[str, object]]] = []
+        self.calls: list[tuple[str, str, str, dict[str, JsonValue]]] = []
 
     def list_data_queries(self):
         return []
 
-    def query_data(self, name: str, params: dict[str, object]):
+    def query_data(self, name: str, params: dict[str, JsonValue]):
         _ = name, params
         raise AssertionError("runtime should prefer query_data_with_session when available")
 
     def query_data_with_session(
         self,
         name: str,
-        params: dict[str, object],
+        params: dict[str, JsonValue],
         *,
         session_id: str,
         actor_principal: str,
     ):
         self.calls.append((name, session_id, actor_principal, dict(params)))
-        return [{"id": "row-1", "subject": "hello"}]
+        return _default_query_rows()
 
 
 class _LegacyCompleteOnlyLlm:
@@ -91,7 +147,7 @@ def test_runtime_rejects_unauthorized_data_query() -> None:
                 name="main",
                 handler=handle,
                 capabilities=AgentCapabilities(
-                    data_queries=frozenset({"gmail.messages"}),
+                    data_queries=frozenset({DEFAULT_DATA_QUERY_NAME}),
                     boxy_tools=frozenset(),
                     builtin_tools=frozenset(),
                 ),
@@ -107,7 +163,7 @@ def test_runtime_passes_session_scope_to_data_query_client_when_supported() -> N
     data_client = _SessionAwareDataQueryClient()
 
     def handle(context):
-        rows = query_data(context, "gmail.messages", {"fts": "alpha"})
+        rows = query_data(context, DEFAULT_DATA_QUERY_NAME, _default_query_params())
         return AgentResult(output={"rows": rows})
 
     runtime = _runtime_with_default_catalog(
@@ -117,7 +173,7 @@ def test_runtime_passes_session_scope_to_data_query_client_when_supported() -> N
                 name="main",
                 handler=handle,
                 capabilities=AgentCapabilities(
-                    data_queries=frozenset({"gmail.messages"}),
+                    data_queries=frozenset({DEFAULT_DATA_QUERY_NAME}),
                     boxy_tools=frozenset(),
                     builtin_tools=frozenset(),
                 ),
@@ -127,13 +183,13 @@ def test_runtime_passes_session_scope_to_data_query_client_when_supported() -> N
 
     report = runtime.run("main", {"type": "start"})
 
-    assert report.last_output == {"rows": [{"id": "row-1", "subject": "hello"}]}
+    assert report.last_output == {"rows": _default_query_rows()}
     assert len(data_client.calls) == 1
     name, session_id, actor_principal, params = data_client.calls[0]
-    assert name == "gmail.messages"
+    assert name == DEFAULT_DATA_QUERY_NAME
     assert session_id == report.session_id
     assert actor_principal == f"agent:main:session:{report.session_id}"
-    assert params == {"fts": "alpha"}
+    assert params == _default_query_params()
 
 
 def test_runtime_rejects_unauthorized_boxy_tool() -> None:
@@ -148,7 +204,7 @@ def test_runtime_rejects_unauthorized_boxy_tool() -> None:
                 handler=handle,
                 capabilities=AgentCapabilities(
                     data_queries=frozenset(),
-                    boxy_tools=frozenset({"gmail.send_message"}),
+                    boxy_tools=frozenset({DEFAULT_BOXY_TOOL_NAME}),
                     builtin_tools=frozenset(),
                 ),
             )
@@ -161,7 +217,7 @@ def test_runtime_rejects_unauthorized_boxy_tool() -> None:
 
 def test_runtime_requires_capability_catalog() -> None:
     def handle(context):
-        query_data(context, "gmail.messages", {"fts": "alpha"})
+        query_data(context, DEFAULT_DATA_QUERY_NAME, _default_query_params())
         return AgentResult(output={"ok": True})
 
     invalid_catalog = cast(CapabilityCatalog, None)
@@ -173,7 +229,7 @@ def test_runtime_requires_capability_catalog() -> None:
                     name="main",
                     handler=handle,
                     capabilities=AgentCapabilities(
-                        data_queries=frozenset({"gmail.messages"}),
+                        data_queries=frozenset({DEFAULT_DATA_QUERY_NAME}),
                         boxy_tools=frozenset(),
                         builtin_tools=frozenset(),
                     ),
@@ -198,9 +254,9 @@ def test_runtime_filters_discovery_by_capabilities() -> None:
                 name="main",
                 handler=handle,
                 capabilities=AgentCapabilities(
-                    data_queries=frozenset({"gmail.messages"}),
-                    boxy_tools=frozenset({"gmail.send_message"}),
-                    builtin_tools=frozenset({"web_search"}),
+                    data_queries=frozenset({DEFAULT_DATA_QUERY_NAME}),
+                    boxy_tools=frozenset({DEFAULT_BOXY_TOOL_NAME}),
+                    builtin_tools=frozenset({DEFAULT_BUILTIN_TOOL_NAME}),
                 ),
             )
         }
@@ -209,9 +265,9 @@ def test_runtime_filters_discovery_by_capabilities() -> None:
     report = runtime.run("main", {"type": "start"})
 
     assert report.last_output == {
-        "data": ["gmail.messages"],
-        "boxy": ["gmail.send_message"],
-        "builtin": ["web_search"],
+        "data": [DEFAULT_DATA_QUERY_NAME],
+        "boxy": [DEFAULT_BOXY_TOOL_NAME],
+        "builtin": [DEFAULT_BUILTIN_TOOL_NAME],
     }
 
 
@@ -219,8 +275,8 @@ def test_runtime_rejects_invalid_capability_input_schema() -> None:
     def handle(context):
         call_boxy_tool(
             context,
-            "gmail.send_message",
-            {"to": "not-an-array", "subject": "Re: x", "body": "hello"},
+            DEFAULT_BOXY_TOOL_NAME,
+            {"target": "chat-1", "message_content": 1, "idempotency_key": "idemp-1"},
         )
         return AgentResult(output={"ok": True})
 
@@ -231,7 +287,7 @@ def test_runtime_rejects_invalid_capability_input_schema() -> None:
                 handler=handle,
                 capabilities=AgentCapabilities(
                     data_queries=frozenset(),
-                    boxy_tools=frozenset({"gmail.send_message"}),
+                    boxy_tools=frozenset({DEFAULT_BOXY_TOOL_NAME}),
                     builtin_tools=frozenset(),
                 ),
             )
@@ -244,7 +300,7 @@ def test_runtime_rejects_invalid_capability_input_schema() -> None:
 
 def test_runtime_rejects_non_string_capability_param_keys() -> None:
     def handle(context):
-        query_data(context, "gmail.messages", {1: "alpha"})  # type: ignore[dict-item]
+        query_data(context, DEFAULT_DATA_QUERY_NAME, {1: "chat-1"})  # type: ignore[dict-item]
         return AgentResult(output={"ok": True})
 
     runtime = _runtime_with_default_catalog(
@@ -253,7 +309,7 @@ def test_runtime_rejects_non_string_capability_param_keys() -> None:
                 name="main",
                 handler=handle,
                 capabilities=AgentCapabilities(
-                    data_queries=frozenset({"gmail.messages"}),
+                    data_queries=frozenset({DEFAULT_DATA_QUERY_NAME}),
                     boxy_tools=frozenset(),
                     builtin_tools=frozenset(),
                 ),
@@ -269,8 +325,8 @@ def test_runtime_rejects_invalid_capability_output_schema() -> None:
     def handle(context):
         call_boxy_tool(
             context,
-            "gmail.send_message",
-            {"to": ["a@example.com"], "subject": "Re: x", "body": "hello"},
+            DEFAULT_BOXY_TOOL_NAME,
+            _default_tool_params(),
         )
         return AgentResult(output={"ok": True})
 
@@ -281,13 +337,13 @@ def test_runtime_rejects_invalid_capability_output_schema() -> None:
                 handler=handle,
                 capabilities=AgentCapabilities(
                     data_queries=frozenset(),
-                    boxy_tools=frozenset({"gmail.send_message"}),
+                    boxy_tools=frozenset({DEFAULT_BOXY_TOOL_NAME}),
                     builtin_tools=frozenset(),
                 ),
             )
         },
         boxy_tool_client=StaticToolClient(
-            execution_results={"gmail.send_message": {"status": "sent"}}
+            execution_results={DEFAULT_BOXY_TOOL_NAME: {"status": "sent"}}
         ),
     )
 
@@ -413,8 +469,8 @@ def test_runtime_scopes_boxy_tool_calls_with_agent_and_session_actor() -> None:
     def handle(context):
         call_boxy_tool(
             context,
-            "gmail.send_message",
-            {"to": ["a@example.com"], "subject": "Hi", "body": "Hello"},
+            DEFAULT_BOXY_TOOL_NAME,
+            _default_tool_params(),
         )
         return AgentResult(output={"ok": True})
 
@@ -425,7 +481,7 @@ def test_runtime_scopes_boxy_tool_calls_with_agent_and_session_actor() -> None:
                 handler=handle,
                 capabilities=AgentCapabilities(
                     data_queries=frozenset(),
-                    boxy_tools=frozenset({"gmail.send_message"}),
+                    boxy_tools=frozenset({DEFAULT_BOXY_TOOL_NAME}),
                     builtin_tools=frozenset(),
                 ),
             )
@@ -438,8 +494,8 @@ def test_runtime_scopes_boxy_tool_calls_with_agent_and_session_actor() -> None:
     assert report.status == "idle"
     assert len(tool_client.calls) == 1
     name, actor_principal, params = tool_client.calls[0]
-    assert name == "gmail.send_message"
-    assert params == {"to": ["a@example.com"], "subject": "Hi", "body": "Hello"}
+    assert name == DEFAULT_BOXY_TOOL_NAME
+    assert params == _default_tool_params()
     assert actor_principal == f"agent:main:session:{report.session_id}"
 
 
@@ -474,29 +530,52 @@ def test_runtime_chat_complete_requires_chat_complete_implementation() -> None:
 
 
 def test_runtime_rejects_invalid_datetime_format_input() -> None:
+    catalog = load_capability_catalog_from_text(
+        "\n".join(
+            [
+                "schema_version = 1",
+                "boxy_tools = []",
+                "builtin_tools = []",
+                "",
+                "[[data_queries]]",
+                'name = "custom.messages"',
+                'description = "Custom query"',
+                (
+                    'input_schema = { type = "object", properties = { time_range = { '
+                    'type = "object", properties = { start = { type = "string", '
+                    'format = "date-time" }, end = { type = "string", format = '
+                    '"date-time" } }, required = ["start", "end"], '
+                    'additionalProperties = false } }, required = ["time_range"], '
+                    "additionalProperties = false }"
+                ),
+                'output_schema = { type = "array", items = { type = "object" } }',
+            ]
+        )
+    )
+
     def handle(context):
         query_data(
             context,
-            "gmail.messages",
+            "custom.messages",
             {
-                "fts": "alpha",
                 "time_range": {"start": "not-a-datetime", "end": "also-invalid"},
             },
         )
         return AgentResult(output={"ok": True})
 
-    runtime = _runtime_with_default_catalog(
+    runtime = AgentRuntime(
+        capability_catalog=catalog,
         agent_registry_loader=lambda: {
             "main": discovered_agent(
                 name="main",
                 handler=handle,
                 capabilities=AgentCapabilities(
-                    data_queries=frozenset({"gmail.messages"}),
+                    data_queries=frozenset({"custom.messages"}),
                     boxy_tools=frozenset(),
                     builtin_tools=frozenset(),
                 ),
             )
-        }
+        },
     )
 
     with pytest.raises(CapabilitySchemaError, match="date-time"):

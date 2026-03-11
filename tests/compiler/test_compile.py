@@ -5,7 +5,11 @@ from pathlib import Path
 
 import pytest
 from support import write_agent_project
-from test_helpers.capabilities import default_capability_catalog
+from test_helpers.capabilities import (
+    DEFAULT_BOXY_TOOL_NAME,
+    DEFAULT_DATA_QUERY_NAME,
+    default_capability_catalog,
+)
 
 from boxy_agent.capabilities import load_capability_catalog
 from boxy_agent.compiler import compile_agent
@@ -30,7 +34,7 @@ module = "sample_agent.agent"
 expected_event_types = ["start"]
 
 [tool.boxy_agent.capabilities]
-data_queries = ["gmail.messages"]
+data_queries = ["whatsapp.chat_context"]
 boxy_tools = []
 builtin_tools = ["web_search"]
 event_emitters = []
@@ -69,7 +73,7 @@ def test_compile_agent_writes_manifest(tmp_path: Path) -> None:
     payload = json.loads(compiled.manifest_path.read_text(encoding="utf-8"))
     assert payload["name"] == "test-agent"
     assert payload["type"] == "automation"
-    assert payload["capabilities"]["data_queries"] == ["gmail.messages"]
+    assert payload["capabilities"]["data_queries"] == [DEFAULT_DATA_QUERY_NAME]
     assert payload["capabilities"]["event_emitters"] == []
 
 
@@ -95,7 +99,7 @@ name = "sample-agent"
 version = "0.1.0"
 description = "No boxy metadata"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["boxy-agent>=0.2.0a1,<0.3.0"]
 
 [tool.other]
 enabled = true
@@ -170,7 +174,7 @@ def test_compile_rejects_non_canonical_signature(tmp_path: Path) -> None:
 
 
 def test_compile_rejects_unknown_capability(tmp_path: Path) -> None:
-    metadata = BASE_METADATA.replace("gmail.messages", "unknown.data")
+    metadata = BASE_METADATA.replace(DEFAULT_DATA_QUERY_NAME, "unknown.data")
     project_dir = _make_project(tmp_path, metadata=metadata)
 
     with pytest.raises(MetadataValidationError, match="Unknown data_queries"):
@@ -181,15 +185,15 @@ def test_compile_rejects_unknown_capability(tmp_path: Path) -> None:
         )
 
 
-def test_compile_rejects_declared_capabilities_without_injected_catalog(tmp_path: Path) -> None:
+def test_compile_uses_packaged_capability_catalog_by_default(tmp_path: Path) -> None:
     project_dir = _make_project(tmp_path)
 
-    with pytest.raises(CompilationError, match="capability_catalog is required"):
-        compile_agent(
-            project_dir=project_dir,
-            output_dir=tmp_path / "output",
-            capability_catalog=None,  # type: ignore[arg-type]
-        )
+    compiled = compile_agent(
+        project_dir=project_dir,
+        output_dir=tmp_path / "output",
+    )
+
+    assert compiled.manifest.capabilities.data_queries == frozenset({DEFAULT_DATA_QUERY_NAME})
 
 
 def test_compile_rejects_data_mining_with_boxy_tools(tmp_path: Path) -> None:
@@ -201,7 +205,7 @@ def test_compile_rejects_data_mining_with_boxy_tools(tmp_path: Path) -> None:
         )
         .replace(
             "boxy_tools = []",
-            'boxy_tools = ["gmail.send_message"]',
+            f'boxy_tools = ["{DEFAULT_BOXY_TOOL_NAME}"]',
         )
     )
     project_dir = _make_project(tmp_path, metadata=metadata)

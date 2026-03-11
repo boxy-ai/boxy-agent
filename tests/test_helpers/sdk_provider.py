@@ -3,7 +3,12 @@ from __future__ import annotations
 import uuid
 from collections.abc import Mapping
 
-from test_helpers.capabilities import default_capability_catalog
+from test_helpers.capabilities import (
+    DEFAULT_BOXY_TOOL_NAME,
+    DEFAULT_BUILTIN_TOOL_NAME,
+    DEFAULT_DATA_QUERY_NAME,
+    default_capability_catalog,
+)
 
 from boxy_agent.capabilities import CapabilityCatalog
 from boxy_agent.models import AgentEvent
@@ -17,24 +22,46 @@ from boxy_agent.sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, T
 from boxy_agent.types import JsonValue
 
 DEFAULT_QUERY_RESULTS: dict[str, list[JsonValue]] = {
-    "gmail.messages": [
+    DEFAULT_DATA_QUERY_NAME: [
         {
-            "id": "msg-1",
-            "subject": "Status update",
+            "chat_id": "chat-1",
+            "before_ts_ms": None,
+            "before_message_id": None,
+            "next_before_ts_ms": None,
+            "next_before_message_id": None,
+            "has_more": False,
+            "count": 1,
+            "messages": [
+                {
+                    "chat_id": "chat-1",
+                    "message_id": "msg-1",
+                    "from_me": False,
+                    "sender_id": "contact-1",
+                    "push_name": "Alex",
+                    "timestamp_ms": 1,
+                    "text": "Status update",
+                    "upsert_type": "notify",
+                    "source_event_id": 1,
+                    "ingested_at": "2026-01-01T00:00:00Z",
+                }
+            ],
         }
     ]
 }
 
 DEFAULT_BOXY_TOOL_RESULTS: dict[str, JsonValue] = {
-    "gmail.send_message": {
+    DEFAULT_BOXY_TOOL_NAME: {
         "status": "sent",
-        "message_id": "out-1",
+        "target_resolved": "chat-1",
+        "message_ref": "out-1",
+        "sent_at": "2026-01-01T00:00:00Z",
+        "details": {},
     }
 }
 
 DEFAULT_BUILTIN_TOOL_RESULTS: dict[str, JsonValue] = {
-    "web_search": {
-        "items": [],
+    DEFAULT_BUILTIN_TOOL_NAME: {
+        "results": [],
     },
     "python_exec": {
         "result": None,

@@ -31,7 +31,7 @@ module = "sample_agent.agent"
 expected_event_types = ["start"]
 
 [tool.boxy_agent.capabilities]
-data_queries = ["gmail.messages"]
+data_queries = ["whatsapp.chat_context"]
 boxy_tools = []
 builtin_tools = []
 event_emitters = []
@@ -161,5 +161,5 @@ def test_project_config_includes_example_pyproject_package_data() -> None:
         (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text(encoding="utf-8")
     )
     patterns = pyproject["tool"]["setuptools"]["package-data"]["boxy_agent"]
-    assert "examples/*/pyproject.toml" in patterns
     assert "builtin_capability.toml" in patterns
+    assert "capability_catalog.toml" in patterns

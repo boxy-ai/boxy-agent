@@ -1,13 +1,27 @@
 [project]
 name = "boxy-agent"
-version = "0.1.0"
-description = "Boxy agent component"
+dynamic = ["version"]
+description = "SDK and CLI for building Boxy agents"
+readme = "README.md"
 requires-python = ">=3.12,<3.13"
+license = "LicenseRef-Proprietary"
+authors = [{ name = "Boxy AI" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+]
 dependencies = [
   "jsonschema==4.23.0",
   "pydantic>=2.12.5",
   "pydantic-monty>=0.0.7",
 ]
+
+[project.urls]
+Homepage = "https://github.com/boxy-ai/boxy-agent"
+Repository = "https://github.com/boxy-ai/boxy"
+Issues = "https://github.com/boxy-ai/boxy/issues"
 
 [project.optional-dependencies]
 packaging = ["build==1.2.2.post1", "setuptools==69.5.1", "wheel==0.45.1"]
@@ -34,11 +48,14 @@ build-backend = "setuptools.build_meta"
 package-dir = { "" = "src" }
 include-package-data = true
 
+[tool.setuptools.dynamic]
+version = { attr = "boxy_agent._version.__version__" }
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-boxy_agent = ["examples/*/pyproject.toml", "builtin_capability.toml"]
+boxy_agent = ["builtin_capability.toml", "capability_catalog.toml"]
 
 [tool.ruff]
 line-length = 100

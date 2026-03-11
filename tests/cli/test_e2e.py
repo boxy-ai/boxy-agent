@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 import json
-import os
+import shutil
 import subprocess
 import sys
-import sysconfig
+import zipfile
 from pathlib import Path
+from typing import cast
 
 from support import write_agent_project
-from test_helpers.capabilities import empty_capability_catalog
 
 from boxy_agent.compiler import package_agent
 
 
-def test_package_run_in_venv_with_local_sdk_source(tmp_path: Path) -> None:
+def test_package_run_in_clean_venv_without_repo_path_hacks(tmp_path: Path) -> None:
     project_dir = write_agent_project(
         project_dir=tmp_path / "agent-project",
         distribution_name="sample-agent-e2e",
@@ -47,53 +47,31 @@ def test_package_run_in_venv_with_local_sdk_source(tmp_path: Path) -> None:
     packaged = package_agent(
         project_dir=project_dir,
         output_dir=dist_dir,
-        capability_catalog=empty_capability_catalog(),
     )
 
+    sdk_wheel = _build_sdk_wheel(tmp_path / "sdk-dist")
+    with zipfile.ZipFile(sdk_wheel) as wheel:
+        assert "boxy_agent/_catalog_generation.py" not in wheel.namelist()
     venv_dir = tmp_path / "venv"
-    subprocess.run([sys.executable, "-m", "venv", str(venv_dir)], check=True)
-
+    _run([sys.executable, "-m", "venv", str(venv_dir)])
     python_bin = venv_dir / "bin" / "python"
-    repo_agent_dir = Path(__file__).resolve().parents[2]
-    env = dict(os.environ)
-    existing_pythonpath = env.get("PYTHONPATH")
-    repo_src = str(repo_agent_dir / "src")
-    host_site_packages = sysconfig.get_path("purelib")
-    pythonpath_parts = [repo_src]
-    if host_site_packages:
-        pythonpath_parts.append(host_site_packages)
-    if existing_pythonpath:
-        pythonpath_parts.append(existing_pythonpath)
-    env["PYTHONPATH"] = ":".join(pythonpath_parts)
-    capability_catalog_path = tmp_path / "catalog.toml"
-    capability_catalog_path.write_text(
-        """
-schema_version = 1
-data_queries = []
-boxy_tools = []
-builtin_tools = []
-""".strip()
-        + "\n",
-        encoding="utf-8",
-    )
 
-    examples_probe = subprocess.run(
+    _run([str(python_bin), "-m", "pip", "install", "--upgrade", "pip"])
+    _run([str(python_bin), "-m", "pip", "install", str(sdk_wheel)])
+
+    catalog_probe = _run_json(
         [
             str(python_bin),
             "-c",
             (
-                "from boxy_agent.examples import "
-                "canonical_automation_email_agent_project_dir; "
-                "print((canonical_automation_email_agent_project_dir() "
-                "/ 'pyproject.toml').exists())"
+                "from boxy_agent.capabilities import load_packaged_capability_catalog; "
+                "catalog = load_packaged_capability_catalog(); "
+                "import json; "
+                "print(json.dumps(sorted(catalog.data_queries)))"
             ),
-        ],
-        check=True,
-        text=True,
-        capture_output=True,
-        env=env,
+        ]
     )
-    assert examples_probe.stdout.strip() == "True"
+    assert "whatsapp.chat_context" in catalog_probe
 
     registry_path = tmp_path / "installed_agents.json"
     registry_path.write_text(
@@ -119,17 +97,46 @@ builtin_tools = []
             "sample-agent-e2e",
             "--registry-file",
             str(registry_path),
-            "--capability-catalog",
-            str(capability_catalog_path),
             "--event-json",
             '{"type": "start"}',
         ],
         check=True,
         text=True,
         capture_output=True,
-        env=env,
     )
 
     payload = json.loads(run_result.stdout)
     assert payload["status"] == "idle"
     assert payload["last_output"] == {"event_type": "start"}
+
+
+def _build_sdk_wheel(output_dir: Path) -> Path:
+    repo_root = Path(__file__).resolve().parents[3]
+    project_dir = repo_root / "boxy-agent"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    shutil.rmtree(project_dir / "build", ignore_errors=True)
+    _run(
+        [
+            sys.executable,
+            "-m",
+            "build",
+            "--wheel",
+            "--outdir",
+            str(output_dir),
+            str(project_dir),
+        ]
+    )
+    wheels = sorted(output_dir.glob("*.whl"))
+    assert wheels
+    return wheels[-1]
+
+
+def _run(command: list[str]) -> None:
+    subprocess.run(command, check=True, text=True, capture_output=True)
+
+
+def _run_json(command: list[str]) -> list[str]:
+    result = subprocess.run(command, check=True, text=True, capture_output=True)
+    payload = json.loads(result.stdout)
+    assert isinstance(payload, list)
+    return cast(list[str], payload)

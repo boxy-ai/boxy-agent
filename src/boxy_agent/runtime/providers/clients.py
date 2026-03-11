@@ -23,6 +23,7 @@ class UnconfiguredLlmClient(LlmClient):
 
     def chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
         _ = request
+        # TODO(boxy-agent): add an optional BYOK OpenRouter-backed LLM client for local SDK tests.
         raise UnconfiguredClientError("No LLM client configured")
 
 

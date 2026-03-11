@@ -117,6 +117,8 @@ class BuiltinToolClient(ToolClient):
                 f"web_search field 'count' must be between 1 and {_BRAVE_MAX_RESULT_COUNT}"
             )
 
+        # TODO(boxy-agent): add an optional BYOK Brave-backed web_search implementation for local
+        # SDK testing outside Boxy Cloud.
         raise UnconfiguredClientError(
             "web_search is not implemented in boxy-agent runtime; integrate via boxy-cloud"
         )

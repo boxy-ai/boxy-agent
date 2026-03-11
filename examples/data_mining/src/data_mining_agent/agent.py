@@ -1,4 +1,4 @@
-"""Minimal canonical data-mining agent."""
+"""Minimal reference data-mining agent."""
 
 from __future__ import annotations
 
@@ -16,11 +16,19 @@ def handle(exec_ctx: models.AgentExecutionContext) -> models.AgentResult:
             }
         )
 
-    messages = data_queries.query(exec_ctx, "gmail.messages", {"limit": 1})
+    chat_id_value = exec_ctx.event.payload.get("chat_id", "chat-1")
+    if not isinstance(chat_id_value, str) or not chat_id_value.strip():
+        raise ValueError("chat_id payload field must be a non-empty string")
+
+    messages = data_queries.query(
+        exec_ctx,
+        "whatsapp.chat_context",
+        {"chat_id": chat_id_value.strip()},
+    )
     events.emit(
         exec_ctx,
         "insight.generated",
-        description="Generated a minimal inbox insight",
+        description="Generated a minimal chat insight",
         payload={"message_count": len(messages)},
     )
     return models.AgentResult(

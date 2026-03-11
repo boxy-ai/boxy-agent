@@ -1,4 +1,4 @@
-"""Runtime provider package exports."""
+"""Experimental runtime provider exports for host-side SDK integrations."""
 
 from __future__ import annotations
 

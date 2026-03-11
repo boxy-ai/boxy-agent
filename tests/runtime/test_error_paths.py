@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 from runtime.support import discovered_agent
-from test_helpers.capabilities import default_capability_catalog
+from test_helpers.capabilities import DEFAULT_DATA_QUERY_NAME, default_capability_catalog
 
 from boxy_agent import AgentCapabilities, AgentResult, query_data, trace
 from boxy_agent.runtime import AgentRuntime
@@ -107,7 +107,7 @@ def test_runtime_wraps_unexpected_handler_failures() -> None:
 
 def test_runtime_does_not_wrap_unconfigured_client_errors() -> None:
     def handle(context):
-        query_data(context, "gmail.messages", {})
+        query_data(context, DEFAULT_DATA_QUERY_NAME, {"chat_id": "chat-1"})
         return AgentResult(output={"ok": True})
 
     runtime = AgentRuntime(
@@ -116,7 +116,7 @@ def test_runtime_does_not_wrap_unconfigured_client_errors() -> None:
             "main": discovered_agent(
                 name="main",
                 handler=handle,
-                capabilities=AgentCapabilities(data_queries=frozenset({"gmail.messages"})),
+                capabilities=AgentCapabilities(data_queries=frozenset({DEFAULT_DATA_QUERY_NAME})),
             )
         },
     )

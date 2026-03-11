@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
+
+from boxy_agent._version import __version__
 
 
 def write_agent_project(
@@ -26,7 +29,7 @@ name = "{distribution_name}"
 version = "0.1.0"
 description = "Temporary agent project"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["{_runtime_dependency_requirement()}"]
 
 [build-system]
 requires = ["setuptools>=69.0"]
@@ -44,3 +47,16 @@ where = ["src"]
     )
 
     return project_dir
+
+
+def _runtime_dependency_requirement() -> str:
+    match = re.fullmatch(
+        r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?P<suffix>[A-Za-z0-9.-]+)?",
+        __version__,
+    )
+    if match is None:
+        raise ValueError(f"Unsupported boxy-agent version format: {__version__}")
+
+    major = int(match.group("major"))
+    minor = int(match.group("minor"))
+    return f"boxy-agent>={__version__},<{major}.{minor + 1}.0"

@@ -6,7 +6,7 @@ import ast
 import json
 from pathlib import Path
 
-from boxy_agent.capabilities import CapabilityCatalog
+from boxy_agent.capabilities import CapabilityCatalog, load_packaged_capability_catalog
 from boxy_agent.compiler.metadata import load_agent_metadata
 from boxy_agent.compiler.models import CompiledAgent, CompiledManifest
 
@@ -19,16 +19,17 @@ def compile_agent(
     project_dir: Path,
     output_dir: Path,
     *,
-    capability_catalog: CapabilityCatalog,
+    capability_catalog: CapabilityCatalog | None = None,
 ) -> CompiledAgent:
     """Compile an agent project into a validated manifest artifact."""
     project = project_dir.resolve()
     if not project.exists():
         raise CompilationError(f"Project directory does not exist: {project}")
-    if capability_catalog is None:
-        raise CompilationError("capability_catalog is required")
+    resolved_catalog = (
+        capability_catalog if capability_catalog is not None else load_packaged_capability_catalog()
+    )
 
-    metadata = load_agent_metadata(project, capability_catalog=capability_catalog)
+    metadata = load_agent_metadata(project, capability_catalog=resolved_catalog)
     module_path = _resolve_module_path(project, metadata.module)
     entrypoint_function = _find_entrypoint_function(module_path)
 

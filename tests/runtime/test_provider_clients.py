@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import pytest
-from test_helpers.capabilities import default_capability_catalog
+from test_helpers.capabilities import (
+    DEFAULT_BOXY_TOOL_NAME,
+    DEFAULT_DATA_QUERY_NAME,
+    default_capability_catalog,
+)
 
 from boxy_agent.models import ToolDescriptor
 from boxy_agent.runtime.providers import (
@@ -19,35 +23,56 @@ from boxy_agent.types import JsonValue
 def test_static_data_query_client_contract() -> None:
     catalog = default_capability_catalog()
     client = StaticDataQueryClient(
-        descriptors=[catalog.data_queries["gmail.messages"]],
-        query_results={"gmail.messages": [{"id": "row-1"}]},
+        descriptors=[catalog.data_queries[DEFAULT_DATA_QUERY_NAME]],
+        query_results={DEFAULT_DATA_QUERY_NAME: [{"id": "row-1"}]},
     )
 
-    assert [item.name for item in client.list_data_queries()] == ["gmail.messages"]
-    assert client.query_data("gmail.messages", {"fts": "alpha"}) == [{"id": "row-1"}]
+    assert [item.name for item in client.list_data_queries()] == [DEFAULT_DATA_QUERY_NAME]
+    assert client.query_data(DEFAULT_DATA_QUERY_NAME, {"chat_id": "chat-1"}) == [{"id": "row-1"}]
 
     with pytest.raises(UnconfiguredClientError, match="No data query result configured"):
-        StaticDataQueryClient(descriptors=[catalog.data_queries["gmail.messages"]]).query_data(
-            "gmail.messages", {}
+        StaticDataQueryClient(
+            descriptors=[catalog.data_queries[DEFAULT_DATA_QUERY_NAME]]
+        ).query_data(
+            DEFAULT_DATA_QUERY_NAME,
+            {},
         )
 
 
 def test_static_tool_client_contract() -> None:
     catalog = default_capability_catalog()
     client = StaticToolClient(
-        descriptors=[catalog.boxy_tools["gmail.send_message"]],
-        execution_results={"gmail.send_message": {"status": "sent", "message_id": "out-1"}},
+        descriptors=[catalog.boxy_tools[DEFAULT_BOXY_TOOL_NAME]],
+        execution_results={
+            DEFAULT_BOXY_TOOL_NAME: {
+                "status": "sent",
+                "target_resolved": "chat-1",
+                "message_ref": "out-1",
+                "sent_at": "2026-01-01T00:00:00Z",
+                "details": {},
+            }
+        },
     )
 
-    assert [item.name for item in client.list_tools()] == ["gmail.send_message"]
-    assert client.call_tool("gmail.send_message", {"to": ["a@example.com"]}) == {
+    assert [item.name for item in client.list_tools()] == [DEFAULT_BOXY_TOOL_NAME]
+    assert client.call_tool(
+        DEFAULT_BOXY_TOOL_NAME,
+        {
+            "target": "chat-1",
+            "message_content": "hello",
+            "idempotency_key": "idemp-1",
+        },
+    ) == {
         "status": "sent",
-        "message_id": "out-1",
+        "target_resolved": "chat-1",
+        "message_ref": "out-1",
+        "sent_at": "2026-01-01T00:00:00Z",
+        "details": {},
     }
 
     with pytest.raises(UnconfiguredClientError, match="No tool result configured"):
-        StaticToolClient(descriptors=[catalog.boxy_tools["gmail.send_message"]]).call_tool(
-            "gmail.send_message",
+        StaticToolClient(descriptors=[catalog.boxy_tools[DEFAULT_BOXY_TOOL_NAME]]).call_tool(
+            DEFAULT_BOXY_TOOL_NAME,
             {},
         )
 

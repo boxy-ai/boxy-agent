@@ -7,6 +7,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from boxy_agent._version import __version__
 from boxy_agent.models import AgentType
 
 
@@ -60,12 +61,13 @@ def create_agent_project(
 def _resolve_agent_type(requested_type: str) -> AgentType:
     normalized = requested_type.strip().lower().replace("_", "-")
     mapping: dict[str, AgentType] = {
+        "automation": "automation",
         "operation": "automation",
         "data-mining": "data_mining",
     }
 
     if normalized not in mapping:
-        allowed = ", ".join(sorted(mapping))
+        allowed = ", ".join(["automation", "data-mining"])
         raise ValueError(f"Unsupported agent type '{requested_type}'. Supported types: {allowed}")
 
     return mapping[normalized]
@@ -96,7 +98,7 @@ def _write_pyproject(
         'version = "0.1.0"',
         f"description = {_toml_string(agent_description)}",
         'requires-python = ">=3.12"',
-        "dependencies = []",
+        f"dependencies = [{_toml_string(_runtime_dependency_requirement())}]",
         "",
         "[build-system]",
         'requires = ["setuptools>=69.0"]',
@@ -133,6 +135,19 @@ def _write_pyproject(
 
 def _toml_string(value: str) -> str:
     return json.dumps(value)
+
+
+def _runtime_dependency_requirement() -> str:
+    match = re.fullmatch(
+        r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?P<suffix>[A-Za-z0-9.-]+)?",
+        __version__,
+    )
+    if match is None:
+        raise ValueError(f"Unsupported boxy-agent version format: {__version__}")
+
+    major = int(match.group("major"))
+    minor = int(match.group("minor"))
+    return f"boxy-agent>={__version__},<{major}.{minor + 1}.0"
 
 
 def _write_source_files(*, project_dir: Path, package_name: str, project_name: str) -> None:

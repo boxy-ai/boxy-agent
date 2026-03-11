@@ -43,7 +43,6 @@ def test_public_api_export_surfaces() -> None:
         exported=boxy_agent.__all__,
         expected={
             "AgentExecutionContext",
-            "AgentRuntime",
             "agent_main",
             "compile_agent",
             "package_agent",
@@ -52,6 +51,13 @@ def test_public_api_export_surfaces() -> None:
             "call_boxy_tool",
             "call_builtin_tool",
             "emit_event",
+            "llm_chat_complete",
+            "memory_get",
+            "memory_set",
+            "memory_delete",
+            "terminate",
+            "trace",
+            "__version__",
         },
     )
     _assert_export_surface(

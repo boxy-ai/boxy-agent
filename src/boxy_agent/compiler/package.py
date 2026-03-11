@@ -23,11 +23,9 @@ def package_agent(
     project_dir: Path,
     output_dir: Path,
     *,
-    capability_catalog: CapabilityCatalog,
+    capability_catalog: CapabilityCatalog | None = None,
 ) -> PackagedAgent:
     """Compile and package an agent project into an installable wheel."""
-    if capability_catalog is None:
-        raise PackagingError("capability_catalog is required")
     compiled = compile_agent(
         project_dir=project_dir,
         output_dir=output_dir,

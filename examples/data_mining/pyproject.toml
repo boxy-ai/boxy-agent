@@ -1,9 +1,9 @@
 [project]
-name = "canonical-data-mining-email-agent"
+name = "reference-data-mining-chat-agent"
 version = "0.1.0"
-description = "Minimal canonical Boxy data-mining email agent"
+description = "Minimal reference Boxy data-mining chat agent"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["boxy-agent>=0.2.0a1,<0.3.0"]
 
 [build-system]
 requires = ["setuptools>=69.0"]
@@ -16,14 +16,14 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [tool.boxy_agent.agent]
-name = "canonical-data-mining-email-agent"
-description = "Minimal data-mining agent"
+name = "reference-data-mining-chat-agent"
+description = "Minimal data-mining chat agent"
 version = "0.1.0"
 type = "data_mining"
 module = "data_mining_agent.agent"
 
 [tool.boxy_agent.capabilities]
-data_queries = ["gmail.messages"]
+data_queries = ["whatsapp.chat_context"]
 boxy_tools = []
 builtin_tools = []
 event_emitters = ["insight.generated"]

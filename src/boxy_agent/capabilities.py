@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import tomllib
 from dataclasses import dataclass
+from functools import lru_cache
+from importlib import resources
 from pathlib import Path
 from typing import cast
 
@@ -14,6 +16,8 @@ from boxy_agent.models import DataQueryDescriptor, ToolDescriptor
 from boxy_agent.types import JsonValue, ensure_json_value
 
 CATALOG_SCHEMA_VERSION = 1
+DEFAULT_BUILTIN_CAPABILITY_CATALOG_FILE = "builtin_capability.toml"
+DEFAULT_PACKAGED_CAPABILITY_CATALOG_FILE = "capability_catalog.toml"
 
 
 class CapabilityCatalogError(ValueError):
@@ -94,6 +98,34 @@ def load_capability_catalog_from_text(text: str, *, source: str = "<memory>") ->
         data_queries=data_queries,
         boxy_tools=boxy_tools,
         builtin_tools=builtin_tools,
+    )
+
+
+@lru_cache(maxsize=1)
+def load_packaged_capability_catalog() -> CapabilityCatalog:
+    """Load the packaged default capability catalog shipped with ``boxy-agent``."""
+    text = (
+        resources.files("boxy_agent")
+        .joinpath(DEFAULT_PACKAGED_CAPABILITY_CATALOG_FILE)
+        .read_text(encoding="utf-8")
+    )
+    return load_capability_catalog_from_text(
+        text,
+        source=f"boxy_agent:{DEFAULT_PACKAGED_CAPABILITY_CATALOG_FILE}",
+    )
+
+
+@lru_cache(maxsize=1)
+def load_packaged_builtin_capability_catalog() -> CapabilityCatalog:
+    """Load the packaged built-in-only capability catalog."""
+    text = (
+        resources.files("boxy_agent")
+        .joinpath(DEFAULT_BUILTIN_CAPABILITY_CATALOG_FILE)
+        .read_text(encoding="utf-8")
+    )
+    return load_capability_catalog_from_text(
+        text,
+        source=f"boxy_agent:{DEFAULT_BUILTIN_CAPABILITY_CATALOG_FILE}",
     )
 
 
@@ -282,6 +314,10 @@ __all__ = [
     "CATALOG_SCHEMA_VERSION",
     "CapabilityCatalog",
     "CapabilityCatalogError",
+    "DEFAULT_BUILTIN_CAPABILITY_CATALOG_FILE",
+    "DEFAULT_PACKAGED_CAPABILITY_CATALOG_FILE",
     "load_capability_catalog",
     "load_capability_catalog_from_text",
+    "load_packaged_builtin_capability_catalog",
+    "load_packaged_capability_catalog",
 ]

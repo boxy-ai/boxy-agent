@@ -7,8 +7,8 @@ import json
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
-from boxy_agent.capabilities import CapabilityCatalog, load_capability_catalog
-from boxy_agent.compiler import compile_agent, package_agent
+from boxy_agent.capabilities import CapabilityCatalog, load_packaged_capability_catalog
+from boxy_agent.compiler import package_agent
 from boxy_agent.runtime import AgentRuntime
 from boxy_agent.runtime.discovery import discover_registered_agents
 from boxy_agent.scaffold import create_agent_project
@@ -21,24 +21,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        capability_catalog: CapabilityCatalog | None = None
-        if hasattr(args, "capability_catalog"):
-            capability_catalog = _load_capability_catalog_arg(args.capability_catalog)
-
-        if args.command == "compile":
-            if capability_catalog is None:
-                raise ValueError("capability_catalog is required")
-            compiled = compile_agent(
-                project_dir=Path(args.project_dir),
-                output_dir=Path(args.output_dir),
-                capability_catalog=capability_catalog,
-            )
-            print(compiled.manifest_path)
-            return 0
+        capability_catalog: CapabilityCatalog = load_packaged_capability_catalog()
 
         if args.command == "package":
-            if capability_catalog is None:
-                raise ValueError("capability_catalog is required")
             packaged = package_agent(
                 project_dir=Path(args.project_dir),
                 output_dir=Path(args.output_dir),
@@ -48,8 +33,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
 
         if args.command == "list-agents":
-            if capability_catalog is None:
-                raise ValueError("capability_catalog is required")
             runtime, close_runtime_resources = _runtime_from_args(
                 args, capability_catalog=capability_catalog
             )
@@ -82,8 +65,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
 
         if args.command == "run":
-            if capability_catalog is None:
-                raise ValueError("capability_catalog is required")
             runtime, close_runtime_resources = _runtime_from_args(
                 args, capability_catalog=capability_catalog
             )
@@ -133,31 +114,23 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="boxy-agent")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    compile_parser = subparsers.add_parser("compile", help="Compile agent metadata and entrypoint")
-    compile_parser.add_argument("--project-dir", required=True)
-    compile_parser.add_argument("--output-dir", required=True)
-    compile_parser.add_argument("--capability-catalog", required=True)
-
     package_parser = subparsers.add_parser("package", help="Build an installable wheel")
     package_parser.add_argument("--project-dir", required=True)
     package_parser.add_argument("--output-dir", required=True)
-    package_parser.add_argument("--capability-catalog", required=True)
 
     list_agents_parser = subparsers.add_parser("list-agents", help="List installed agents")
     list_agents_parser.add_argument("--json", action="store_true")
     list_agents_parser.add_argument("--registry-file")
-    list_agents_parser.add_argument("--capability-catalog", required=True)
 
     run_parser = subparsers.add_parser("run", help="Run an installed agent")
     run_parser.add_argument("--agent", required=True)
     run_parser.add_argument("--registry-file")
-    run_parser.add_argument("--capability-catalog", required=True)
     event_group = run_parser.add_mutually_exclusive_group(required=True)
     event_group.add_argument("--event-json")
     event_group.add_argument("--event-file")
 
     create_parser = subparsers.add_parser("create-agent", help="Create a new agent project")
-    create_parser.add_argument("agent_type", help="Agent type: operation or data-mining")
+    create_parser.add_argument("agent_type", help="Agent type: automation or data-mining")
     create_parser.add_argument("--project-dir", required=True)
     create_parser.add_argument("--name")
     create_parser.add_argument("--description")
@@ -192,10 +165,6 @@ def _load_event_from_args(args: argparse.Namespace) -> dict[str, object]:
         "description": description,
         "payload": payload,
     }
-
-
-def _load_capability_catalog_arg(path: str) -> CapabilityCatalog:
-    return load_capability_catalog(Path(path))
 
 
 def _runtime_from_args(

@@ -3,7 +3,12 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from test_helpers.capabilities import default_capability_catalog
+from test_helpers.capabilities import (
+    DEFAULT_BOXY_TOOL_NAME,
+    DEFAULT_BUILTIN_TOOL_NAME,
+    DEFAULT_DATA_QUERY_NAME,
+    default_capability_catalog,
+)
 
 from boxy_agent.capabilities import (
     CapabilityCatalogError,
@@ -13,9 +18,9 @@ from boxy_agent.capabilities import (
 
 def test_default_capability_catalog_contains_expected_capabilities() -> None:
     catalog = default_capability_catalog()
-    assert "gmail.messages" in catalog.data_queries
-    assert "gmail.send_message" in catalog.boxy_tools
-    assert "web_search" in catalog.builtin_tools
+    assert DEFAULT_DATA_QUERY_NAME in catalog.data_queries
+    assert DEFAULT_BOXY_TOOL_NAME in catalog.boxy_tools
+    assert DEFAULT_BUILTIN_TOOL_NAME in catalog.builtin_tools
     assert "python_exec" in catalog.builtin_tools
 
 
