@@ -99,7 +99,7 @@ name = "sample-agent"
 version = "0.1.0"
 description = "No boxy metadata"
 requires-python = ">=3.12"
-dependencies = ["boxy-agent>=0.2.0a1,<0.3.0"]
+dependencies = ["boxy-agent>=0.2.0a2,<0.3.0"]
 
 [tool.other]
 enabled = true
