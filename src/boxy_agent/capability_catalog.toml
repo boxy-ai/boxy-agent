@@ -1,6 +1,323 @@
 schema_version = 1
 
 [[data_queries]]
+name = "wechat.chat_context"
+description = "Load WeChat chat history from raw connector message records."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "contact_username",
+]
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.contact_username]
+type = "string"
+
+[data_queries.input_schema.properties.before_create_time]
+type = "integer"
+minimum = 0
+
+[data_queries.input_schema.properties.before_local_id]
+type = "integer"
+minimum = 0
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "resolved_account_id",
+    "contact_username",
+    "before_create_time",
+    "before_local_id",
+    "next_before_create_time",
+    "next_before_local_id",
+    "has_more",
+    "count",
+    "messages",
+]
+
+[data_queries.output_schema.items.properties.resolved_account_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.contact_username]
+type = "string"
+
+[data_queries.output_schema.items.properties.before_create_time]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_local_id]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_create_time]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_local_id]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.has_more]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.count]
+type = "integer"
+
+[data_queries.output_schema.items.properties.messages]
+type = "array"
+
+[data_queries.output_schema.items.properties.messages.items]
+type = "object"
+required = [
+    "account_id",
+    "contact_username",
+    "local_id",
+    "server_id",
+    "local_type",
+    "create_time",
+    "real_sender_id",
+    "status",
+    "message_content",
+    "source",
+    "ingested_at",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.messages.items.properties.contact_username]
+type = "string"
+
+[data_queries.output_schema.items.properties.messages.items.properties.local_id]
+type = "integer"
+
+[data_queries.output_schema.items.properties.messages.items.properties.server_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.local_type]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.create_time]
+type = "integer"
+
+[data_queries.output_schema.items.properties.messages.items.properties.real_sender_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.status]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.message_content]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.source]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.ingested_at]
+type = "string"
+
+[[data_queries]]
+name = "wechat.list_chats_latest"
+description = "List latest WeChat conversations from raw connector history with stable seek pagination."
+
+[data_queries.input_schema]
+type = "object"
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.query]
+type = "string"
+
+[data_queries.input_schema.properties.contact_username]
+type = "string"
+
+[data_queries.input_schema.properties.before_latest_create_time]
+type = "integer"
+minimum = 0
+
+[data_queries.input_schema.properties.before_latest_local_id]
+type = "integer"
+minimum = 0
+
+[data_queries.input_schema.properties.before_contact_username]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "resolved_account_id",
+    "before_latest_create_time",
+    "before_latest_local_id",
+    "before_contact_username",
+    "next_before_latest_create_time",
+    "next_before_latest_local_id",
+    "next_before_contact_username",
+    "has_more",
+    "count",
+    "rows",
+]
+
+[data_queries.output_schema.items.properties.resolved_account_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_latest_create_time]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_latest_local_id]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_contact_username]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_latest_create_time]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_latest_local_id]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_contact_username]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.has_more]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.count]
+type = "integer"
+
+[data_queries.output_schema.items.properties.rows]
+type = "array"
+
+[data_queries.output_schema.items.properties.rows.items]
+type = "object"
+required = [
+    "account_id",
+    "contact_username",
+    "latest_create_time",
+    "latest_local_id",
+    "latest_server_id",
+    "latest_local_type",
+    "latest_real_sender_id",
+    "latest_status",
+    "latest_message_content",
+    "latest_source",
+    "latest_ingested_at",
+    "message_count",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.rows.items.properties.contact_username]
+type = "string"
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_create_time]
+type = "integer"
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_local_id]
+type = "integer"
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_server_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_local_type]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_real_sender_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_status]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_message_content]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_source]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_ingested_at]
+type = "string"
+
+[data_queries.output_schema.items.properties.rows.items.properties.message_count]
+type = "integer"
+
+[[data_queries]]
 name = "whatsapp.chat_context"
 description = "Load chat message context from connector DB history."
 
@@ -533,385 +850,6 @@ type = [
     "null",
 ]
 
-[[data_queries]]
-name = "wechat.chat_context"
-description = "Load WeChat chat history from raw connector message records."
-
-[data_queries.input_schema]
-type = "object"
-required = [
-    "contact_username",
-]
-
-[data_queries.input_schema.properties.account_id]
-type = "string"
-
-[data_queries.input_schema.properties.contact_username]
-type = "string"
-
-[data_queries.input_schema.properties.before_create_time]
-type = "integer"
-minimum = 0
-
-[data_queries.input_schema.properties.before_local_id]
-type = "integer"
-minimum = 0
-
-[data_queries.output_schema]
-type = "array"
-
-[data_queries.output_schema.items]
-type = "object"
-required = [
-    "resolved_account_id",
-    "contact_username",
-    "before_create_time",
-    "before_local_id",
-    "next_before_create_time",
-    "next_before_local_id",
-    "has_more",
-    "count",
-    "messages",
-]
-
-[data_queries.output_schema.items.properties.resolved_account_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.contact_username]
-type = "string"
-
-[data_queries.output_schema.items.properties.before_create_time]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.before_local_id]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.next_before_create_time]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.next_before_local_id]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.has_more]
-type = "boolean"
-
-[data_queries.output_schema.items.properties.count]
-type = "integer"
-
-[data_queries.output_schema.items.properties.messages]
-type = "array"
-
-[data_queries.output_schema.items.properties.messages.items]
-type = "object"
-required = [
-    "account_id",
-    "contact_username",
-    "local_id",
-    "server_id",
-    "local_type",
-    "create_time",
-    "real_sender_id",
-    "status",
-    "message_content",
-    "source",
-    "ingested_at",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.account_id]
-type = "string"
-
-[data_queries.output_schema.items.properties.messages.items.properties.contact_username]
-type = "string"
-
-[data_queries.output_schema.items.properties.messages.items.properties.local_id]
-type = "integer"
-
-[data_queries.output_schema.items.properties.messages.items.properties.server_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.local_type]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.create_time]
-type = "integer"
-
-[data_queries.output_schema.items.properties.messages.items.properties.real_sender_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.status]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.message_content]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.source]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.ingested_at]
-type = "string"
-
-[[data_queries]]
-name = "wechat.list_chats_latest"
-description = "List latest WeChat conversations from raw connector history with stable seek pagination."
-
-[data_queries.input_schema]
-type = "object"
-
-[data_queries.input_schema.properties.account_id]
-type = "string"
-
-[data_queries.input_schema.properties.query]
-type = "string"
-
-[data_queries.input_schema.properties.contact_username]
-type = "string"
-
-[data_queries.input_schema.properties.before_latest_create_time]
-type = "integer"
-minimum = 0
-
-[data_queries.input_schema.properties.before_latest_local_id]
-type = "integer"
-minimum = 0
-
-[data_queries.input_schema.properties.before_contact_username]
-type = "string"
-
-[data_queries.output_schema]
-type = "array"
-
-[data_queries.output_schema.items]
-type = "object"
-required = [
-    "resolved_account_id",
-    "before_latest_create_time",
-    "before_latest_local_id",
-    "before_contact_username",
-    "next_before_latest_create_time",
-    "next_before_latest_local_id",
-    "next_before_contact_username",
-    "has_more",
-    "count",
-    "rows",
-]
-
-[data_queries.output_schema.items.properties.resolved_account_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.before_latest_create_time]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.before_latest_local_id]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.before_contact_username]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.next_before_latest_create_time]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.next_before_latest_local_id]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.next_before_contact_username]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.has_more]
-type = "boolean"
-
-[data_queries.output_schema.items.properties.count]
-type = "integer"
-
-[data_queries.output_schema.items.properties.rows]
-type = "array"
-
-[data_queries.output_schema.items.properties.rows.items]
-type = "object"
-required = [
-    "account_id",
-    "contact_username",
-    "latest_create_time",
-    "latest_local_id",
-    "latest_server_id",
-    "latest_local_type",
-    "latest_real_sender_id",
-    "latest_status",
-    "latest_message_content",
-    "latest_source",
-    "latest_ingested_at",
-    "message_count",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.account_id]
-type = "string"
-
-[data_queries.output_schema.items.properties.rows.items.properties.contact_username]
-type = "string"
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_create_time]
-type = "integer"
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_local_id]
-type = "integer"
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_server_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_local_type]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_real_sender_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_status]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_message_content]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_source]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.latest_ingested_at]
-type = "string"
-
-[data_queries.output_schema.items.properties.rows.items.properties.message_count]
-type = "integer"
-
-[[boxy_tools]]
-name = "whatsapp.send_message"
-description = "Send one WhatsApp text message via whatsapp-runtime. Uses idempotency_key as runtime clientMessageId and retries 409 conflicts using Retry-After."
-side_effect = true
-
-[boxy_tools.input_schema]
-type = "object"
-required = [
-    "target",
-    "message_content",
-    "idempotency_key",
-]
-
-[boxy_tools.input_schema.properties.target]
-type = "string"
-description = "Target phone or jid accepted by whatsapp-runtime /messages/send."
-
-[boxy_tools.input_schema.properties.message_content]
-type = "string"
-description = "Plain-text message body."
-maxLength = 4096
-
-[boxy_tools.input_schema.properties.idempotency_key]
-type = "string"
-description = "Non-empty idempotency key mapped to runtime clientMessageId for safe retries."
-
-[boxy_tools.output_schema]
-type = "object"
-required = [
-    "status",
-    "target_resolved",
-    "message_ref",
-    "sent_at",
-    "details",
-]
-
-[boxy_tools.output_schema.properties.status]
-type = "string"
-enum = [
-    "sent",
-    "failed",
-    "unknown_delivery",
-]
-
-[boxy_tools.output_schema.properties.target_resolved]
-type = "string"
-
-[boxy_tools.output_schema.properties.message_ref]
-type = [
-    "string",
-    "null",
-]
-
-[boxy_tools.output_schema.properties.sent_at]
-type = [
-    "string",
-    "null",
-]
-
-[boxy_tools.output_schema.properties.details]
-type = "object"
-
 [[boxy_tools]]
 name = "wechat.login"
 description = "Start/poll/cancel/close WeChat QR login on a dedicated display"
@@ -1044,6 +982,529 @@ type = [
 [boxy_tools.output_schema.properties.details]
 type = "object"
 description = "Additional diagnostics; for `unknown_delivery`, `requires_new_idempotency_key_for_retry=true` indicates retries must use a new idempotency key."
+
+[[boxy_tools]]
+name = "whatsapp.send_message"
+description = "Send one WhatsApp text message via whatsapp-runtime. Uses idempotency_key as runtime clientMessageId and retries 409 conflicts using Retry-After."
+side_effect = true
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "target",
+    "message_content",
+    "idempotency_key",
+]
+
+[boxy_tools.input_schema.properties.target]
+type = "string"
+description = "Target phone or jid accepted by whatsapp-runtime /messages/send."
+
+[boxy_tools.input_schema.properties.message_content]
+type = "string"
+description = "Plain-text message body."
+maxLength = 4096
+
+[boxy_tools.input_schema.properties.idempotency_key]
+type = "string"
+description = "Non-empty idempotency key mapped to runtime clientMessageId for safe retries."
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "status",
+    "target_resolved",
+    "message_ref",
+    "sent_at",
+    "details",
+]
+
+[boxy_tools.output_schema.properties.status]
+type = "string"
+enum = [
+    "sent",
+    "failed",
+    "unknown_delivery",
+]
+
+[boxy_tools.output_schema.properties.target_resolved]
+type = "string"
+
+[boxy_tools.output_schema.properties.message_ref]
+type = [
+    "string",
+    "null",
+]
+
+[boxy_tools.output_schema.properties.sent_at]
+type = [
+    "string",
+    "null",
+]
+
+[boxy_tools.output_schema.properties.details]
+type = "object"
+
+[[boxy_tools]]
+name = "google_gmail.gmail_search_threads"
+description = "Search Gmail threads"
+
+[boxy_tools.input_schema]
+type = "object"
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.query]
+type = "string"
+
+[boxy_tools.input_schema.properties.limit]
+type = "integer"
+minimum = 1
+maximum = 100
+
+[boxy_tools.input_schema.properties.page_token]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "threads",
+    "next_page_token",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.threads]
+type = "array"
+
+[boxy_tools.output_schema.properties.next_page_token]
+type = [
+    "string",
+    "null",
+]
+
+[[boxy_tools]]
+name = "google_gmail.gmail_get_thread"
+description = "Fetch Gmail thread details"
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "thread_id",
+]
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.thread_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.format]
+type = "string"
+enum = [
+    "metadata",
+    "full",
+    "minimal",
+]
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "thread",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.thread]
+type = "object"
+
+[[boxy_tools]]
+name = "google_gmail.gmail_send_email"
+description = "Send Gmail email"
+side_effect = true
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "to",
+    "subject",
+    "body_text",
+]
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.to]
+type = "array"
+
+[boxy_tools.input_schema.properties.to.items]
+type = "string"
+
+[boxy_tools.input_schema.properties.cc]
+type = "array"
+
+[boxy_tools.input_schema.properties.cc.items]
+type = "string"
+
+[boxy_tools.input_schema.properties.bcc]
+type = "array"
+
+[boxy_tools.input_schema.properties.bcc.items]
+type = "string"
+
+[boxy_tools.input_schema.properties.subject]
+type = "string"
+
+[boxy_tools.input_schema.properties.body_text]
+type = "string"
+
+[boxy_tools.input_schema.properties.thread_id]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "message_id",
+    "thread_id",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.message_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.thread_id]
+type = [
+    "string",
+    "null",
+]
+
+[[boxy_tools]]
+name = "google_calendar.calendar_list_events"
+description = "List Google Calendar events"
+
+[boxy_tools.input_schema]
+type = "object"
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.calendar_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.time_min]
+type = "string"
+
+[boxy_tools.input_schema.properties.time_max]
+type = "string"
+
+[boxy_tools.input_schema.properties.query]
+type = "string"
+
+[boxy_tools.input_schema.properties.limit]
+type = "integer"
+minimum = 1
+maximum = 250
+
+[boxy_tools.input_schema.properties.page_token]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "events",
+    "next_page_token",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.events]
+type = "array"
+
+[boxy_tools.output_schema.properties.next_page_token]
+type = [
+    "string",
+    "null",
+]
+
+[[boxy_tools]]
+name = "google_calendar.calendar_create_event"
+description = "Create a Google Calendar event"
+side_effect = true
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "summary",
+    "start",
+    "end",
+]
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.calendar_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.summary]
+type = "string"
+
+[boxy_tools.input_schema.properties.start]
+type = "string"
+
+[boxy_tools.input_schema.properties.end]
+type = "string"
+
+[boxy_tools.input_schema.properties.attendees]
+type = "array"
+
+[boxy_tools.input_schema.properties.attendees.items]
+type = "string"
+
+[boxy_tools.input_schema.properties.location]
+type = "string"
+
+[boxy_tools.input_schema.properties.description]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "event",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.event]
+type = "object"
+
+[[boxy_tools]]
+name = "google_drive.drive_search_files"
+description = "Search Google Drive files"
+
+[boxy_tools.input_schema]
+type = "object"
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.q]
+type = "string"
+
+[boxy_tools.input_schema.properties.limit]
+type = "integer"
+minimum = 1
+maximum = 100
+
+[boxy_tools.input_schema.properties.page_token]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "files",
+    "next_page_token",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.files]
+type = "array"
+
+[boxy_tools.output_schema.properties.next_page_token]
+type = [
+    "string",
+    "null",
+]
+
+[[boxy_tools]]
+name = "google_drive.drive_get_file"
+description = "Fetch Google Drive file metadata"
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "file_id",
+]
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.file_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.fields]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "file",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.file]
+type = "object"
+
+[[boxy_tools]]
+name = "google_chat.chat_list_spaces"
+description = "List Google Chat spaces"
+
+[boxy_tools.input_schema]
+type = "object"
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.limit]
+type = "integer"
+minimum = 1
+maximum = 100
+
+[boxy_tools.input_schema.properties.page_token]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "spaces",
+    "next_page_token",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.spaces]
+type = "array"
+
+[boxy_tools.output_schema.properties.next_page_token]
+type = [
+    "string",
+    "null",
+]
+
+[[boxy_tools]]
+name = "google_chat.chat_list_messages"
+description = "List Google Chat messages in a space"
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "space",
+]
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.space]
+type = "string"
+
+[boxy_tools.input_schema.properties.limit]
+type = "integer"
+minimum = 1
+maximum = 100
+
+[boxy_tools.input_schema.properties.page_token]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "messages",
+    "next_page_token",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.messages]
+type = "array"
+
+[boxy_tools.output_schema.properties.next_page_token]
+type = [
+    "string",
+    "null",
+]
+
+[[boxy_tools]]
+name = "google_docs.docs_get_document"
+description = "Fetch Google Docs document structure"
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "document_id",
+]
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.document_id]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "document",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.document]
+type = "object"
+
+[[boxy_tools]]
+name = "google_sheets.sheets_get_values"
+description = "Read Google Sheets cell values"
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "spreadsheet_id",
+    "range_a1",
+]
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.spreadsheet_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.range_a1]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "values",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.values]
+type = "array"
 
 [[builtin_tools]]
 name = "web_search"

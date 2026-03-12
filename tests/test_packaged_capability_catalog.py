@@ -9,8 +9,10 @@ from boxy_agent.capabilities import (
 def test_packaged_capability_catalog_contains_shipping_connector_and_builtin_capabilities() -> None:
     catalog = load_packaged_capability_catalog()
 
+    assert "google_gmail.gmail_search_threads" in catalog.boxy_tools
     assert "whatsapp.chat_context" in catalog.data_queries
     assert "whatsapp.send_message" in catalog.boxy_tools
+    assert "reference.reference_echo" not in catalog.boxy_tools
     assert "web_search" in catalog.builtin_tools
 
 

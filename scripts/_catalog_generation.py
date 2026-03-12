@@ -43,9 +43,6 @@ def _load_capability_helpers():
     return CapabilityCatalog, load_capability_catalog
 
 
-SHIPPING_CONNECTOR_IDS: tuple[str, ...] = ("local_files", "whatsapp", "wechat")
-
-
 @dataclass(frozen=True)
 class GeneratedCapabilityCatalogs:
     connector_catalog: CapabilityCatalog
@@ -59,29 +56,11 @@ def generate_capability_catalogs(
     CapabilityCatalog, load_capability_catalog = _load_capability_helpers()
     _ensure_monorepo_import_paths()
 
-    from boxy_desktop.connector.apps.local_files.connector import (
-        LocalFilesConnector,
-        LocalFilesConnectorConfig,
-    )
-    from boxy_desktop.connector.apps.wechat import WechatConnector
-    from boxy_desktop.connector.apps.whatsapp import WhatsappConnector
+    from boxy_desktop.connector import create_shipping_connectors
     from boxy_desktop.connector.capability_generator import build_catalog
 
-    connectors = (
-        ("local_files", LocalFilesConnector(config=LocalFilesConnectorConfig())),
-        ("whatsapp", WhatsappConnector()),
-        ("wechat", WechatConnector()),
-    )
-    connector_ids = tuple(connector_id for connector_id, _connector in connectors)
-    if connector_ids != SHIPPING_CONNECTOR_IDS:
-        raise RuntimeError(
-            "Shipping connector profile mismatch: "
-            f"expected {SHIPPING_CONNECTOR_IDS}, got {connector_ids}"
-        )
-
-    connector_catalog = build_catalog(
-        [connector.describe() for _connector_id, connector in connectors]
-    )
+    connectors = create_shipping_connectors()
+    connector_catalog = build_catalog([connector.describe() for connector in connectors])
     builtin_catalog = load_capability_catalog(
         builtin_catalog_path or builtin_capability_catalog_path()
     )
