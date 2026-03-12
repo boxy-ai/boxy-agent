@@ -57,10 +57,13 @@ class ToolDescriptor:
         }
     )
     output_schema: dict[str, JsonValue] = field(default_factory=dict)
+    side_effect: bool = False
 
     def __post_init__(self) -> None:
         _require_non_empty("name", self.name)
         _require_non_empty("description", self.description)
+        if not isinstance(self.side_effect, bool):
+            raise TypeError("side_effect must be a boolean")
         for key, value in self.input_schema.items():
             _require_non_empty("input schema key", key)
             ensure_json_value(value, label=f"input schema value for {self.name}:{key}")

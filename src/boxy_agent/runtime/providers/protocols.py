@@ -90,8 +90,8 @@ class AgentSdkProvider(Protocol):
         """Provide a built-in tool client."""
         ...
 
-    def llm_client(self) -> LlmClient:
-        """Provide an LLM client."""
+    def llm_client(self, *, agent_name: str, session_id: str) -> LlmClient:
+        """Provide an LLM client for one runtime invocation."""
         ...
 
     def create_memory_store(self, *, agent_name: str, session_id: str) -> MemoryStore:
@@ -100,4 +100,16 @@ class AgentSdkProvider(Protocol):
 
     def publish_event(self, event: EventQueueItem) -> None:
         """Publish one queued runtime event."""
+        ...
+
+    def record_trace(
+        self,
+        *,
+        agent_name: str,
+        session_id: str,
+        event: AgentEvent,
+        trace_name: str,
+        payload: dict[str, JsonValue],
+    ) -> None:
+        """Persist or forward one runtime trace record."""
         ...

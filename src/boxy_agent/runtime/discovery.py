@@ -4,16 +4,15 @@ from __future__ import annotations
 
 import importlib
 import sys
-import zipfile
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
 from typing import cast
 
-from boxy_agent.models import AgentCapabilities, parse_agent_type
 from boxy_agent.runtime.errors import RegistrationError
 from boxy_agent.runtime.models import InstalledAgent
+from boxy_agent.runtime.wheel_inspection import InspectedWheelArtifact, inspect_wheel_artifact
 from boxy_agent.sdk.interfaces import AgentMainFunction
 
 
@@ -24,6 +23,30 @@ class DiscoveredAgent:
     installed: InstalledAgent
     handler: AgentMainFunction
     wheel_path: Path | None = None
+
+
+def validate_wheel_entrypoint(
+    *,
+    wheel_path: Path,
+    agent_name: str | None = None,
+) -> InspectedWheelArtifact:
+    """Validate that a wheel manifest resolves to an importable callable entrypoint."""
+    inspected = inspect_wheel_artifact(wheel_path=wheel_path, agent_name=agent_name)
+    module_name, _function_name = _require_manifest_entrypoint(
+        inspected.manifest,
+        agent_name=inspected.installed.name,
+    )
+    root_package = module_name.split(".")[0]
+    try:
+        _load_handler_from_manifest(
+            inspected.manifest,
+            agent_name=inspected.installed.name,
+            wheel_path=inspected.wheel_path,
+        )
+    finally:
+        _unload_package_modules(root_package)
+        _remove_wheel_from_sys_path(inspected.wheel_path)
+    return inspected
 
 
 def discover_registered_agents(
@@ -59,87 +82,18 @@ def discover_registered_agents(
 
     discovered: dict[str, DiscoveredAgent] = {}
     for _agent_id, agent_name, wheel_path in normalized_records:
-        manifest = _load_manifest_from_wheel(wheel_path=wheel_path, agent_name=agent_name)
-        installed = _installed_agent_from_manifest(name=agent_name, payload=manifest)
+        inspected = inspect_wheel_artifact(wheel_path=wheel_path, agent_name=agent_name)
         handler = _load_handler_from_manifest(
-            manifest,
+            inspected.manifest,
             agent_name=agent_name,
             wheel_path=wheel_path,
         )
         discovered[agent_name] = DiscoveredAgent(
-            installed=installed,
+            installed=inspected.installed,
             handler=handler,
             wheel_path=wheel_path,
         )
     return discovered
-
-
-def _load_manifest_from_wheel(*, wheel_path: Path, agent_name: str) -> dict[str, object]:
-    manifest_module_name = _manifest_module_name_from_wheel(
-        wheel_path=wheel_path, agent_name=agent_name
-    )
-    module = _import_module_from_wheel(
-        module_name=manifest_module_name,
-        wheel_path=wheel_path,
-        agent_name=agent_name,
-    )
-    payload = getattr(module, "COMPILED_AGENT_MANIFEST", None)
-    if not isinstance(payload, dict):
-        raise RegistrationError(
-            "Compiled manifest module must define COMPILED_AGENT_MANIFEST as an object for "
-            f"agent '{agent_name}'"
-        )
-    return cast(dict[str, object], payload)
-
-
-def _manifest_module_name_from_wheel(*, wheel_path: Path, agent_name: str) -> str:
-    try:
-        with zipfile.ZipFile(wheel_path) as wheel:
-            module_names = sorted(
-                {
-                    module_name
-                    for member in wheel.namelist()
-                    if (module_name := _module_name_for_manifest_member(member)) is not None
-                }
-            )
-    except zipfile.BadZipFile as exc:
-        raise RegistrationError(
-            f"Wheel artifact is not a valid zip file for '{agent_name}': {wheel_path}"
-        ) from exc
-
-    if not module_names:
-        raise RegistrationError(
-            f"Wheel for '{agent_name}' is missing embedded compiled manifest module"
-        )
-    if len(module_names) > 1:
-        rendered = ", ".join(module_names)
-        raise RegistrationError(
-            f"Wheel for '{agent_name}' defines multiple compiled manifest modules: {rendered}"
-        )
-    return module_names[0]
-
-
-def _module_name_for_manifest_member(member: str) -> str | None:
-    if not member.endswith("/boxy_agent_compiled_manifest.py"):
-        return None
-
-    parts = tuple(part for part in member.split("/") if part)
-    if not parts:
-        return None
-
-    module_parts: tuple[str, ...]
-    if parts[0].endswith(".data"):
-        if len(parts) < 4 or parts[1] not in {"purelib", "platlib"}:
-            return None
-        module_parts = parts[2:-1]
-    else:
-        module_parts = parts[:-1]
-
-    if not module_parts:
-        return None
-    if any(not segment.isidentifier() for segment in module_parts):
-        return None
-    return ".".join((*module_parts, "boxy_agent_compiled_manifest"))
 
 
 def _load_handler_from_manifest(
@@ -148,9 +102,7 @@ def _load_handler_from_manifest(
     agent_name: str,
     wheel_path: Path,
 ) -> AgentMainFunction:
-    entrypoint = _require_table(manifest, "entrypoint", agent_name=agent_name)
-    module_name = _require_string(entrypoint, "module", agent_name=agent_name)
-    function_name = _require_string(entrypoint, "function", agent_name=agent_name)
+    module_name, function_name = _require_manifest_entrypoint(manifest, agent_name=agent_name)
 
     module = _import_module_from_wheel(
         module_name=module_name,
@@ -166,25 +118,57 @@ def _load_handler_from_manifest(
     return cast(AgentMainFunction, handler)
 
 
+def _require_manifest_entrypoint(
+    manifest: dict[str, object],
+    *,
+    agent_name: str,
+) -> tuple[str, str]:
+    entrypoint = manifest.get("entrypoint")
+    if not isinstance(entrypoint, dict):
+        raise RegistrationError(f"Manifest key 'entrypoint' missing for agent '{agent_name}'")
+
+    module_name = entrypoint.get("module")
+    if not isinstance(module_name, str) or not module_name.strip():
+        raise RegistrationError(
+            f"Manifest key 'module' must be a non-empty string for agent '{agent_name}'"
+        )
+
+    function_name = entrypoint.get("function")
+    if not isinstance(function_name, str) or not function_name.strip():
+        raise RegistrationError(
+            f"Manifest key 'function' must be a non-empty string for agent '{agent_name}'"
+        )
+
+    return module_name.strip(), function_name.strip()
+
+
 def _import_module_from_wheel(*, module_name: str, wheel_path: Path, agent_name: str) -> ModuleType:
     _ensure_wheel_on_sys_path(wheel_path)
+
+    root_package = module_name.split(".")[0]
+    existing_root = sys.modules.get(root_package)
+    if existing_root is not None and not _module_origin_matches_wheel(existing_root, wheel_path):
+        if _module_origin_is_wheel(existing_root):
+            _unload_package_modules(root_package)
+        else:
+            raise RegistrationError(
+                f"Cannot load package '{root_package}' for '{agent_name}' from wheel "
+                f"'{wheel_path}'. Package already loaded from "
+                f"'{_module_origin_label(existing_root)}'"
+            )
 
     existing_module = sys.modules.get(module_name)
     if existing_module is not None:
         if _module_origin_matches_wheel(existing_module, wheel_path):
             return existing_module
-        raise RegistrationError(
-            f"Cannot load module '{module_name}' for '{agent_name}' from wheel '{wheel_path}'. "
-            f"Module already loaded from '{_module_origin_label(existing_module)}'"
-        )
-
-    root_package = module_name.split(".")[0]
-    existing_root = sys.modules.get(root_package)
-    if existing_root is not None and not _module_origin_matches_wheel(existing_root, wheel_path):
-        raise RegistrationError(
-            f"Cannot load package '{root_package}' for '{agent_name}' from wheel '{wheel_path}'. "
-            f"Package already loaded from '{_module_origin_label(existing_root)}'"
-        )
+        if _module_origin_is_wheel(existing_module):
+            _unload_package_modules(root_package)
+        else:
+            raise RegistrationError(
+                f"Cannot load module '{module_name}' for '{agent_name}' from wheel "
+                f"'{wheel_path}'. Module already loaded from "
+                f"'{_module_origin_label(existing_module)}'"
+            )
 
     try:
         module = importlib.import_module(module_name)
@@ -206,17 +190,59 @@ def _ensure_wheel_on_sys_path(wheel_path: Path) -> None:
     if wheel_path_str in sys.path:
         sys.path.remove(wheel_path_str)
     sys.path.insert(0, wheel_path_str)
+    importlib.invalidate_caches()
 
 
-def _module_origin_matches_wheel(module: ModuleType, wheel_path: Path) -> bool:
+def _remove_wheel_from_sys_path(wheel_path: Path) -> None:
+    wheel_path_str = str(wheel_path)
+    if wheel_path_str in sys.path:
+        sys.path.remove(wheel_path_str)
+        importlib.invalidate_caches()
+
+
+def _unload_package_modules(root_package: str) -> None:
+    package_prefix = f"{root_package}."
+    module_names = sorted(
+        name for name in sys.modules if name == root_package or name.startswith(package_prefix)
+    )
+    for module_name in reversed(module_names):
+        sys.modules.pop(module_name, None)
+    if module_names:
+        importlib.invalidate_caches()
+
+
+def _module_origin_is_wheel(module: ModuleType) -> bool:
+    return _module_wheel_path(module) is not None
+
+
+def _module_wheel_path(module: ModuleType) -> Path | None:
     loader = getattr(module, "__loader__", None)
     archive = getattr(loader, "archive", None)
     if isinstance(archive, str):
         try:
-            if Path(archive).resolve() == wheel_path:
-                return True
+            return Path(archive).resolve()
         except OSError:
-            return False
+            return None
+
+    module_file = getattr(module, "__file__", None)
+    if not isinstance(module_file, str):
+        return None
+
+    normalized = module_file.replace("\\", "/")
+    marker = ".whl/"
+    if marker not in normalized:
+        return None
+    archive_path = normalized.split(marker, 1)[0] + ".whl"
+    try:
+        return Path(archive_path).resolve()
+    except OSError:
+        return None
+
+
+def _module_origin_matches_wheel(module: ModuleType, wheel_path: Path) -> bool:
+    origin_wheel_path = _module_wheel_path(module)
+    if origin_wheel_path is not None:
+        return origin_wheel_path == wheel_path
 
     module_file = getattr(module, "__file__", None)
     if isinstance(module_file, str):
@@ -235,83 +261,6 @@ def _module_origin_label(module: ModuleType) -> str:
     if isinstance(module_file, str):
         return module_file
     return "<unknown origin>"
-
-
-def _installed_agent_from_manifest(*, name: str, payload: object) -> InstalledAgent:
-    if not isinstance(payload, dict):
-        raise RegistrationError(f"Manifest entry point for '{name}' must load a dictionary")
-
-    manifest = cast(dict[str, object], payload)
-    capabilities_table = _require_table(manifest, "capabilities", agent_name=name)
-
-    installed_name = _require_string(manifest, "name", agent_name=name)
-    if installed_name != name:
-        raise RegistrationError(
-            f"Manifest name mismatch for '{name}': manifest declares '{installed_name}'"
-        )
-
-    description = _require_string(manifest, "description", agent_name=name)
-    version = _require_string(manifest, "version", agent_name=name)
-    agent_type = parse_agent_type(_require_string(manifest, "type", agent_name=name))
-    expected_event_types = tuple(
-        _optional_string_list(manifest, "expected_event_types", agent_name=name)
-    )
-
-    capabilities = AgentCapabilities(
-        data_queries=frozenset(
-            _optional_string_list(capabilities_table, "data_queries", agent_name=name)
-        ),
-        boxy_tools=frozenset(
-            _optional_string_list(capabilities_table, "boxy_tools", agent_name=name)
-        ),
-        builtin_tools=frozenset(
-            _optional_string_list(capabilities_table, "builtin_tools", agent_name=name)
-        ),
-        event_emitters=frozenset(
-            _optional_string_list(capabilities_table, "event_emitters", agent_name=name)
-        ),
-    )
-
-    return InstalledAgent(
-        name=name,
-        description=description,
-        version=version,
-        agent_type=agent_type,
-        expected_event_types=expected_event_types,
-        capabilities=capabilities,
-    )
-
-
-def _require_table(data: dict[str, object], key: str, *, agent_name: str) -> dict[str, object]:
-    value = data.get(key)
-    if not isinstance(value, dict):
-        raise RegistrationError(f"Manifest key '{key}' missing for agent '{agent_name}'")
-    return cast(dict[str, object], value)
-
-
-def _require_string(data: dict[str, object], key: str, *, agent_name: str) -> str:
-    value = data.get(key)
-    if not isinstance(value, str) or not value.strip():
-        raise RegistrationError(
-            f"Manifest key '{key}' must be a non-empty string for agent '{agent_name}'"
-        )
-    return value.strip()
-
-
-def _optional_string_list(data: dict[str, object], key: str, *, agent_name: str) -> list[str]:
-    value = data.get(key)
-    if value is None:
-        return []
-    if not isinstance(value, list):
-        raise RegistrationError(f"Manifest key '{key}' must be a list for agent '{agent_name}'")
-    normalized: list[str] = []
-    for item in value:
-        if not isinstance(item, str) or not item.strip():
-            raise RegistrationError(
-                f"Manifest key '{key}' must contain non-empty strings for agent '{agent_name}'"
-            )
-        normalized.append(item.strip())
-    return normalized
 
 
 def _require_record_string(record: Mapping[str, object], key: str) -> str:

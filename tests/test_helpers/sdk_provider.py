@@ -163,7 +163,8 @@ class MockAgentSdkProvider:
             return self._builtin_tool_client
         return default_builtin_tool_client(catalog=catalog)
 
-    def llm_client(self) -> LlmClient:
+    def llm_client(self, *, agent_name: str, session_id: str) -> LlmClient:
+        _ = agent_name, session_id
         if self._llm_client is not None:
             return self._llm_client
         return MockLlmClient()
@@ -179,3 +180,14 @@ class MockAgentSdkProvider:
 
     def publish_event(self, event: EventQueueItem) -> None:
         _ = event
+
+    def record_trace(
+        self,
+        *,
+        agent_name: str,
+        session_id: str,
+        event: AgentEvent,
+        trace_name: str,
+        payload: dict[str, JsonValue],
+    ) -> None:
+        _ = agent_name, session_id, event, trace_name, payload

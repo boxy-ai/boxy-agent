@@ -187,11 +187,18 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             capability_name=name,
             source=source,
         )
+        side_effect = _optional_bool(
+            table,
+            "side_effect",
+            label=f"{label}[{index}]",
+            source=source,
+        )
         by_name[name] = ToolDescriptor(
             name=name,
             description=description,
             input_schema=input_schema,
             output_schema=output_schema,
+            side_effect=side_effect,
         )
     return by_name
 
@@ -216,6 +223,19 @@ def _require_string(data: dict[str, object], key: str, *, label: str) -> str:
     if not normalized:
         raise CapabilityCatalogError(f"{label}.{key} must be non-empty")
     return normalized
+
+
+def _optional_bool(
+    data: dict[str, object],
+    key: str,
+    *,
+    label: str,
+    source: str,
+) -> bool:
+    value = data.get(key, False)
+    if not isinstance(value, bool):
+        raise CapabilityCatalogError(f"{label}.{key} must be a boolean ({source})")
+    return value
 
 
 def _require_schema(

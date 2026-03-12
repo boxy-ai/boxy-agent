@@ -9,12 +9,15 @@ from boxy_agent import (
     AgentEvent,
     AgentResult,
     emit_event,
+    llm_chat_complete,
     memory_get,
     memory_set,
+    trace,
 )
 from boxy_agent.runtime import AgentRuntime
 from boxy_agent.runtime.models import EventQueueItem
 from boxy_agent.runtime.providers import CoreAgentSdkProvider
+from boxy_agent.sdk.interfaces import LlmClient
 from boxy_agent.types import JsonValue
 
 
@@ -24,6 +27,7 @@ class _RecordingProvider(MockAgentSdkProvider):
         self.created_sessions: list[tuple[str, str]] = []
         self.closed_sessions: list[str] = []
         self.published_events: list[EventQueueItem] = []
+        self.recorded_traces: list[tuple[str, str, str]] = []
 
     def create_session(self, *, agent_name: str, event: AgentEvent) -> str:
         session_id = super().create_session(agent_name=agent_name, event=event)
@@ -35,6 +39,37 @@ class _RecordingProvider(MockAgentSdkProvider):
 
     def publish_event(self, event: EventQueueItem) -> None:
         self.published_events.append(event)
+
+    def record_trace(
+        self,
+        *,
+        agent_name: str,
+        session_id: str,
+        event: AgentEvent,
+        trace_name: str,
+        payload: dict[str, JsonValue],
+    ) -> None:
+        _ = payload
+        self.recorded_traces.append((agent_name, session_id, f"{event.type}:{trace_name}"))
+
+
+class _RecordingLlmClient:
+    def __init__(self) -> None:
+        self.requests: list[dict[str, JsonValue]] = []
+
+    def chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        self.requests.append(request)
+        return {"choices": [{"message": {"role": "assistant", "content": "ok"}}]}
+
+
+class _SessionAwareLlmProvider(MockAgentSdkProvider):
+    def __init__(self, *, llm_client: LlmClient) -> None:
+        super().__init__(llm_client=llm_client)
+        self.llm_client_calls: list[tuple[str, str]] = []
+
+    def llm_client(self, *, agent_name: str, session_id: str) -> LlmClient:
+        self.llm_client_calls.append((agent_name, session_id))
+        return super().llm_client(agent_name=agent_name, session_id=session_id)
 
 
 class _FakeCoreClient:
@@ -99,6 +134,7 @@ def test_runtime_uses_injected_sdk_provider() -> None:
 
     def handle(exec_ctx):
         memory_set(exec_ctx, "counter", 1)
+        trace(exec_ctx, "main.test.trace", {"iteration_index": 1})
         emit_event(exec_ctx, "followup", payload={"step": 2})
         return AgentResult(output={"counter": memory_get(exec_ctx, "counter")})
 
@@ -122,6 +158,7 @@ def test_runtime_uses_injected_sdk_provider() -> None:
     assert provider.created_sessions == [("main", "start")]
     assert provider.closed_sessions == [report.session_id]
     assert [item.event.type for item in provider.published_events] == ["followup"]
+    assert provider.recorded_traces == [("main", report.session_id, "start:main.test.trace")]
 
 
 def test_core_provider_uses_core_for_sessions_memory_and_events() -> None:
@@ -174,23 +211,63 @@ def test_core_provider_uses_core_for_sessions_memory_and_events() -> None:
     first_payload, first_topic = core_client.enqueued_events[0]
     assert first_topic == "agent-events"
     assert first_payload == {
+        "target_kind": "main_agent",
+        "mode": "workflow",
+        "trigger_kind": "root",
         "event": {"type": "followup", "description": "", "payload": {"k": "v"}},
         "source": "agent",
-        "workflow": True,
-        "trigger_kind": "root",
         "source_agent": "main",
-        "session_id": "core-session-1",
+        "source_session_id": "core-session-1",
     }
 
     second_payload, second_topic = core_client.enqueued_events[1]
     assert second_topic == "agent-events"
     assert second_payload == {
+        "target_kind": "main_agent",
+        "mode": "workflow",
+        "trigger_kind": "root",
         "event": {
             "type": "connector.email",
             "description": "",
             "payload": {"id": "m-1"},
         },
         "source": "connector",
-        "workflow": True,
-        "trigger_kind": "root",
     }
+
+
+def test_runtime_requests_llm_client_with_bound_session() -> None:
+    llm_client = _RecordingLlmClient()
+    provider = _SessionAwareLlmProvider(llm_client=llm_client)
+
+    def handle(exec_ctx):
+        return AgentResult(
+            output=llm_chat_complete(
+                exec_ctx,
+                {
+                    "model": "gpt-4.1",
+                    "messages": [{"role": "user", "content": "hello"}],
+                },
+            )
+        )
+
+    runtime = AgentRuntime(
+        capability_catalog=default_capability_catalog(),
+        sdk_provider=provider,
+        agent_registry_loader=lambda: {
+            "main": discovered_agent(
+                name="main",
+                handler=handle,
+                capabilities=AgentCapabilities(),
+            )
+        },
+    )
+
+    report = runtime.run("main", {"type": "start"})
+
+    assert provider.llm_client_calls == [("main", report.session_id)]
+    assert llm_client.requests == [
+        {
+            "model": "gpt-4.1",
+            "messages": [{"role": "user", "content": "hello"}],
+        }
+    ]

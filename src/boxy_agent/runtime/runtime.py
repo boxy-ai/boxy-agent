@@ -129,7 +129,8 @@ class _RuntimeDefaultSdkProvider:
     def builtin_tool_client(self, catalog: CapabilityCatalog) -> ToolClient:
         return BuiltinToolClient(descriptors=list(catalog.builtin_tools.values()))
 
-    def llm_client(self) -> LlmClient:
+    def llm_client(self, *, agent_name: str, session_id: str) -> LlmClient:
+        _ = agent_name, session_id
         return UnconfiguredLlmClient()
 
     def create_memory_store(self, *, agent_name: str, session_id: str) -> MemoryStore:
@@ -142,6 +143,17 @@ class _RuntimeDefaultSdkProvider:
 
     def publish_event(self, event: EventQueueItem) -> None:
         _ = event
+
+    def record_trace(
+        self,
+        *,
+        agent_name: str,
+        session_id: str,
+        event: AgentEvent,
+        trace_name: str,
+        payload: dict[str, JsonValue],
+    ) -> None:
+        _ = agent_name, session_id, event, trace_name, payload
 
 
 @dataclass
@@ -377,7 +389,6 @@ class AgentRuntime:
         self._data_client = self._sdk_provider.data_query_client(self._capability_catalog)
         self._boxy_tool_client = self._sdk_provider.boxy_tool_client(self._capability_catalog)
         self._builtin_tool_client = self._sdk_provider.builtin_tool_client(self._capability_catalog)
-        self._llm_client = self._sdk_provider.llm_client()
         self._terminated_sessions: set[str] = set()
         self._event_queue: list[EventQueueItem] = []
 
@@ -528,6 +539,13 @@ class AgentRuntime:
                     payload=payload,
                 )
             )
+            self._sdk_provider.record_trace(
+                agent_name=target.installed.name,
+                session_id=session_state.session_id,
+                event=event,
+                trace_name=name,
+                payload=payload,
+            )
 
         def emit_event_callback(agent_event: AgentEvent) -> None:
             queue_item = EventQueueItem(
@@ -547,7 +565,10 @@ class AgentRuntime:
             "data_client": self._data_client,
             "boxy_tool_client": self._boxy_tool_client,
             "builtin_tool_client": self._builtin_tool_client,
-            "llm_client": self._llm_client,
+            "llm_client": self._sdk_provider.llm_client(
+                agent_name=target.installed.name,
+                session_id=session_state.session_id,
+            ),
             "memory_store": memory_store,
             "trace_callback": trace_callback,
             "terminate_callback": terminate_callback,

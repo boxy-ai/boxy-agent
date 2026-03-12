@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from boxy_agent.runtime.discovery import discover_registered_agents
+from boxy_agent.runtime.discovery import (
+    discover_registered_agents,
+    validate_wheel_entrypoint,
+)
 from boxy_agent.runtime.errors import (
     AgentExecutionError,
     AgentNotFoundError,
@@ -24,6 +27,7 @@ from boxy_agent.runtime.providers import (
     CoreAgentSdkProvider,
 )
 from boxy_agent.runtime.runtime import AgentRuntime
+from boxy_agent.runtime.wheel_inspection import inspect_wheel_artifact
 
 __all__ = [
     "AgentExecutionError",
@@ -37,9 +41,11 @@ __all__ = [
     "discover_registered_agents",
     "EventQueueItem",
     "InstalledAgent",
+    "inspect_wheel_artifact",
     "InvalidEventError",
     "RegistrationError",
     "RunReport",
     "RunStatus",
     "TraceRecord",
+    "validate_wheel_entrypoint",
 ]

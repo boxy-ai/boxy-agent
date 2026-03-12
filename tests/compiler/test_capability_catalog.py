@@ -72,6 +72,7 @@ name = "custom.send"
 description = "Custom tool"
 input_schema = { type = "object", properties = { body = { type = "string" } } }
 output_schema = { type = "object", properties = { status = { type = "string" } } }
+side_effect = true
 
 [[builtin_tools]]
 name = "custom.search"
@@ -87,3 +88,4 @@ output_schema = { type = "object" }
     assert list(catalog.data_queries) == ["custom.messages"]
     assert list(catalog.boxy_tools) == ["custom.send"]
     assert list(catalog.builtin_tools) == ["custom.search"]
+    assert catalog.boxy_tools["custom.send"].side_effect is True

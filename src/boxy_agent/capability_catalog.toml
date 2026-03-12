@@ -853,6 +853,7 @@ type = "integer"
 [[boxy_tools]]
 name = "whatsapp.send_message"
 description = "Send one WhatsApp text message via whatsapp-runtime. Uses idempotency_key as runtime clientMessageId and retries 409 conflicts using Retry-After."
+side_effect = true
 
 [boxy_tools.input_schema]
 type = "object"
@@ -914,6 +915,7 @@ type = "object"
 [[boxy_tools]]
 name = "wechat.login"
 description = "Start/poll/cancel/close WeChat QR login on a dedicated display"
+side_effect = true
 
 [boxy_tools.input_schema]
 type = "object"
@@ -973,6 +975,7 @@ type = "object"
 [[boxy_tools]]
 name = "wechat.send_message"
 description = "Dispatch a single-line WeChat plain-text message (max 4096 chars). Requires idempotency_key for safe deduplication/replay; `status=sent` is dispatch-only (not delivery-confirmed), and `unknown_delivery` requires retry with a new idempotency key."
+side_effect = true
 
 [boxy_tools.input_schema]
 type = "object"

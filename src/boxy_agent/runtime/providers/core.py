@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from boxy_agent.capabilities import CapabilityCatalog
 from boxy_agent.models import AgentEvent
 from boxy_agent.runtime.models import EventQueueItem
@@ -59,6 +61,11 @@ class CoreAgentSdkProvider:
         builtin_tool_client: ToolClient | None = None,
         llm_client: LlmClient | None = None,
         event_topic: str = "default",
+        trace_recorder: Callable[
+            [str, str, AgentEvent, str, dict[str, JsonValue]],
+            None,
+        ]
+        | None = None,
     ) -> None:
         if not event_topic.strip():
             raise ValueError("event_topic must be non-empty")
@@ -68,6 +75,7 @@ class CoreAgentSdkProvider:
         self._builtin_tool_client = builtin_tool_client
         self._llm_client = llm_client
         self._event_topic = event_topic.strip()
+        self._trace_recorder = trace_recorder
         self._externally_managed_session_ids: set[str] = set()
 
     def create_session(self, *, agent_name: str, event: AgentEvent) -> str:
@@ -105,7 +113,8 @@ class CoreAgentSdkProvider:
             return self._builtin_tool_client
         return BuiltinToolClient(descriptors=list(catalog.builtin_tools.values()))
 
-    def llm_client(self) -> LlmClient:
+    def llm_client(self, *, agent_name: str, session_id: str) -> LlmClient:
+        _ = agent_name, session_id
         if self._llm_client is not None:
             return self._llm_client
         return UnconfiguredLlmClient()
@@ -116,6 +125,19 @@ class CoreAgentSdkProvider:
 
     def publish_event(self, event: EventQueueItem) -> None:
         self._core_client.enqueue_event(_event_payload(event), topic=self._event_topic)
+
+    def record_trace(
+        self,
+        *,
+        agent_name: str,
+        session_id: str,
+        event: AgentEvent,
+        trace_name: str,
+        payload: dict[str, JsonValue],
+    ) -> None:
+        if self._trace_recorder is None:
+            return
+        self._trace_recorder(agent_name, session_id, event, trace_name, payload)
 
 
 def _session_id_for_scope(*, scope: str, session_id: str) -> str | None:
@@ -129,6 +151,9 @@ def _session_id_for_scope(*, scope: str, session_id: str) -> str | None:
 
 def _event_payload(event: EventQueueItem) -> dict[str, JsonValue]:
     payload: dict[str, JsonValue] = {
+        "target_kind": "main_agent",
+        "mode": "workflow",
+        "trigger_kind": "root",
         "event": {
             "type": event.event.type,
             "description": event.event.description,
@@ -136,13 +161,10 @@ def _event_payload(event: EventQueueItem) -> dict[str, JsonValue]:
         },
         "source": event.source,
     }
-    if event.source in {"agent", "connector"}:
-        payload["workflow"] = True
-        payload["trigger_kind"] = "root"
     if event.source_agent is not None:
         payload["source_agent"] = event.source_agent
     if event.session_id is not None:
-        payload["session_id"] = event.session_id
+        payload["source_session_id"] = event.session_id
     return payload
 
 
