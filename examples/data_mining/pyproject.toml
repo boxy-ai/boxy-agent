@@ -3,7 +3,7 @@ name = "reference-data-mining-chat-agent"
 version = "0.1.0"
 description = "Minimal reference Boxy data-mining chat agent"
 requires-python = ">=3.12"
-dependencies = ["boxy-agent>=0.2.0a2,<0.3.0"]
+dependencies = ["boxy-agent>=0.2.0a3,<0.3.0"]
 
 [build-system]
 requires = ["setuptools>=69.0"]

@@ -28,10 +28,13 @@ from boxy_agent.runtime.errors import (
     AgentExecutionError,
     CapabilitySchemaError,
     CapabilityViolationError,
+    RegistrationError,
 )
 from boxy_agent.runtime.providers import StaticDataQueryClient, StaticToolClient
 from boxy_agent.sdk import llm as llm_sdk
 from boxy_agent.types import JsonValue
+
+READ_ONLY_BOXY_TOOL_NAME = "google_gmail.gmail_search_threads"
 
 
 def _runtime_with_default_catalog(**kwargs) -> AgentRuntime:
@@ -225,6 +228,74 @@ def test_runtime_rejects_unauthorized_boxy_tool() -> None:
 
     with pytest.raises(CapabilityViolationError):
         runtime.run("main", {"type": "start"})
+
+
+def test_runtime_rejects_data_mining_with_side_effecting_boxy_tools() -> None:
+    runtime = _runtime_with_default_catalog(
+        agent_registry_loader=lambda: {
+            "miner": discovered_agent(
+                name="miner",
+                handler=lambda _context: AgentResult(output={"ok": True}),
+                agent_type="data_mining",
+                expected_event_types=(),
+                capabilities=AgentCapabilities(
+                    data_queries=frozenset(),
+                    boxy_tools=frozenset({DEFAULT_BOXY_TOOL_NAME}),
+                    builtin_tools=frozenset(),
+                ),
+            )
+        }
+    )
+
+    with pytest.raises(
+        RegistrationError,
+        match=f"side-effecting boxy_tools: {DEFAULT_BOXY_TOOL_NAME}",
+    ):
+        runtime.list_installed_agents()
+
+
+def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
+    def handle(context):
+        result = call_boxy_tool(context, READ_ONLY_BOXY_TOOL_NAME, {"account_id": "acct-1"})
+        return AgentResult(output=cast(dict[str, JsonValue], result))
+
+    runtime = _runtime_with_default_catalog(
+        agent_registry_loader=lambda: {
+            "miner": discovered_agent(
+                name="miner",
+                handler=handle,
+                agent_type="data_mining",
+                expected_event_types=(),
+                capabilities=AgentCapabilities(
+                    data_queries=frozenset(),
+                    boxy_tools=frozenset({READ_ONLY_BOXY_TOOL_NAME}),
+                    builtin_tools=frozenset(),
+                ),
+            )
+        },
+        sdk_provider=MockAgentSdkProvider(
+            boxy_tool_client=StaticToolClient(
+                descriptors=[
+                    default_capability_catalog().boxy_tools[READ_ONLY_BOXY_TOOL_NAME],
+                ],
+                execution_results={
+                    READ_ONLY_BOXY_TOOL_NAME: {
+                        "account_id": "acct-1",
+                        "threads": [],
+                        "next_page_token": None,
+                    }
+                },
+            )
+        ),
+    )
+
+    report = runtime.run("miner", {"type": "scheduled.interval"})
+
+    assert report.last_output == {
+        "account_id": "acct-1",
+        "threads": [],
+        "next_page_token": None,
+    }
 
 
 def test_runtime_requires_capability_catalog() -> None:

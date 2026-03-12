@@ -85,7 +85,7 @@ name = "my-agent"
 version = "0.1.0"
 description = "My Boxy agent"
 requires-python = ">=3.12"
-dependencies = ["boxy-agent>=0.2.0a2,<0.3.0"]
+dependencies = ["boxy-agent>=0.2.0a3,<0.3.0"]
 
 [build-system]
 requires = ["setuptools>=69.0"]
@@ -139,12 +139,12 @@ Entrypoint rules:
 `boxy-agent` supports two agent types:
 
 - `automation`: event-driven agents that react to triggers and can declare tool access
-- `data_mining`: analysis-oriented agents that read data, generate insights, and emit events, but cannot declare `boxy_tools`
+- `data_mining`: analysis-oriented agents that read data, generate insights, and emit events, and may declare only non-side-effecting `boxy_tools`
 
 Type-specific rules:
 - `automation` agents must declare non-empty `expected_event_types`
 - `data_mining` agents must not declare `expected_event_types`
-- `data_mining` agents must not declare `boxy_tools`
+- `data_mining` agents must not declare side-effecting `boxy_tools`
 
 The CLI scaffold uses `data-mining` as the command-line name and writes `data_mining` into project metadata.
 
@@ -177,7 +177,7 @@ The main authoring surface includes:
 
 Typical usage patterns:
 - use `query_data` to pull context from Boxy-connected sources
-- use `call_boxy_tool` to request side effects through the host runtime
+- use `call_boxy_tool` for host runtime actions; data-mining agents may only declare read-only tools where `side_effect == false`
 - use `call_builtin_tool` for package-provided tools
 - use memory helpers for session or persistent state
 - use `emit_event` to schedule downstream work

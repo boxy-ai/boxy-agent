@@ -11,6 +11,7 @@ from typing import cast
 from jsonschema import Draft202012Validator, FormatChecker, validators
 from jsonschema.exceptions import FormatError, ValidationError
 
+from boxy_agent.agent_contract import validate_agent_type_contract
 from boxy_agent.capabilities import CapabilityCatalog
 from boxy_agent.models import (
     AgentCapabilities,
@@ -27,6 +28,7 @@ from boxy_agent.runtime.errors import (
     CapabilitySchemaError,
     CapabilityViolationError,
     InvalidEventError,
+    RegistrationError,
 )
 from boxy_agent.runtime.models import (
     EventQueueItem,
@@ -394,7 +396,7 @@ class AgentRuntime:
 
     def list_installed_agents(self) -> list[InstalledAgent]:
         """Return discovered installed agents."""
-        discovered = self._agent_registry_loader()
+        discovered = self._load_discovered_agents()
         return sorted(
             (entry.installed for entry in discovered.values()), key=lambda item: item.name
         )
@@ -423,7 +425,7 @@ class AgentRuntime:
 
     def run(self, agent_name: str, event: AgentEvent | Mapping[str, object]) -> RunReport:
         """Run an installed agent once for a single trigger event."""
-        discovered = self._agent_registry_loader()
+        discovered = self._load_discovered_agents()
         target = discovered.get(agent_name)
         if target is None:
             raise AgentNotFoundError(f"Unknown agent: {agent_name}")
@@ -442,6 +444,20 @@ class AgentRuntime:
             )
         finally:
             self._sdk_provider.close_session(session_id)
+
+    def _load_discovered_agents(self) -> dict[str, DiscoveredAgent]:
+        discovered = self._agent_registry_loader()
+        for agent_name, entry in discovered.items():
+            validate_agent_type_contract(
+                agent_type=entry.installed.agent_type,
+                expected_event_types=entry.installed.expected_event_types,
+                capabilities=entry.installed.capabilities,
+                capability_catalog=self._capability_catalog,
+                raise_error=lambda message, agent_name=agent_name: RegistrationError(
+                    f"Installed agent '{agent_name}' violates agent-type contract: {message}"
+                ),
+            )
+        return discovered
 
     def _run_agent(
         self,

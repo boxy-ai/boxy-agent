@@ -16,6 +16,8 @@ from boxy_agent.compiler import compile_agent
 from boxy_agent.compiler.compile import CompilationError
 from boxy_agent.compiler.metadata import MetadataValidationError
 
+READ_ONLY_BOXY_TOOL_NAME = "google_gmail.gmail_search_threads"
+
 BASE_SOURCE = (
     "from boxy_agent.sdk import decorators, models\n"
     "\n"
@@ -99,7 +101,7 @@ name = "sample-agent"
 version = "0.1.0"
 description = "No boxy metadata"
 requires-python = ">=3.12"
-dependencies = ["boxy-agent>=0.2.0a2,<0.3.0"]
+dependencies = ["boxy-agent>=0.2.0a3,<0.3.0"]
 
 [tool.other]
 enabled = true
@@ -196,7 +198,31 @@ def test_compile_uses_packaged_capability_catalog_by_default(tmp_path: Path) -> 
     assert compiled.manifest.capabilities.data_queries == frozenset({DEFAULT_DATA_QUERY_NAME})
 
 
-def test_compile_rejects_data_mining_with_boxy_tools(tmp_path: Path) -> None:
+def test_compile_accepts_data_mining_with_read_only_boxy_tools(tmp_path: Path) -> None:
+    metadata = (
+        BASE_METADATA.replace('type = "automation"', 'type = "data_mining"')
+        .replace(
+            'expected_event_types = ["start"]\n',
+            "",
+        )
+        .replace(
+            "boxy_tools = []",
+            f'boxy_tools = ["{READ_ONLY_BOXY_TOOL_NAME}"]',
+        )
+    )
+    project_dir = _make_project(tmp_path, metadata=metadata)
+
+    compiled = compile_agent(
+        project_dir=project_dir,
+        output_dir=tmp_path / "output",
+        capability_catalog=default_capability_catalog(),
+    )
+
+    assert compiled.manifest.agent_type == "data_mining"
+    assert compiled.manifest.capabilities.boxy_tools == frozenset({READ_ONLY_BOXY_TOOL_NAME})
+
+
+def test_compile_rejects_data_mining_with_side_effecting_boxy_tools(tmp_path: Path) -> None:
     metadata = (
         BASE_METADATA.replace('type = "automation"', 'type = "data_mining"')
         .replace(
@@ -210,7 +236,10 @@ def test_compile_rejects_data_mining_with_boxy_tools(tmp_path: Path) -> None:
     )
     project_dir = _make_project(tmp_path, metadata=metadata)
 
-    with pytest.raises(MetadataValidationError, match="must not declare boxy_tools"):
+    with pytest.raises(
+        MetadataValidationError,
+        match=f"side-effecting boxy_tools: {DEFAULT_BOXY_TOOL_NAME}",
+    ):
         compile_agent(
             project_dir=project_dir,
             output_dir=tmp_path / "output",

@@ -6,6 +6,7 @@ import tomllib
 from pathlib import Path
 from typing import cast
 
+from boxy_agent.agent_contract import validate_agent_type_contract
 from boxy_agent.capabilities import CapabilityCatalog
 from boxy_agent.models import AgentCapabilities, AgentMetadata, parse_agent_type
 
@@ -71,18 +72,18 @@ def load_agent_metadata(
         label="builtin_tools",
     )
 
-    if agent_type == "automation" and not expected_event_types:
-        raise MetadataValidationError("Automation agents require non-empty expected_event_types")
-    if agent_type == "data_mining" and expected_event_types:
-        raise MetadataValidationError("Data mining agents must not declare expected_event_types")
-    if agent_type == "data_mining" and boxy_tools:
-        raise MetadataValidationError("Data mining agents must not declare boxy_tools")
-
     capabilities = AgentCapabilities(
         data_queries=data_queries,
         boxy_tools=boxy_tools,
         builtin_tools=builtin_tools,
         event_emitters=event_emitters,
+    )
+    validate_agent_type_contract(
+        agent_type=agent_type,
+        expected_event_types=expected_event_types,
+        capabilities=capabilities,
+        capability_catalog=catalog,
+        raise_error=MetadataValidationError,
     )
 
     return AgentMetadata(
