@@ -85,7 +85,7 @@ name = "my-agent"
 version = "0.1.0"
 description = "My Boxy agent"
 requires-python = ">=3.12"
-dependencies = ["boxy-agent>=0.2.0a4,<0.3.0"]
+dependencies = ["boxy-agent>=0.2.0a5,<0.3.0"]
 
 [build-system]
 requires = ["setuptools>=69.0"]

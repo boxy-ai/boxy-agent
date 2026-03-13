@@ -1530,7 +1530,7 @@ type = "object"
 
 [[builtin_tools]]
 name = "python_exec"
-description = "Execute Python code"
+description = "Execute simple local Python computations in a constrained environment. No network access and no general stdlib/runtime access; use it for small local calculations and transformations only."
 
 [builtin_tools.input_schema]
 type = "object"

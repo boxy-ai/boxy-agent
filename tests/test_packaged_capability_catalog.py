@@ -24,3 +24,12 @@ def test_packaged_builtin_catalog_is_builtin_only() -> None:
     assert catalog.data_queries == {}
     assert catalog.boxy_tools == {}
     assert "web_search" in catalog.builtin_tools
+
+
+def test_packaged_python_exec_description_warns_about_constraints() -> None:
+    catalog = load_packaged_builtin_capability_catalog()
+
+    description = catalog.builtin_tools["python_exec"].description.lower()
+    assert "constrained environment" in description
+    assert "no network access" in description
+    assert "small local calculations" in description

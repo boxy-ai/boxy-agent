@@ -11,6 +11,6 @@ output_schema = { type = "object", properties = { results = { type = "array", it
 
 [[builtin_tools]]
 name = "python_exec"
-description = "Execute Python code"
+description = "Execute simple local Python computations in a constrained environment. No network access and no general stdlib/runtime access; use it for small local calculations and transformations only."
 input_schema = { type = "object", properties = { code = { type = "string" } }, required = ["code"] }
 output_schema = { type = "object", properties = { result = {}, stdout = { type = "string" }, stderr = { type = "string" } } }

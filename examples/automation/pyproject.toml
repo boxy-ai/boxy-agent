@@ -3,7 +3,7 @@ name = "reference-automation-chat-agent"
 version = "0.1.0"
 description = "Minimal reference Boxy automation chat agent"
 requires-python = ">=3.12"
-dependencies = ["boxy-agent>=0.2.0a4,<0.3.0"]
+dependencies = ["boxy-agent>=0.2.0a5,<0.3.0"]
 
 [build-system]
 requires = ["setuptools>=69.0"]
