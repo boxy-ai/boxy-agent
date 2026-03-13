@@ -213,7 +213,7 @@ def test_core_provider_uses_core_for_sessions_memory_and_events() -> None:
     assert first_payload == {
         "target_kind": "main_agent",
         "mode": "workflow",
-        "trigger_kind": "root",
+        "trigger_kind": "agent_event",
         "event": {"type": "followup", "description": "", "payload": {"k": "v"}},
         "source": "agent",
         "source_agent": "main",
@@ -225,7 +225,7 @@ def test_core_provider_uses_core_for_sessions_memory_and_events() -> None:
     assert second_payload == {
         "target_kind": "main_agent",
         "mode": "workflow",
-        "trigger_kind": "root",
+        "trigger_kind": "agent_event",
         "event": {
             "type": "connector.email",
             "description": "",

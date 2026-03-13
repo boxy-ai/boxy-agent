@@ -354,6 +354,91 @@ def test_runtime_filters_discovery_by_capabilities() -> None:
     }
 
 
+def test_runtime_filters_discovery_by_live_provider_descriptors() -> None:
+    catalog = load_capability_catalog_from_text(
+        """
+schema_version = 1
+
+[[data_queries]]
+name = "enabled.messages"
+description = "Enabled query"
+input_schema = { type = "object" }
+output_schema = { type = "array", items = { type = "object" } }
+
+[[data_queries]]
+name = "disabled.messages"
+description = "Disabled query"
+input_schema = { type = "object" }
+output_schema = { type = "array", items = { type = "object" } }
+
+[[boxy_tools]]
+name = "enabled.send"
+description = "Enabled tool"
+input_schema = { type = "object" }
+output_schema = { type = "object" }
+
+[[boxy_tools]]
+name = "disabled.send"
+description = "Disabled tool"
+input_schema = { type = "object" }
+output_schema = { type = "object" }
+
+[[builtin_tools]]
+name = "enabled.web"
+description = "Enabled built-in"
+input_schema = { type = "object" }
+output_schema = { type = "object" }
+
+[[builtin_tools]]
+name = "disabled.web"
+description = "Disabled built-in"
+input_schema = { type = "object" }
+output_schema = { type = "object" }
+""".strip()
+    )
+
+    def handle(context):
+        return AgentResult(
+            output={
+                "data": [item.name for item in list_data_queries(context)],
+                "boxy": [item.name for item in list_boxy_tools(context)],
+                "builtin": [item.name for item in list_builtin_tools(context)],
+            }
+        )
+
+    runtime = _runtime_with_default_catalog(
+        capability_catalog=catalog,
+        data_client=StaticDataQueryClient(
+            descriptors=[catalog.data_queries["enabled.messages"]],
+        ),
+        boxy_tool_client=StaticToolClient(
+            descriptors=[catalog.boxy_tools["enabled.send"]],
+        ),
+        builtin_tool_client=StaticToolClient(
+            descriptors=[catalog.builtin_tools["enabled.web"]],
+        ),
+        agent_registry_loader=lambda: {
+            "main": discovered_agent(
+                name="main",
+                handler=handle,
+                capabilities=AgentCapabilities(
+                    data_queries=frozenset({"enabled.messages", "disabled.messages"}),
+                    boxy_tools=frozenset({"enabled.send", "disabled.send"}),
+                    builtin_tools=frozenset({"enabled.web", "disabled.web"}),
+                ),
+            )
+        },
+    )
+
+    report = runtime.run("main", {"type": "start"})
+
+    assert report.last_output == {
+        "data": ["enabled.messages"],
+        "boxy": ["enabled.send"],
+        "builtin": ["enabled.web"],
+    }
+
+
 def test_runtime_rejects_invalid_capability_input_schema() -> None:
     def handle(context):
         call_boxy_tool(

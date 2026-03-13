@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from typing import cast
@@ -185,9 +185,10 @@ class _ContextRuntimeBindings:
         return self.llm_client.chat_complete(request)
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:
-        return _filter_descriptors(
+        return _filter_discoverable_descriptors(
             allowed=self.capabilities.data_queries,
             catalog=self.capability_catalog.data_queries,
+            discoverable_names=_discoverable_names(self.data_client.list_data_queries()),
         )
 
     def query_data(self, name: str, params: dict[str, JsonValue]) -> list[JsonValue]:
@@ -205,9 +206,10 @@ class _ContextRuntimeBindings:
         return cast(list[JsonValue], result)
 
     def list_boxy_tools(self) -> list[ToolDescriptor]:
-        return _filter_descriptors(
+        return _filter_discoverable_descriptors(
             allowed=self.capabilities.boxy_tools,
             catalog=self.capability_catalog.boxy_tools,
+            discoverable_names=_discoverable_names(self.boxy_tool_client.list_tools()),
         )
 
     def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
@@ -226,9 +228,10 @@ class _ContextRuntimeBindings:
         )
 
     def list_builtin_tools(self) -> list[ToolDescriptor]:
-        return _filter_descriptors(
+        return _filter_discoverable_descriptors(
             allowed=self.capabilities.builtin_tools,
             catalog=self.capability_catalog.builtin_tools,
+            discoverable_names=_discoverable_names(self.builtin_tool_client.list_tools()),
         )
 
     def call_builtin_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
@@ -616,12 +619,25 @@ def _validate_scope(scope: str) -> None:
         raise ValueError("scope must be either 'session' or 'persistent'")
 
 
-def _filter_descriptors[T](
+def _filter_discoverable_descriptors[TDescriptor](
     *,
     allowed: frozenset[str],
-    catalog: dict[str, T],
-) -> list[T]:
-    return [descriptor for name in sorted(allowed) if (descriptor := catalog.get(name)) is not None]
+    catalog: Mapping[str, TDescriptor],
+    discoverable_names: set[str],
+) -> list[TDescriptor]:
+    if not discoverable_names:
+        return []
+    return [
+        descriptor
+        for name in sorted(allowed)
+        if name in discoverable_names and (descriptor := catalog.get(name)) is not None
+    ]
+
+
+def _discoverable_names(
+    descriptors: Sequence[DataQueryDescriptor | ToolDescriptor],
+) -> set[str]:
+    return {descriptor.name for descriptor in descriptors if descriptor.name}
 
 
 def _validate_schema_instance(

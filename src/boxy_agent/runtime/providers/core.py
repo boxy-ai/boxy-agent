@@ -153,7 +153,7 @@ def _event_payload(event: EventQueueItem) -> dict[str, JsonValue]:
     payload: dict[str, JsonValue] = {
         "target_kind": "main_agent",
         "mode": "workflow",
-        "trigger_kind": "root",
+        "trigger_kind": "agent_event",
         "event": {
             "type": event.event.type,
             "description": event.event.description,
