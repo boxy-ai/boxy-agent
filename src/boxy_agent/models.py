@@ -29,6 +29,7 @@ class DataQueryDescriptor:
         }
     )
     query_capabilities: dict[str, JsonValue] = field(default_factory=dict)
+    completion_contract: dict[str, JsonValue] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         _require_non_empty("name", self.name)
@@ -42,6 +43,9 @@ class DataQueryDescriptor:
         for key, value in self.query_capabilities.items():
             _require_non_empty("query capability key", key)
             ensure_json_value(value, label=f"query capability value for {self.name}:{key}")
+        for key, value in self.completion_contract.items():
+            _require_non_empty("completion contract key", key)
+            ensure_json_value(value, label=f"completion contract value for {self.name}:{key}")
 
 
 @dataclass(frozen=True)
@@ -58,6 +62,7 @@ class ToolDescriptor:
     )
     output_schema: dict[str, JsonValue] = field(default_factory=dict)
     side_effect: bool = False
+    completion_contract: dict[str, JsonValue] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         _require_non_empty("name", self.name)
@@ -70,6 +75,9 @@ class ToolDescriptor:
         for key, value in self.output_schema.items():
             _require_non_empty("output schema key", key)
             ensure_json_value(value, label=f"output schema value for {self.name}:{key}")
+        for key, value in self.completion_contract.items():
+            _require_non_empty("completion contract key", key)
+            ensure_json_value(value, label=f"completion contract value for {self.name}:{key}")
 
 
 @dataclass(frozen=True)

@@ -850,6 +850,197 @@ type = [
     "null",
 ]
 
+[[data_queries]]
+name = "google_gmail.search_threads_local"
+description = "Search Gmail threads from locally ingested data. Prefer this over remote Gmail tools when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.text]
+type = "string"
+
+[data_queries.input_schema.properties.mailbox]
+type = "string"
+enum = [
+    "all",
+    "inbox",
+    "sent",
+    "drafts",
+    "spam",
+    "trash",
+]
+
+[data_queries.input_schema.properties.unread]
+type = "boolean"
+
+[data_queries.input_schema.properties.before_internal_date]
+type = "integer"
+minimum = 0
+
+[data_queries.input_schema.properties.before_thread_id]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "threads",
+    "next_before_internal_date",
+    "next_before_thread_id",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.threads]
+type = "array"
+
+[data_queries.output_schema.items.properties.next_before_internal_date]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_thread_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.completion_contract.collection]
+source = "query_rows_first_field"
+items_field = "threads"
+
+[data_queries.completion_contract.collection.exhausted]
+kind = "all_cursor_fields_empty"
+fields = [
+    "next_before_internal_date",
+    "next_before_thread_id",
+]
+
+[[data_queries]]
+name = "google_gmail.get_thread_local"
+description = "Fetch a Gmail thread from locally ingested data. Prefer this over remote Gmail tools when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "thread_id",
+]
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.thread_id]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "thread_id",
+    "messages",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.thread_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.messages]
+type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[[data_queries]]
+name = "google_gmail.get_threads_local"
+description = "Fetch multiple Gmail threads from locally ingested data in one call. Prefer this over repeated remote Gmail reads when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "thread_ids",
+]
+additionalProperties = false
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.thread_ids]
+type = "array"
+minItems = 1
+maxItems = 25
+
+[data_queries.input_schema.properties.thread_ids.items]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "threads",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.threads]
+type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
 [[boxy_tools]]
 name = "wechat.login"
 description = "Start/poll/cancel/close WeChat QR login on a dedicated display"
@@ -1047,7 +1238,7 @@ type = "object"
 
 [[boxy_tools]]
 name = "google_gmail.gmail_search_threads"
-description = "Search Gmail threads"
+description = "Search Gmail threads via Google. Prefer local Gmail data queries when available; this is slower but may be slightly fresher."
 
 [boxy_tools.input_schema]
 type = "object"
@@ -1088,7 +1279,7 @@ type = [
 
 [[boxy_tools]]
 name = "google_gmail.gmail_get_thread"
-description = "Fetch Gmail thread details"
+description = "Fetch Gmail thread details via Google. Prefer local Gmail data queries when available; this is slower but may be slightly fresher."
 
 [boxy_tools.input_schema]
 type = "object"

@@ -156,12 +156,19 @@ def _load_data_queries(value: object, *, source: str) -> dict[str, DataQueryDesc
             label=f"data_queries[{index}]",
             source=source,
         )
+        completion_contract = _optional_json_table(
+            table,
+            "completion_contract",
+            label=f"data_queries[{index}]",
+            source=source,
+        )
         by_name[name] = DataQueryDescriptor(
             name=name,
             description=description,
             input_schema=input_schema,
             output_schema=output_schema,
             query_capabilities=query_capabilities,
+            completion_contract=completion_contract,
         )
     return by_name
 
@@ -193,12 +200,19 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             label=f"{label}[{index}]",
             source=source,
         )
+        completion_contract = _optional_json_table(
+            table,
+            "completion_contract",
+            label=f"{label}[{index}]",
+            source=source,
+        )
         by_name[name] = ToolDescriptor(
             name=name,
             description=description,
             input_schema=input_schema,
             output_schema=output_schema,
             side_effect=side_effect,
+            completion_contract=completion_contract,
         )
     return by_name
 

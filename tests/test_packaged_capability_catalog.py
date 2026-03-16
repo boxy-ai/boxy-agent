@@ -9,6 +9,8 @@ from boxy_agent.capabilities import (
 def test_packaged_capability_catalog_contains_shipping_connector_and_builtin_capabilities() -> None:
     catalog = load_packaged_capability_catalog()
 
+    assert "google_gmail.search_threads_local" in catalog.data_queries
+    assert "google_gmail.get_thread_local" in catalog.data_queries
     assert "google_gmail.gmail_search_threads" in catalog.boxy_tools
     assert catalog.boxy_tools["google_gmail.gmail_search_threads"].side_effect is False
     assert "whatsapp.chat_context" in catalog.data_queries
