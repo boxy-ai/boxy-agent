@@ -56,6 +56,7 @@ uv run boxy-agent run --agent email-ops-agent --event-file ./event.json
 ```
 
 Event input must decode to a JSON object with:
+
 - `type`: required non-empty string
 - `description`: optional string
 - `payload`: optional object
@@ -129,6 +130,7 @@ def handle(exec_ctx: AgentExecutionContext) -> AgentResult:
 ```
 
 Entrypoint rules:
+
 - your configured module must define exactly one function decorated with `@agent_main`
 - the entrypoint must be synchronous
 - it must accept exactly one positional execution-context argument
@@ -142,6 +144,7 @@ Entrypoint rules:
 - `data_mining`: analysis-oriented agents that read data, generate insights, and emit events, and may declare only non-side-effecting `boxy_tools`
 
 Type-specific rules:
+
 - `automation` agents must declare non-empty `expected_event_types`
 - `data_mining` agents must not declare `expected_event_types`
 - `data_mining` agents must not declare side-effecting `boxy_tools`
@@ -176,6 +179,7 @@ The main authoring surface includes:
 - `llm_chat_complete`
 
 Typical usage patterns:
+
 - use `query_data` to pull context from Boxy-connected sources
 - use `call_boxy_tool` for host runtime actions; data-mining agents may only declare read-only tools where `side_effect == false`
 - use `call_builtin_tool` for package-provided tools
@@ -184,6 +188,7 @@ Typical usage patterns:
 - use `trace` for structured diagnostics
 
 Some SDK surfaces are public but intentionally unconfigured in the standalone runtime by default:
+
 - `boxy_agent.sdk.llm.chat_complete`
 - built-in `web_search`
 
@@ -192,6 +197,7 @@ They stay public because Boxy runtimes can provide them. In a standalone SDK run
 ## CLI
 
 Main commands:
+
 - `boxy-agent create-agent <automation|data-mining> --project-dir <dir>`
 - `boxy-agent package --project-dir <dir> --output-dir <dir>`
 - `boxy-agent list-agents [--json] [--registry-file <file>]`
@@ -202,6 +208,7 @@ Use `--registry-file` when you want runtime discovery to come from explicit pack
 ## Examples
 
 Reference example projects live in this repository:
+
 - `examples/automation`
 - `examples/data_mining`
 

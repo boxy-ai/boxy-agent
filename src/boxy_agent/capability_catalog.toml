@@ -1,28 +1,20 @@
 schema_version = 1
 
 [[data_queries]]
-name = "wechat.chat_context"
-description = "Load WeChat chat history from raw connector message records."
+name = "wechat.resolve_targets"
+description = "Resolve likely WeChat contacts or chats from persisted desktop data."
 
 [data_queries.input_schema]
 type = "object"
 required = [
-    "contact_username",
+    "query",
 ]
 
 [data_queries.input_schema.properties.account_id]
 type = "string"
 
-[data_queries.input_schema.properties.contact_username]
+[data_queries.input_schema.properties.query]
 type = "string"
-
-[data_queries.input_schema.properties.before_create_time]
-type = "integer"
-minimum = 0
-
-[data_queries.input_schema.properties.before_local_id]
-type = "integer"
-minimum = 0
 
 [data_queries.output_schema]
 type = "array"
@@ -31,14 +23,9 @@ type = "array"
 type = "object"
 required = [
     "resolved_account_id",
-    "contact_username",
-    "before_create_time",
-    "before_local_id",
-    "next_before_create_time",
-    "next_before_local_id",
-    "has_more",
+    "query",
     "count",
-    "messages",
+    "candidates",
 ]
 
 [data_queries.output_schema.items.properties.resolved_account_id]
@@ -47,112 +34,80 @@ type = [
     "null",
 ]
 
-[data_queries.output_schema.items.properties.contact_username]
+[data_queries.output_schema.items.properties.query]
 type = "string"
-
-[data_queries.output_schema.items.properties.before_create_time]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.before_local_id]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.next_before_create_time]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.next_before_local_id]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.has_more]
-type = "boolean"
 
 [data_queries.output_schema.items.properties.count]
 type = "integer"
 
-[data_queries.output_schema.items.properties.messages]
+[data_queries.output_schema.items.properties.candidates]
 type = "array"
 
-[data_queries.output_schema.items.properties.messages.items]
+[data_queries.output_schema.items.properties.candidates.items]
 type = "object"
 required = [
     "account_id",
     "contact_username",
-    "local_id",
-    "server_id",
-    "local_type",
-    "create_time",
-    "real_sender_id",
-    "status",
-    "message_content",
-    "source",
-    "ingested_at",
+    "display_name",
+    "alias",
+    "nick_name",
+    "is_chatroom",
+    "is_active",
+    "has_messages",
+    "match_type",
+    "matched_fields",
+    "ambiguous",
 ]
 
-[data_queries.output_schema.items.properties.messages.items.properties.account_id]
+[data_queries.output_schema.items.properties.candidates.items.properties.account_id]
 type = "string"
 
-[data_queries.output_schema.items.properties.messages.items.properties.contact_username]
+[data_queries.output_schema.items.properties.candidates.items.properties.contact_username]
 type = "string"
 
-[data_queries.output_schema.items.properties.messages.items.properties.local_id]
-type = "integer"
-
-[data_queries.output_schema.items.properties.messages.items.properties.server_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.local_type]
-type = [
-    "integer",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.create_time]
-type = "integer"
-
-[data_queries.output_schema.items.properties.messages.items.properties.real_sender_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.status]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.message_content]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.source]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.messages.items.properties.ingested_at]
+[data_queries.output_schema.items.properties.candidates.items.properties.display_name]
 type = "string"
+
+[data_queries.output_schema.items.properties.candidates.items.properties.alias]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.candidates.items.properties.nick_name]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.candidates.items.properties.is_chatroom]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.candidates.items.properties.is_active]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.candidates.items.properties.has_messages]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.candidates.items.properties.match_type]
+type = "string"
+enum = [
+    "exact",
+    "partial",
+]
+
+[data_queries.output_schema.items.properties.candidates.items.properties.matched_fields]
+type = "array"
+
+[data_queries.output_schema.items.properties.candidates.items.properties.matched_fields.items]
+type = "string"
+
+[data_queries.output_schema.items.properties.candidates.items.properties.ambiguous]
+type = "boolean"
 
 [[data_queries]]
-name = "wechat.list_chats_latest"
-description = "List latest WeChat conversations from raw connector history with stable seek pagination."
+name = "wechat.list_conversations"
+description = "List persisted WeChat conversations from desktop message history with stable seek pagination."
 
 [data_queries.input_schema]
 type = "object"
@@ -251,14 +206,26 @@ type = "object"
 required = [
     "account_id",
     "contact_username",
+    "display_name",
+    "alias",
+    "nick_name",
+    "is_chatroom",
+    "is_active",
     "latest_create_time",
     "latest_local_id",
     "latest_server_id",
     "latest_local_type",
     "latest_real_sender_id",
     "latest_status",
+    "latest_message_kind",
+    "latest_message_kind_detail",
+    "latest_message_summary",
+    "latest_message_title",
+    "latest_message_url",
     "latest_message_content",
+    "latest_message_content_is_blob",
     "latest_source",
+    "latest_source_is_blob",
     "latest_ingested_at",
     "message_count",
 ]
@@ -268,6 +235,36 @@ type = "string"
 
 [data_queries.output_schema.items.properties.rows.items.properties.contact_username]
 type = "string"
+
+[data_queries.output_schema.items.properties.rows.items.properties.display_name]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.alias]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.nick_name]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.is_chatroom]
+type = [
+    "boolean",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.is_active]
+type = [
+    "boolean",
+    "null",
+]
 
 [data_queries.output_schema.items.properties.rows.items.properties.latest_create_time]
 type = "integer"
@@ -299,9 +296,48 @@ type = [
     "null",
 ]
 
+[data_queries.output_schema.items.properties.rows.items.properties.latest_message_kind]
+type = "string"
+enum = [
+    "text",
+    "structured",
+    "blob_payload",
+    "unknown",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_message_kind_detail]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_message_summary]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_message_title]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_message_url]
+type = [
+    "string",
+    "null",
+]
+
 [data_queries.output_schema.items.properties.rows.items.properties.latest_message_content]
 type = [
     "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.latest_message_content_is_blob]
+type = [
+    "boolean",
     "null",
 ]
 
@@ -311,11 +347,507 @@ type = [
     "null",
 ]
 
+[data_queries.output_schema.items.properties.rows.items.properties.latest_source_is_blob]
+type = [
+    "boolean",
+    "null",
+]
+
 [data_queries.output_schema.items.properties.rows.items.properties.latest_ingested_at]
 type = "string"
 
 [data_queries.output_schema.items.properties.rows.items.properties.message_count]
 type = "integer"
+
+[[data_queries]]
+name = "wechat.get_messages"
+description = "Load WeChat message history for one conversation handle (account_id + contact_username)."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "contact_username",
+]
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.contact_username]
+type = "string"
+
+[data_queries.input_schema.properties.before_create_time]
+type = "integer"
+minimum = 0
+
+[data_queries.input_schema.properties.before_local_id]
+type = "integer"
+minimum = 0
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "resolved_account_id",
+    "contact_username",
+    "display_name",
+    "alias",
+    "nick_name",
+    "is_chatroom",
+    "is_active",
+    "before_create_time",
+    "before_local_id",
+    "next_before_create_time",
+    "next_before_local_id",
+    "has_more",
+    "count",
+    "messages",
+]
+
+[data_queries.output_schema.items.properties.resolved_account_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.contact_username]
+type = "string"
+
+[data_queries.output_schema.items.properties.display_name]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.alias]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.nick_name]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.is_chatroom]
+type = [
+    "boolean",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.is_active]
+type = [
+    "boolean",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_create_time]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_local_id]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_create_time]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_local_id]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.has_more]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.count]
+type = "integer"
+
+[data_queries.output_schema.items.properties.messages]
+type = "array"
+
+[data_queries.output_schema.items.properties.messages.items]
+type = "object"
+required = [
+    "account_id",
+    "contact_username",
+    "local_id",
+    "server_id",
+    "local_type",
+    "create_time",
+    "real_sender_id",
+    "status",
+    "message_kind",
+    "message_kind_detail",
+    "message_summary",
+    "message_title",
+    "message_url",
+    "message_content",
+    "message_content_is_blob",
+    "source",
+    "source_is_blob",
+    "ingested_at",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.messages.items.properties.contact_username]
+type = "string"
+
+[data_queries.output_schema.items.properties.messages.items.properties.local_id]
+type = "integer"
+
+[data_queries.output_schema.items.properties.messages.items.properties.server_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.local_type]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.create_time]
+type = "integer"
+
+[data_queries.output_schema.items.properties.messages.items.properties.real_sender_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.status]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.message_kind]
+type = "string"
+enum = [
+    "text",
+    "structured",
+    "blob_payload",
+    "unknown",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.message_kind_detail]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.message_summary]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.message_title]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.message_url]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.message_content]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.message_content_is_blob]
+type = [
+    "boolean",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.source]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.source_is_blob]
+type = [
+    "boolean",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.messages.items.properties.ingested_at]
+type = "string"
+
+[[data_queries]]
+name = "wechat.search_messages"
+description = "Search persisted WeChat message text across chats with stable seek pagination."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "query",
+]
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.contact_username]
+type = "string"
+
+[data_queries.input_schema.properties.query]
+type = "string"
+
+[data_queries.input_schema.properties.before_create_time]
+type = "integer"
+minimum = 0
+
+[data_queries.input_schema.properties.before_local_id]
+type = "integer"
+minimum = 0
+
+[data_queries.input_schema.properties.before_account_id]
+type = "string"
+
+[data_queries.input_schema.properties.before_contact_username]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "resolved_account_id",
+    "query",
+    "contact_username",
+    "before_create_time",
+    "before_local_id",
+    "before_account_id",
+    "before_contact_username",
+    "next_before_create_time",
+    "next_before_local_id",
+    "next_before_account_id",
+    "next_before_contact_username",
+    "has_more",
+    "count",
+    "rows",
+]
+
+[data_queries.output_schema.items.properties.resolved_account_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.query]
+type = "string"
+
+[data_queries.output_schema.items.properties.contact_username]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_create_time]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_local_id]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_account_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.before_contact_username]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_create_time]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_local_id]
+type = [
+    "integer",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_account_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_before_contact_username]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.has_more]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.count]
+type = "integer"
+
+[data_queries.output_schema.items.properties.rows]
+type = "array"
+
+[data_queries.output_schema.items.properties.rows.items]
+type = "object"
+required = [
+    "account_id",
+    "contact_username",
+    "display_name",
+    "alias",
+    "nick_name",
+    "is_chatroom",
+    "is_active",
+    "local_id",
+    "create_time",
+    "real_sender_id",
+    "message_kind",
+    "message_kind_detail",
+    "message_summary",
+    "message_title",
+    "message_url",
+    "message_content",
+    "message_content_is_blob",
+    "source",
+    "source_is_blob",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.rows.items.properties.contact_username]
+type = "string"
+
+[data_queries.output_schema.items.properties.rows.items.properties.display_name]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.alias]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.nick_name]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.is_chatroom]
+type = [
+    "boolean",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.is_active]
+type = [
+    "boolean",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.local_id]
+type = "integer"
+
+[data_queries.output_schema.items.properties.rows.items.properties.create_time]
+type = "integer"
+
+[data_queries.output_schema.items.properties.rows.items.properties.real_sender_id]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.message_kind]
+type = "string"
+enum = [
+    "text",
+    "structured",
+    "blob_payload",
+    "unknown",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.message_kind_detail]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.message_summary]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.message_title]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.message_url]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.message_content]
+type = "string"
+
+[data_queries.output_schema.items.properties.rows.items.properties.message_content_is_blob]
+type = [
+    "boolean",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.source]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.rows.items.properties.source_is_blob]
+type = [
+    "boolean",
+    "null",
+]
 
 [[data_queries]]
 name = "whatsapp.chat_context"
