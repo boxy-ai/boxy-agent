@@ -16,14 +16,14 @@ def handle(exec_ctx: models.AgentExecutionContext) -> models.AgentResult:
             }
         )
 
-    chat_id_value = exec_ctx.event.payload.get("chat_id", "chat-1")
-    if not isinstance(chat_id_value, str) or not chat_id_value.strip():
-        raise ValueError("chat_id payload field must be a non-empty string")
+    chat_jid_value = exec_ctx.event.payload.get("chat_jid", "chat-1")
+    if not isinstance(chat_jid_value, str) or not chat_jid_value.strip():
+        raise ValueError("chat_jid payload field must be a non-empty string")
 
     messages = data_queries.query(
         exec_ctx,
         "whatsapp.chat_context",
-        {"chat_id": chat_id_value.strip()},
+        {"chat_jid": chat_jid_value.strip()},
     )
     events.emit(
         exec_ctx,

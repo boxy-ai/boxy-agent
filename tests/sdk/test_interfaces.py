@@ -105,8 +105,8 @@ def test_context_routes_calls_through_sdk_helpers() -> None:
     )
 
     assert [item.name for item in data_queries.list_available(context)] == [DEFAULT_DATA_QUERY_NAME]
-    assert data_queries.query(context, DEFAULT_DATA_QUERY_NAME, {"chat_id": "chat-1"}) == [
-        {"id": "m-1", "params": {"chat_id": "chat-1"}}
+    assert data_queries.query(context, DEFAULT_DATA_QUERY_NAME, {"chat_jid": "chat-1"}) == [
+        {"id": "m-1", "params": {"chat_jid": "chat-1"}}
     ]
     with pytest.raises(CapabilityViolationError):
         data_queries.query(context, "calendar.events", {})

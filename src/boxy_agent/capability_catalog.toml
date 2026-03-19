@@ -319,15 +319,15 @@ type = "integer"
 
 [[data_queries]]
 name = "whatsapp.chat_context"
-description = "Load chat message context from connector DB history."
+description = "Load latest visible chat message context from derived tables."
 
 [data_queries.input_schema]
 type = "object"
 required = [
-    "chat_id",
+    "chat_jid",
 ]
 
-[data_queries.input_schema.properties.chat_id]
+[data_queries.input_schema.properties.chat_jid]
 type = "string"
 
 [data_queries.input_schema.properties.before_ts_ms]
@@ -344,7 +344,7 @@ type = "array"
 [data_queries.output_schema.items]
 type = "object"
 required = [
-    "chat_id",
+    "chat_jid",
     "before_ts_ms",
     "before_message_id",
     "next_before_ts_ms",
@@ -354,7 +354,7 @@ required = [
     "messages",
 ]
 
-[data_queries.output_schema.items.properties.chat_id]
+[data_queries.output_schema.items.properties.chat_jid]
 type = "string"
 
 [data_queries.output_schema.items.properties.before_ts_ms]
@@ -393,19 +393,22 @@ type = "array"
 [data_queries.output_schema.items.properties.messages.items]
 type = "object"
 required = [
-    "chat_id",
+    "chat_jid",
     "message_id",
     "from_me",
-    "sender_id",
-    "push_name",
+    "sender_jid",
+    "sender_display_name_hint",
     "timestamp_ms",
     "text",
-    "upsert_type",
-    "source_event_id",
-    "ingested_at",
+    "message_type",
+    "is_deleted",
+    "is_edited",
+    "first_observed_at_ms",
+    "last_observed_at_ms",
+    "updated_at_ms",
 ]
 
-[data_queries.output_schema.items.properties.messages.items.properties.chat_id]
+[data_queries.output_schema.items.properties.messages.items.properties.chat_jid]
 type = "string"
 
 [data_queries.output_schema.items.properties.messages.items.properties.message_id]
@@ -414,10 +417,10 @@ type = "string"
 [data_queries.output_schema.items.properties.messages.items.properties.from_me]
 type = "boolean"
 
-[data_queries.output_schema.items.properties.messages.items.properties.sender_id]
+[data_queries.output_schema.items.properties.messages.items.properties.sender_jid]
 type = "string"
 
-[data_queries.output_schema.items.properties.messages.items.properties.push_name]
+[data_queries.output_schema.items.properties.messages.items.properties.sender_display_name_hint]
 type = [
     "string",
     "null",
@@ -432,18 +435,27 @@ type = [
     "null",
 ]
 
-[data_queries.output_schema.items.properties.messages.items.properties.upsert_type]
+[data_queries.output_schema.items.properties.messages.items.properties.message_type]
 type = "string"
 
-[data_queries.output_schema.items.properties.messages.items.properties.source_event_id]
+[data_queries.output_schema.items.properties.messages.items.properties.is_deleted]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.messages.items.properties.is_edited]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.messages.items.properties.first_observed_at_ms]
 type = "integer"
 
-[data_queries.output_schema.items.properties.messages.items.properties.ingested_at]
-type = "string"
+[data_queries.output_schema.items.properties.messages.items.properties.last_observed_at_ms]
+type = "integer"
+
+[data_queries.output_schema.items.properties.messages.items.properties.updated_at_ms]
+type = "integer"
 
 [[data_queries]]
 name = "whatsapp.list_chats_latest"
-description = "List chat rows from one persisted snapshot. Pass snapshot_id to keep pagination stable."
+description = "List latest-state chat rows from the WhatsApp connector."
 
 [data_queries.input_schema]
 type = "object"
@@ -452,14 +464,14 @@ type = "object"
 type = "integer"
 minimum = 0
 
-[data_queries.input_schema.properties.snapshot_id]
-type = "string"
-
 [data_queries.input_schema.properties.query]
 type = "string"
 
-[data_queries.input_schema.properties.jid]
+[data_queries.input_schema.properties.chat_jid]
 type = "string"
+
+[data_queries.input_schema.properties.include_inactive]
+type = "boolean"
 
 [data_queries.output_schema]
 type = "array"
@@ -467,25 +479,11 @@ type = "array"
 [data_queries.output_schema.items]
 type = "object"
 required = [
-    "resolved_snapshot_id",
-    "synced_at",
     "offset",
     "next_offset",
     "has_more",
     "count",
     "rows",
-]
-
-[data_queries.output_schema.items.properties.resolved_snapshot_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.synced_at]
-type = [
-    "string",
-    "null",
 ]
 
 [data_queries.output_schema.items.properties.offset]
@@ -506,23 +504,27 @@ type = "array"
 [data_queries.output_schema.items.properties.rows.items]
 type = "object"
 required = [
-    "jid",
-    "name",
+    "chat_jid",
+    "chat_kind",
+    "title_hint",
     "unread_count",
     "archived",
     "pinned",
     "mute_end_time_ms",
     "conversation_timestamp_ms",
-    "source",
-    "updated_at_ms",
     "pn_jid",
     "lid_jid",
+    "is_active",
+    "updated_at_ms",
 ]
 
-[data_queries.output_schema.items.properties.rows.items.properties.jid]
+[data_queries.output_schema.items.properties.rows.items.properties.chat_jid]
 type = "string"
 
-[data_queries.output_schema.items.properties.rows.items.properties.name]
+[data_queries.output_schema.items.properties.rows.items.properties.chat_kind]
+type = "string"
+
+[data_queries.output_schema.items.properties.rows.items.properties.title_hint]
 type = [
     "string",
     "null",
@@ -558,18 +560,6 @@ type = [
     "null",
 ]
 
-[data_queries.output_schema.items.properties.rows.items.properties.source]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.updated_at_ms]
-type = [
-    "integer",
-    "null",
-]
-
 [data_queries.output_schema.items.properties.rows.items.properties.pn_jid]
 type = [
     "string",
@@ -582,9 +572,15 @@ type = [
     "null",
 ]
 
+[data_queries.output_schema.items.properties.rows.items.properties.is_active]
+type = "boolean"
+
+[data_queries.output_schema.items.properties.rows.items.properties.updated_at_ms]
+type = "integer"
+
 [[data_queries]]
 name = "whatsapp.list_contacts_latest"
-description = "List contact rows from one persisted snapshot. Pass snapshot_id to keep pagination stable."
+description = "List latest-state address-book rows from the WhatsApp connector."
 
 [data_queries.input_schema]
 type = "object"
@@ -593,14 +589,14 @@ type = "object"
 type = "integer"
 minimum = 0
 
-[data_queries.input_schema.properties.snapshot_id]
-type = "string"
-
 [data_queries.input_schema.properties.query]
 type = "string"
 
 [data_queries.input_schema.properties.jid]
 type = "string"
+
+[data_queries.input_schema.properties.include_inactive]
+type = "boolean"
 
 [data_queries.output_schema]
 type = "array"
@@ -608,25 +604,11 @@ type = "array"
 [data_queries.output_schema.items]
 type = "object"
 required = [
-    "resolved_snapshot_id",
-    "synced_at",
     "offset",
     "next_offset",
     "has_more",
     "count",
     "rows",
-]
-
-[data_queries.output_schema.items.properties.resolved_snapshot_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.synced_at]
-type = [
-    "string",
-    "null",
 ]
 
 [data_queries.output_schema.items.properties.offset]
@@ -655,6 +637,7 @@ required = [
     "short_name",
     "img_url",
     "source",
+    "is_active",
     "updated_at_ms",
 ]
 
@@ -703,15 +686,15 @@ type = [
     "null",
 ]
 
+[data_queries.output_schema.items.properties.rows.items.properties.is_active]
+type = "boolean"
+
 [data_queries.output_schema.items.properties.rows.items.properties.updated_at_ms]
-type = [
-    "integer",
-    "null",
-]
+type = "integer"
 
 [[data_queries]]
 name = "whatsapp.list_directory_mapping_latest"
-description = "List chat-to-display-name mappings from one persisted snapshot. Pass snapshot_id to keep pagination stable."
+description = "List latest-state directory rows resolved from raw truth tables."
 
 [data_queries.input_schema]
 type = "object"
@@ -720,14 +703,14 @@ type = "object"
 type = "integer"
 minimum = 0
 
-[data_queries.input_schema.properties.snapshot_id]
-type = "string"
-
 [data_queries.input_schema.properties.query]
 type = "string"
 
-[data_queries.input_schema.properties.chat_id]
+[data_queries.input_schema.properties.chat_jid]
 type = "string"
+
+[data_queries.input_schema.properties.include_inactive]
+type = "boolean"
 
 [data_queries.output_schema]
 type = "array"
@@ -735,25 +718,11 @@ type = "array"
 [data_queries.output_schema.items]
 type = "object"
 required = [
-    "resolved_snapshot_id",
-    "synced_at",
     "offset",
     "next_offset",
     "has_more",
     "count",
     "rows",
-]
-
-[data_queries.output_schema.items.properties.resolved_snapshot_id]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.synced_at]
-type = [
-    "string",
-    "null",
 ]
 
 [data_queries.output_schema.items.properties.offset]
@@ -774,53 +743,31 @@ type = "array"
 [data_queries.output_schema.items.properties.rows.items]
 type = "object"
 required = [
-    "chat_id",
-    "best_effort_name",
-    "name_source",
-    "chat_name",
+    "chat_jid",
+    "chat_kind",
+    "display_name",
+    "resolution_kind",
     "contact_jid",
-    "contact_name",
-    "contact_notify",
     "pn_jid",
     "lid_jid",
     "conversation_timestamp_ms",
+    "is_active",
     "updated_at_ms",
 ]
 
-[data_queries.output_schema.items.properties.rows.items.properties.chat_id]
+[data_queries.output_schema.items.properties.rows.items.properties.chat_jid]
 type = "string"
 
-[data_queries.output_schema.items.properties.rows.items.properties.best_effort_name]
-type = [
-    "string",
-    "null",
-]
+[data_queries.output_schema.items.properties.rows.items.properties.chat_kind]
+type = "string"
 
-[data_queries.output_schema.items.properties.rows.items.properties.name_source]
-type = [
-    "string",
-    "null",
-]
+[data_queries.output_schema.items.properties.rows.items.properties.display_name]
+type = "string"
 
-[data_queries.output_schema.items.properties.rows.items.properties.chat_name]
-type = [
-    "string",
-    "null",
-]
+[data_queries.output_schema.items.properties.rows.items.properties.resolution_kind]
+type = "string"
 
 [data_queries.output_schema.items.properties.rows.items.properties.contact_jid]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.contact_name]
-type = [
-    "string",
-    "null",
-]
-
-[data_queries.output_schema.items.properties.rows.items.properties.contact_notify]
 type = [
     "string",
     "null",
@@ -844,11 +791,11 @@ type = [
     "null",
 ]
 
+[data_queries.output_schema.items.properties.rows.items.properties.is_active]
+type = "boolean"
+
 [data_queries.output_schema.items.properties.rows.items.properties.updated_at_ms]
-type = [
-    "integer",
-    "null",
-]
+type = "integer"
 
 [[data_queries]]
 name = "google_gmail.search_threads_local"

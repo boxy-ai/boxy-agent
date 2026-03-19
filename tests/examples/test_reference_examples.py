@@ -62,7 +62,7 @@ def test_reference_data_mining_agent_packaged_and_runs_end_to_end(tmp_path: Path
     )
     report = runtime.run(
         REFERENCE_DATA_MINING_AGENT_NAME,
-        {"type": "scheduled.interval", "payload": {"chat_id": "chat-1"}},
+        {"type": "scheduled.interval", "payload": {"chat_jid": "chat-1"}},
     )
 
     assert report.status == "idle"
@@ -93,7 +93,7 @@ def test_reference_automation_agent_packaged_and_runs_end_to_end(tmp_path: Path)
         REFERENCE_AUTOMATION_AGENT_NAME,
         {
             "type": "chat.reply_request",
-            "payload": {"target": "chat-1", "chat_id": "chat-1"},
+            "payload": {"target": "chat-1", "chat_jid": "chat-1"},
         },
     )
 

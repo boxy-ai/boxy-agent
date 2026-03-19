@@ -24,7 +24,7 @@ from boxy_agent.types import JsonValue
 DEFAULT_QUERY_RESULTS: dict[str, list[JsonValue]] = {
     DEFAULT_DATA_QUERY_NAME: [
         {
-            "chat_id": "chat-1",
+            "chat_jid": "chat-1",
             "before_ts_ms": None,
             "before_message_id": None,
             "next_before_ts_ms": None,
@@ -33,16 +33,19 @@ DEFAULT_QUERY_RESULTS: dict[str, list[JsonValue]] = {
             "count": 1,
             "messages": [
                 {
-                    "chat_id": "chat-1",
+                    "chat_jid": "chat-1",
                     "message_id": "msg-1",
                     "from_me": False,
-                    "sender_id": "contact-1",
-                    "push_name": "Alex",
+                    "sender_jid": "contact-1",
+                    "sender_display_name_hint": "Alex",
                     "timestamp_ms": 1,
                     "text": "Status update",
-                    "upsert_type": "notify",
-                    "source_event_id": 1,
-                    "ingested_at": "2026-01-01T00:00:00Z",
+                    "message_type": "text",
+                    "is_deleted": False,
+                    "is_edited": False,
+                    "first_observed_at_ms": 1,
+                    "last_observed_at_ms": 1,
+                    "updated_at_ms": 1,
                 }
             ],
         }

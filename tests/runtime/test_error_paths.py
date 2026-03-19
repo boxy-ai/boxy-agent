@@ -107,7 +107,7 @@ def test_runtime_wraps_unexpected_handler_failures() -> None:
 
 def test_runtime_does_not_wrap_unconfigured_client_errors() -> None:
     def handle(context):
-        query_data(context, DEFAULT_DATA_QUERY_NAME, {"chat_id": "chat-1"})
+        query_data(context, DEFAULT_DATA_QUERY_NAME, {"chat_jid": "chat-1"})
         return AgentResult(output={"ok": True})
 
     runtime = AgentRuntime(

@@ -24,16 +24,40 @@ def test_static_data_query_client_contract() -> None:
     catalog = default_capability_catalog()
     client = StaticDataQueryClient(
         descriptors=[catalog.data_queries[DEFAULT_DATA_QUERY_NAME]],
-        query_results={DEFAULT_DATA_QUERY_NAME: [{"id": "row-1"}]},
+        query_results={
+            DEFAULT_DATA_QUERY_NAME: [
+                {
+                    "chat_jid": "chat-1",
+                    "before_ts_ms": None,
+                    "before_message_id": None,
+                    "next_before_ts_ms": None,
+                    "next_before_message_id": None,
+                    "has_more": False,
+                    "count": 1,
+                    "messages": [],
+                }
+            ]
+        },
     )
 
     assert [item.name for item in client.list_data_queries()] == [DEFAULT_DATA_QUERY_NAME]
     assert client.query_data(
         DEFAULT_DATA_QUERY_NAME,
-        {"chat_id": "chat-1"},
+        {"chat_jid": "chat-1"},
         session_id="session-1",
         actor_principal="agent:test:session:session-1",
-    ) == [{"id": "row-1"}]
+    ) == [
+        {
+            "chat_jid": "chat-1",
+            "before_ts_ms": None,
+            "before_message_id": None,
+            "next_before_ts_ms": None,
+            "next_before_message_id": None,
+            "has_more": False,
+            "count": 1,
+            "messages": [],
+        }
+    ]
 
     with pytest.raises(UnconfiguredClientError, match="No data query result configured"):
         StaticDataQueryClient(
