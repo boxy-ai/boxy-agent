@@ -66,6 +66,7 @@ name = "custom.messages"
 description = "Custom query"
 input_schema = { type = "object", properties = { fts = { type = "string" } } }
 output_schema = { type = "array", items = { type = "object" } }
+query_capabilities = { source_kind = "local_ingested", selection_group = "custom.messages.search" }
 
 [[boxy_tools]]
 name = "custom.send"
@@ -73,6 +74,7 @@ description = "Custom tool"
 input_schema = { type = "object", properties = { body = { type = "string" } } }
 output_schema = { type = "object", properties = { status = { type = "string" } } }
 side_effect = true
+tool_capabilities = { source_kind = "live_provider", selection_group = "custom.messages.send" }
 
 [[builtin_tools]]
 name = "custom.search"
@@ -88,4 +90,12 @@ output_schema = { type = "object" }
     assert list(catalog.data_queries) == ["custom.messages"]
     assert list(catalog.boxy_tools) == ["custom.send"]
     assert list(catalog.builtin_tools) == ["custom.search"]
+    assert catalog.data_queries["custom.messages"].query_capabilities == {
+        "source_kind": "local_ingested",
+        "selection_group": "custom.messages.search",
+    }
     assert catalog.boxy_tools["custom.send"].side_effect is True
+    assert catalog.boxy_tools["custom.send"].tool_capabilities == {
+        "source_kind": "live_provider",
+        "selection_group": "custom.messages.send",
+    }

@@ -206,12 +206,19 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             label=f"{label}[{index}]",
             source=source,
         )
+        tool_capabilities = _optional_json_table(
+            table,
+            "tool_capabilities",
+            label=f"{label}[{index}]",
+            source=source,
+        )
         by_name[name] = ToolDescriptor(
             name=name,
             description=description,
             input_schema=input_schema,
             output_schema=output_schema,
             side_effect=side_effect,
+            tool_capabilities=tool_capabilities,
             completion_contract=completion_contract,
         )
     return by_name

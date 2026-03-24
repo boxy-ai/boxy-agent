@@ -1407,6 +1407,17 @@ type = [
     "null",
 ]
 
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_gmail.threads.search"
+preferred_for = [
+    "search",
+    "summary",
+    "recent",
+    "latest",
+]
+order_guarantee = "newest_first"
+
 [data_queries.completion_contract.collection]
 source = "query_rows_first_field"
 items_field = "threads"
@@ -1468,6 +1479,16 @@ type = [
     "null",
 ]
 
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_gmail.thread.get"
+preferred_for = [
+    "lookup",
+    "summary",
+    "recent",
+    "latest",
+]
+
 [[data_queries]]
 name = "google_gmail.get_threads_local"
 description = "Fetch multiple Gmail threads from locally ingested data in one call. Prefer this over repeated remote Gmail reads when local data is acceptable."
@@ -1507,6 +1528,509 @@ type = "string"
 
 [data_queries.output_schema.items.properties.threads]
 type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[[data_queries]]
+name = "google_calendar.search_events_local"
+description = "Search Google Calendar events from locally ingested data. Prefer this over remote Calendar tools when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.text]
+type = "string"
+
+[data_queries.input_schema.properties.time_min]
+type = "string"
+
+[data_queries.input_schema.properties.time_max]
+type = "string"
+
+[data_queries.input_schema.properties.include_cancelled]
+type = "boolean"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "events",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.events]
+type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_calendar.events.search"
+preferred_for = [
+    "search",
+    "summary",
+    "recent",
+    "latest",
+]
+
+[[data_queries]]
+name = "google_drive.search_files_local"
+description = "Search Google Drive files from locally ingested change metadata. Prefer this over remote Drive reads when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.text]
+type = "string"
+
+[data_queries.input_schema.properties.include_removed]
+type = "boolean"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "files",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.files]
+type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_drive.files.search"
+preferred_for = [
+    "search",
+    "summary",
+    "recent",
+    "latest",
+]
+
+[[data_queries]]
+name = "google_drive.get_file_local"
+description = "Fetch one Google Drive file from locally ingested change metadata. Prefer this over remote Drive reads when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "file_id",
+]
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.file_id]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "file",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.file]
+type = [
+    "object",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_drive.file.get"
+preferred_for = [
+    "lookup",
+    "summary",
+]
+
+[[data_queries]]
+name = "google_chat.search_spaces_local"
+description = "List Google Chat conversations from locally ingested messages. Prefer this over remote Chat reads when local data is acceptable, including finding spaces before summarizing recent messages."
+
+[data_queries.input_schema]
+type = "object"
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.text]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "spaces",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.spaces]
+type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_chat.spaces.search"
+preferred_for = [
+    "search",
+    "summary",
+    "recent",
+    "latest",
+]
+order_guarantee = "newest_first"
+
+[[data_queries]]
+name = "google_chat.get_space_messages_local"
+description = "Fetch newest-first Google Chat messages for one space from locally ingested data. Prefer this over remote Chat reads for recent/latest message summaries when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "space_name",
+]
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.space_name]
+type = "string"
+
+[data_queries.input_schema.properties.text]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "space_name",
+    "messages",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.space_name]
+type = "string"
+
+[data_queries.output_schema.items.properties.messages]
+type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_chat.messages.get"
+preferred_for = [
+    "lookup",
+    "summary",
+    "recent",
+    "latest",
+]
+order_guarantee = "newest_first"
+
+[[data_queries]]
+name = "google_docs.search_documents_local"
+description = "Search Google Docs metadata and extracted body text from locally ingested changes. Prefer this over remote Docs reads when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.text]
+type = "string"
+
+[data_queries.input_schema.properties.include_removed]
+type = "boolean"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "documents",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.documents]
+type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_docs.documents.search"
+preferred_for = [
+    "search",
+    "summary",
+    "recent",
+    "latest",
+]
+
+[[data_queries]]
+name = "google_docs.get_document_local"
+description = "Fetch one Google Docs document record with extracted body text from locally ingested changes. Prefer this over remote Docs reads when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "document_id",
+]
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.document_id]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "document",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.document]
+type = [
+    "object",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_docs.document.get"
+preferred_for = [
+    "lookup",
+    "summary",
+    "recent",
+    "latest",
+]
+
+[[data_queries]]
+name = "google_sheets.search_spreadsheets_local"
+description = "Search Google Sheets metadata from locally ingested changes. Prefer this over remote Sheets metadata reads when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.text]
+type = "string"
+
+[data_queries.input_schema.properties.include_removed]
+type = "boolean"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "spreadsheets",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.spreadsheets]
+type = "array"
+
+[data_queries.output_schema.items.properties.local_last_ingested_at]
+type = [
+    "string",
+    "null",
+]
+
+[data_queries.output_schema.items.properties.next_planned_ingest_at]
+type = [
+    "string",
+    "null",
+]
+
+[[data_queries]]
+name = "google_sheets.get_spreadsheet_local"
+description = "Fetch one Google Sheets spreadsheet record from locally ingested changes. Prefer this over remote Sheets metadata reads when local data is acceptable."
+
+[data_queries.input_schema]
+type = "object"
+required = [
+    "spreadsheet_id",
+]
+
+[data_queries.input_schema.properties.account_id]
+type = "string"
+
+[data_queries.input_schema.properties.spreadsheet_id]
+type = "string"
+
+[data_queries.output_schema]
+type = "array"
+
+[data_queries.output_schema.items]
+type = "object"
+required = [
+    "account_id",
+    "spreadsheet",
+    "local_last_ingested_at",
+    "next_planned_ingest_at",
+]
+
+[data_queries.output_schema.items.properties.account_id]
+type = "string"
+
+[data_queries.output_schema.items.properties.spreadsheet]
+type = [
+    "object",
+    "null",
+]
 
 [data_queries.output_schema.items.properties.local_last_ingested_at]
 type = [
@@ -1756,6 +2280,14 @@ type = [
     "null",
 ]
 
+[boxy_tools.tool_capabilities]
+source_kind = "live_provider"
+selection_group = "google_gmail.threads.search"
+preferred_for = [
+    "explicit_live_read",
+]
+requires_explicit_live_opt_in = true
+
 [[boxy_tools]]
 name = "google_gmail.gmail_get_thread"
 description = "Fetch Gmail thread details via Google. Prefer local Gmail data queries when available; this is slower but may be slightly fresher."
@@ -1792,6 +2324,14 @@ type = "string"
 
 [boxy_tools.output_schema.properties.thread]
 type = "object"
+
+[boxy_tools.tool_capabilities]
+source_kind = "live_provider"
+selection_group = "google_gmail.thread.get"
+preferred_for = [
+    "explicit_live_read",
+]
+requires_explicit_live_opt_in = true
 
 [[boxy_tools]]
 name = "google_gmail.gmail_send_email"
@@ -1858,7 +2398,7 @@ type = [
 
 [[boxy_tools]]
 name = "google_calendar.calendar_list_events"
-description = "List Google Calendar events"
+description = "List Google Calendar events directly via Google. Prefer locally ingested Calendar queries unless the user explicitly asks for a live provider read."
 
 [boxy_tools.input_schema]
 type = "object"
@@ -1905,6 +2445,14 @@ type = [
     "string",
     "null",
 ]
+
+[boxy_tools.tool_capabilities]
+source_kind = "live_provider"
+selection_group = "google_calendar.events.search"
+preferred_for = [
+    "explicit_live_read",
+]
+requires_explicit_live_opt_in = true
 
 [[boxy_tools]]
 name = "google_calendar.calendar_create_event"
@@ -1961,7 +2509,7 @@ type = "object"
 
 [[boxy_tools]]
 name = "google_drive.drive_search_files"
-description = "Search Google Drive files"
+description = "Search Google Drive files directly via Google. Prefer locally ingested Drive queries unless the user explicitly asks for a live provider read."
 
 [boxy_tools.input_schema]
 type = "object"
@@ -2000,9 +2548,17 @@ type = [
     "null",
 ]
 
+[boxy_tools.tool_capabilities]
+source_kind = "live_provider"
+selection_group = "google_drive.files.search"
+preferred_for = [
+    "explicit_live_read",
+]
+requires_explicit_live_opt_in = true
+
 [[boxy_tools]]
 name = "google_drive.drive_get_file"
-description = "Fetch Google Drive file metadata"
+description = "Fetch Google Drive file metadata directly via Google. Prefer locally ingested Drive queries unless the user explicitly asks for a live provider read."
 
 [boxy_tools.input_schema]
 type = "object"
@@ -2032,9 +2588,17 @@ type = "string"
 [boxy_tools.output_schema.properties.file]
 type = "object"
 
+[boxy_tools.tool_capabilities]
+source_kind = "live_provider"
+selection_group = "google_drive.file.get"
+preferred_for = [
+    "explicit_live_read",
+]
+requires_explicit_live_opt_in = true
+
 [[boxy_tools]]
 name = "google_chat.chat_list_spaces"
-description = "List Google Chat spaces"
+description = "List Google Chat spaces directly via the Google Chat API. Prefer locally ingested Chat space queries unless the user explicitly asks for a live provider read."
 
 [boxy_tools.input_schema]
 type = "object"
@@ -2070,9 +2634,17 @@ type = [
     "null",
 ]
 
+[boxy_tools.tool_capabilities]
+source_kind = "live_provider"
+selection_group = "google_chat.spaces.search"
+preferred_for = [
+    "explicit_live_read",
+]
+requires_explicit_live_opt_in = true
+
 [[boxy_tools]]
 name = "google_chat.chat_list_messages"
-description = "List Google Chat messages in a space"
+description = "List Google Chat messages directly via the Google Chat API. Provider page order follows Google defaults and is not reliable for recent/latest message summaries. Prefer locally ingested Chat message queries unless the user explicitly asks for a live provider read."
 
 [boxy_tools.input_schema]
 type = "object"
@@ -2114,9 +2686,55 @@ type = [
     "null",
 ]
 
+[boxy_tools.tool_capabilities]
+source_kind = "live_provider"
+selection_group = "google_chat.messages.get"
+preferred_for = [
+    "explicit_live_read",
+]
+requires_explicit_live_opt_in = true
+order_guarantee = "provider_default"
+
+[[boxy_tools]]
+name = "google_chat.chat_send_message"
+description = "Send a Google Chat message to a space"
+side_effect = true
+
+[boxy_tools.input_schema]
+type = "object"
+required = [
+    "space",
+    "text",
+]
+
+[boxy_tools.input_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.input_schema.properties.space]
+type = "string"
+
+[boxy_tools.input_schema.properties.text]
+type = "string"
+
+[boxy_tools.input_schema.properties.thread_name]
+type = "string"
+
+[boxy_tools.output_schema]
+type = "object"
+required = [
+    "account_id",
+    "message",
+]
+
+[boxy_tools.output_schema.properties.account_id]
+type = "string"
+
+[boxy_tools.output_schema.properties.message]
+type = "object"
+
 [[boxy_tools]]
 name = "google_docs.docs_get_document"
-description = "Fetch Google Docs document structure"
+description = "Fetch Google Docs document structure directly via Google. Prefer locally ingested Docs queries unless the user explicitly asks for a live provider read."
 
 [boxy_tools.input_schema]
 type = "object"
@@ -2142,6 +2760,14 @@ type = "string"
 
 [boxy_tools.output_schema.properties.document]
 type = "object"
+
+[boxy_tools.tool_capabilities]
+source_kind = "live_provider"
+selection_group = "google_docs.document.get"
+preferred_for = [
+    "explicit_live_read",
+]
+requires_explicit_live_opt_in = true
 
 [[boxy_tools]]
 name = "google_sheets.sheets_get_values"
