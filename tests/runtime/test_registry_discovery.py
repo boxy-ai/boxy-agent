@@ -31,7 +31,7 @@ class _NoopBindings:
     def list_data_queries(self) -> list[models.DataQueryDescriptor]:
         return []
 
-    def query_data(self, name: str, params: dict[str, JsonValue]) -> list[JsonValue]:
+    def query_data(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         raise AssertionError(f"registry discovery handler should not query data: {name}")
 
     def list_boxy_tools(self) -> list[models.ToolDescriptor]:

@@ -21,16 +21,10 @@ from boxy_agent.runtime.providers import (
 from boxy_agent.sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
 from boxy_agent.types import JsonValue
 
-DEFAULT_QUERY_RESULTS: dict[str, list[JsonValue]] = {
-    DEFAULT_DATA_QUERY_NAME: [
-        {
+DEFAULT_QUERY_RESULTS: dict[str, JsonValue] = {
+    DEFAULT_DATA_QUERY_NAME: {
+        "data": {
             "chat_jid": "chat-1",
-            "before_ts_ms": None,
-            "before_message_id": None,
-            "next_before_ts_ms": None,
-            "next_before_message_id": None,
-            "has_more": False,
-            "count": 1,
             "messages": [
                 {
                     "chat_jid": "chat-1",
@@ -48,8 +42,16 @@ DEFAULT_QUERY_RESULTS: dict[str, list[JsonValue]] = {
                     "updated_at_ms": 1,
                 }
             ],
-        }
-    ]
+        },
+        "page_info": {
+            "has_more": False,
+            "returned": 1,
+        },
+        "resolution": {
+            "account_id": "acct-1",
+            "target": "chat-1",
+        },
+    }
 }
 
 DEFAULT_BOXY_TOOL_RESULTS: dict[str, JsonValue] = {
@@ -58,7 +60,7 @@ DEFAULT_BOXY_TOOL_RESULTS: dict[str, JsonValue] = {
         "target_resolved": "chat-1",
         "message_ref": "out-1",
         "sent_at": "2026-01-01T00:00:00Z",
-        "details": {},
+        "data": {},
     }
 }
 
@@ -85,14 +87,12 @@ class MockLlmClient(LlmClient):
 def default_data_query_client(
     *,
     catalog: CapabilityCatalog | None = None,
-    query_results: Mapping[str, list[JsonValue]] | None = None,
+    query_results: Mapping[str, JsonValue] | None = None,
 ) -> StaticDataQueryClient:
     active_catalog = catalog or default_capability_catalog()
-    resolved_results: dict[str, list[JsonValue]] = {
-        name: list(rows) for name, rows in DEFAULT_QUERY_RESULTS.items()
-    }
-    for name, rows in (query_results or {}).items():
-        resolved_results[name] = list(rows)
+    resolved_results: dict[str, JsonValue] = dict(DEFAULT_QUERY_RESULTS)
+    for name, output in (query_results or {}).items():
+        resolved_results[name] = output
     return StaticDataQueryClient(
         descriptors=list(active_catalog.data_queries.values()),
         query_results=resolved_results,

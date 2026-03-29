@@ -34,11 +34,11 @@ class StaticDataQueryClient(DataQueryClient):
         self,
         *,
         descriptors: Sequence[DataQueryDescriptor] | None = None,
-        query_results: Mapping[str, Sequence[JsonValue]] | None = None,
+        query_results: Mapping[str, JsonValue] | None = None,
     ) -> None:
         source_descriptors = descriptors or []
         self._descriptors = {descriptor.name: descriptor for descriptor in source_descriptors}
-        self._query_results = {name: list(rows) for name, rows in (query_results or {}).items()}
+        self._query_results = dict(query_results or {})
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:
         return list(self._descriptors.values())
@@ -50,11 +50,11 @@ class StaticDataQueryClient(DataQueryClient):
         *,
         session_id: str,
         actor_principal: str,
-    ) -> list[JsonValue]:
+    ) -> JsonValue:
         _ = params, session_id, actor_principal
         if name not in self._query_results:
             raise UnconfiguredClientError(f"No data query result configured for '{name}'")
-        return list(self._query_results[name])
+        return self._query_results[name]
 
 
 class StaticToolClient(ToolClient):

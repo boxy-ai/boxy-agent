@@ -63,16 +63,10 @@ def _default_query_params() -> dict[str, JsonValue]:
     return {"chat_jid": "chat-1"}
 
 
-def _default_query_rows() -> list[dict[str, JsonValue]]:
-    return [
-        {
+def _default_query_rows() -> dict[str, JsonValue]:
+    return {
+        "data": {
             "chat_jid": "chat-1",
-            "before_ts_ms": None,
-            "before_message_id": None,
-            "next_before_ts_ms": None,
-            "next_before_message_id": None,
-            "has_more": False,
-            "count": 1,
             "messages": [
                 {
                     "chat_jid": "chat-1",
@@ -90,8 +84,16 @@ def _default_query_rows() -> list[dict[str, JsonValue]]:
                     "updated_at_ms": 1,
                 }
             ],
-        }
-    ]
+        },
+        "page_info": {
+            "has_more": False,
+            "returned": 1,
+        },
+        "resolution": {
+            "account_id": "acct-1",
+            "target": "chat-1",
+        },
+    }
 
 
 def _default_tool_params() -> dict[str, JsonValue]:
@@ -108,7 +110,7 @@ def _default_tool_result() -> dict[str, JsonValue]:
         "target_resolved": "chat-1",
         "message_ref": "msg-1",
         "sent_at": "2026-01-01T00:00:00Z",
-        "details": {},
+        "data": {},
     }
 
 
@@ -283,9 +285,15 @@ def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
                 ],
                 execution_results={
                     READ_ONLY_BOXY_TOOL_NAME: {
-                        "account_id": "acct-1",
-                        "threads": [],
-                        "next_page_token": None,
+                        "data": {
+                            "threads": [],
+                        },
+                        "page_info": {
+                            "next_page_token": None,
+                        },
+                        "resolution": {
+                            "account_id": "acct-1",
+                        },
                     }
                 },
             )
@@ -295,9 +303,15 @@ def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
     report = runtime.run("miner", {"type": "scheduled.interval"})
 
     assert report.last_output == {
-        "account_id": "acct-1",
-        "threads": [],
-        "next_page_token": None,
+        "data": {
+            "threads": [],
+        },
+        "page_info": {
+            "next_page_token": None,
+        },
+        "resolution": {
+            "account_id": "acct-1",
+        },
     }
 
 
@@ -514,7 +528,7 @@ def test_runtime_rejects_invalid_capability_output_schema() -> None:
             )
         },
         boxy_tool_client=StaticToolClient(
-            execution_results={DEFAULT_BOXY_TOOL_NAME: {"status": "sent"}}
+            execution_results={DEFAULT_BOXY_TOOL_NAME: {"status": "delivered"}}
         ),
     )
 

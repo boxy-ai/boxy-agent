@@ -5,6 +5,18 @@ from __future__ import annotations
 from boxy_agent.sdk import boxy_tools, data_queries, decorators, models
 
 
+def _chat_context_message_count(result: object) -> int:
+    if not isinstance(result, dict):
+        return 0
+    data = result.get("data")
+    if not isinstance(data, dict):
+        return 0
+    messages = data.get("messages")
+    if not isinstance(messages, list):
+        return 0
+    return len(messages)
+
+
 @decorators.agent_main
 def handle(exec_ctx: models.AgentExecutionContext) -> models.AgentResult:
     """Run a single sequential automation pass."""
@@ -25,7 +37,8 @@ def handle(exec_ctx: models.AgentExecutionContext) -> models.AgentResult:
     target = target_value.strip()
     chat_jid = chat_jid_value.strip()
 
-    messages = data_queries.query(exec_ctx, "whatsapp.chat_context", {"chat_jid": chat_jid})
+    chat_context = data_queries.query(exec_ctx, "whatsapp.chat_context", {"chat_jid": chat_jid})
+    message_count = _chat_context_message_count(chat_context)
     send_result = boxy_tools.call(
         exec_ctx,
         "whatsapp.send_message",
@@ -40,7 +53,7 @@ def handle(exec_ctx: models.AgentExecutionContext) -> models.AgentResult:
         output={
             "status": "completed",
             "target": target,
-            "message_count": len(messages),
+            "message_count": message_count,
             "send_result": send_result,
         }
     )

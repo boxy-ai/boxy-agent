@@ -6,7 +6,6 @@ import uuid
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import cast
 
 from jsonschema import Draft202012Validator, FormatChecker, validators
 from jsonschema.exceptions import FormatError, ValidationError
@@ -191,7 +190,7 @@ class _ContextRuntimeBindings:
             discoverable_names=_discoverable_names(self.data_client.list_data_queries()),
         )
 
-    def query_data(self, name: str, params: dict[str, JsonValue]) -> list[JsonValue]:
+    def query_data(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         self._ensure_capability(
             name=name, allowed=self.capabilities.data_queries, kind="data query"
         )
@@ -203,7 +202,7 @@ class _ContextRuntimeBindings:
             descriptor=descriptor,
             call=self._call_data_query_with_session_scope,
         )
-        return cast(list[JsonValue], result)
+        return result
 
     def list_boxy_tools(self) -> list[ToolDescriptor]:
         return _filter_discoverable_descriptors(

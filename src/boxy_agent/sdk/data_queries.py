@@ -18,6 +18,6 @@ def query(
     exec_ctx: AgentExecutionContext,
     name: str,
     params: dict[str, JsonValue],
-) -> list[JsonValue]:
+) -> JsonValue:
     """Run a capability-checked Boxy data query."""
     return runtime_bindings(exec_ctx).query_data(name, params)

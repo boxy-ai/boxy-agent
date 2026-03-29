@@ -8,6 +8,11 @@ from typing import Literal, cast
 from boxy_agent.types import JsonValue, ensure_json_value
 
 AgentType = Literal["automation", "data_mining"]
+ResultContract = Literal[
+    "raw",
+    "read_result",
+    "mutation_result",
+]
 
 
 @dataclass(frozen=True)
@@ -16,20 +21,15 @@ class DataQueryDescriptor:
 
     name: str
     description: str
+    output_schema: dict[str, JsonValue]
     input_schema: dict[str, JsonValue] = field(
         default_factory=lambda: {
             "type": "object",
             "additionalProperties": True,
         }
     )
-    output_schema: dict[str, JsonValue] = field(
-        default_factory=lambda: {
-            "type": "array",
-            "items": {},
-        }
-    )
+    result_contract: ResultContract = "raw"
     query_capabilities: dict[str, JsonValue] = field(default_factory=dict)
-    completion_contract: dict[str, JsonValue] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         _require_non_empty("name", self.name)
@@ -40,12 +40,10 @@ class DataQueryDescriptor:
         for key, value in self.output_schema.items():
             _require_non_empty("output schema key", key)
             ensure_json_value(value, label=f"output schema value for {self.name}:{key}")
+        _require_result_contract(self.result_contract, label=f"result contract for {self.name}")
         for key, value in self.query_capabilities.items():
             _require_non_empty("query capability key", key)
             ensure_json_value(value, label=f"query capability value for {self.name}:{key}")
-        for key, value in self.completion_contract.items():
-            _require_non_empty("completion contract key", key)
-            ensure_json_value(value, label=f"completion contract value for {self.name}:{key}")
 
 
 @dataclass(frozen=True)
@@ -61,9 +59,9 @@ class ToolDescriptor:
         }
     )
     output_schema: dict[str, JsonValue] = field(default_factory=dict)
+    result_contract: ResultContract = "raw"
     side_effect: bool = False
     tool_capabilities: dict[str, JsonValue] = field(default_factory=dict)
-    completion_contract: dict[str, JsonValue] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         _require_non_empty("name", self.name)
@@ -76,12 +74,10 @@ class ToolDescriptor:
         for key, value in self.output_schema.items():
             _require_non_empty("output schema key", key)
             ensure_json_value(value, label=f"output schema value for {self.name}:{key}")
+        _require_result_contract(self.result_contract, label=f"result contract for {self.name}")
         for key, value in self.tool_capabilities.items():
             _require_non_empty("tool capability key", key)
             ensure_json_value(value, label=f"tool capability value for {self.name}:{key}")
-        for key, value in self.completion_contract.items():
-            _require_non_empty("completion contract key", key)
-            ensure_json_value(value, label=f"completion contract value for {self.name}:{key}")
 
 
 @dataclass(frozen=True)
@@ -138,7 +134,7 @@ class AgentMetadata:
 
 @dataclass(frozen=True)
 class AgentEvent:
-    """Envelope for runtime events passed to agent entrypoints."""
+    """Event record for runtime events passed to agent entrypoints."""
 
     type: str
     description: str = ""
@@ -192,6 +188,15 @@ def _require_non_empty(label: str, value: str) -> None:
         raise TypeError(f"{label} must be a string")
     if not value.strip():
         raise ValueError(f"{label} must be non-empty")
+
+
+def _require_result_contract(value: str, *, label: str) -> None:
+    if value not in {
+        "raw",
+        "read_result",
+        "mutation_result",
+    }:
+        raise ValueError(f"Unsupported {label}: {value}")
 
 
 def parse_agent_type(value: str) -> AgentType:

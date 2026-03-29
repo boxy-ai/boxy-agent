@@ -24,7 +24,7 @@ class DataQueryClient(Protocol):
         *,
         session_id: str,
         actor_principal: str,
-    ) -> list[JsonValue]:
+    ) -> JsonValue:
         """Execute a Boxy data query."""
         ...
 
@@ -87,7 +87,7 @@ class RuntimeBindings(Protocol):
         """List discoverable data queries."""
         ...
 
-    def query_data(self, name: str, params: dict[str, JsonValue]) -> list[JsonValue]:
+    def query_data(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         """Execute a data query."""
         ...
 

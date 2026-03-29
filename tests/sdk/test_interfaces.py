@@ -39,10 +39,10 @@ class _FakeBindings:
     def list_data_queries(self):
         return [data_query_registry()[DEFAULT_DATA_QUERY_NAME]]
 
-    def query_data(self, name: str, params: dict[str, JsonValue]) -> list[JsonValue]:
+    def query_data(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         if name != DEFAULT_DATA_QUERY_NAME:
             raise CapabilityViolationError(f"forbidden query: {name}")
-        return [{"id": "m-1", "params": params}]
+        return {"id": "m-1", "params": params}
 
     def list_boxy_tools(self):
         return [boxy_tool_registry()[DEFAULT_BOXY_TOOL_NAME]]
@@ -105,9 +105,10 @@ def test_context_routes_calls_through_sdk_helpers() -> None:
     )
 
     assert [item.name for item in data_queries.list_available(context)] == [DEFAULT_DATA_QUERY_NAME]
-    assert data_queries.query(context, DEFAULT_DATA_QUERY_NAME, {"chat_jid": "chat-1"}) == [
-        {"id": "m-1", "params": {"chat_jid": "chat-1"}}
-    ]
+    assert data_queries.query(context, DEFAULT_DATA_QUERY_NAME, {"chat_jid": "chat-1"}) == {
+        "id": "m-1",
+        "params": {"chat_jid": "chat-1"},
+    }
     with pytest.raises(CapabilityViolationError):
         data_queries.query(context, "calendar.events", {})
 

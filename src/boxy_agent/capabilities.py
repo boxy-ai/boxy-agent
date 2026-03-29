@@ -12,7 +12,7 @@ from typing import cast
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
-from boxy_agent.models import DataQueryDescriptor, ToolDescriptor
+from boxy_agent.models import DataQueryDescriptor, ResultContract, ToolDescriptor
 from boxy_agent.types import JsonValue, ensure_json_value
 
 CATALOG_SCHEMA_VERSION = 1
@@ -150,15 +150,15 @@ def _load_data_queries(value: object, *, source: str) -> dict[str, DataQueryDesc
             capability_name=name,
             source=source,
         )
-        query_capabilities = _optional_json_table(
+        result_contract = _optional_result_contract(
             table,
-            "query_capabilities",
+            "result_contract",
             label=f"data_queries[{index}]",
             source=source,
         )
-        completion_contract = _optional_json_table(
+        query_capabilities = _optional_json_table(
             table,
-            "completion_contract",
+            "query_capabilities",
             label=f"data_queries[{index}]",
             source=source,
         )
@@ -167,8 +167,8 @@ def _load_data_queries(value: object, *, source: str) -> dict[str, DataQueryDesc
             description=description,
             input_schema=input_schema,
             output_schema=output_schema,
+            result_contract=result_contract,
             query_capabilities=query_capabilities,
-            completion_contract=completion_contract,
         )
     return by_name
 
@@ -194,15 +194,15 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             capability_name=name,
             source=source,
         )
-        side_effect = _optional_bool(
+        result_contract = _optional_result_contract(
             table,
-            "side_effect",
+            "result_contract",
             label=f"{label}[{index}]",
             source=source,
         )
-        completion_contract = _optional_json_table(
+        side_effect = _optional_bool(
             table,
-            "completion_contract",
+            "side_effect",
             label=f"{label}[{index}]",
             source=source,
         )
@@ -217,9 +217,9 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             description=description,
             input_schema=input_schema,
             output_schema=output_schema,
+            result_contract=result_contract,
             side_effect=side_effect,
             tool_capabilities=tool_capabilities,
-            completion_contract=completion_contract,
         )
     return by_name
 
@@ -257,6 +257,25 @@ def _optional_bool(
     if not isinstance(value, bool):
         raise CapabilityCatalogError(f"{label}.{key} must be a boolean ({source})")
     return value
+
+
+def _optional_result_contract(
+    data: dict[str, object],
+    key: str,
+    *,
+    label: str,
+    source: str,
+) -> ResultContract:
+    value = data.get(key, "raw")
+    if not isinstance(value, str):
+        raise CapabilityCatalogError(f"{label}.{key} must be a string ({source})")
+    if value not in {
+        "raw",
+        "read_result",
+        "mutation_result",
+    }:
+        raise CapabilityCatalogError(f"{label}.{key} has unsupported value {value!r} ({source})")
+    return cast(ResultContract, value)
 
 
 def _require_schema(
