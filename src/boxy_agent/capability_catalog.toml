@@ -4565,6 +4565,358 @@ preferred_for = [
 order_guarantee = "newest_first"
 
 [[data_queries]]
+name = "google_chat.search_messages_semantic_local"
+description = "Semantically search Google Chat transcript windows from locally ingested data. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching."
+result_contract = "read_result"
+
+[data_queries.input_schema]
+additionalProperties = false
+required = [
+    "text",
+]
+title = "ChatSearchMessagesSemanticLocalInput"
+type = "object"
+
+[data_queries.input_schema.properties.account_id]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Account Id"
+
+[data_queries.input_schema.properties.text]
+title = "Text"
+type = "string"
+
+[data_queries.input_schema.properties.space_name]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Space Name"
+
+[data_queries.input_schema.properties.time_min]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Time Min"
+
+[data_queries.input_schema.properties.time_max]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Time Max"
+
+[data_queries.output_schema]
+additionalProperties = false
+required = [
+    "data",
+]
+title = "ReadResult[ChatSemanticSearchData]"
+type = "object"
+
+[data_queries.output_schema."$defs".ChatMessageRead]
+additionalProperties = false
+required = [
+    "message_name",
+]
+title = "ChatMessageRead"
+type = "object"
+
+[data_queries.output_schema."$defs".ChatMessageRead.properties.message_name]
+title = "Message Name"
+type = "string"
+
+[data_queries.output_schema."$defs".ChatMessageRead.properties.space_name]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Space Name"
+
+[data_queries.output_schema."$defs".ChatMessageRead.properties.create_time]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Create Time"
+
+[data_queries.output_schema."$defs".ChatMessageRead.properties.sender_type]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Sender Type"
+
+[data_queries.output_schema."$defs".ChatMessageRead.properties.sender_name]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Sender Name"
+
+[data_queries.output_schema."$defs".ChatMessageRead.properties.sender_display_name]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Sender Display Name"
+
+[data_queries.output_schema."$defs".ChatMessageRead.properties.thread_name]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Thread Name"
+
+[data_queries.output_schema."$defs".ChatMessageRead.properties.text]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Text"
+
+[data_queries.output_schema."$defs".ChatSemanticEvidenceChunkRead]
+additionalProperties = false
+required = [
+    "chunk_record_id",
+    "score",
+    "chunk_text",
+]
+title = "ChatSemanticEvidenceChunkRead"
+type = "object"
+
+[data_queries.output_schema."$defs".ChatSemanticEvidenceChunkRead.properties.chunk_record_id]
+title = "Chunk Record Id"
+type = "string"
+
+[data_queries.output_schema."$defs".ChatSemanticEvidenceChunkRead.properties.score]
+title = "Score"
+type = "number"
+
+[data_queries.output_schema."$defs".ChatSemanticEvidenceChunkRead.properties.chunk_text]
+title = "Chunk Text"
+type = "string"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchData]
+additionalProperties = false
+required = [
+    "embedding_ready",
+    "indexed_window_count",
+]
+title = "ChatSemanticSearchData"
+type = "object"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchData.properties.matches]
+title = "Matches"
+type = "array"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchData.properties.matches.items]
+"$ref" = "#/$defs/ChatSemanticSearchMatchRead"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchData.properties.embedding_ready]
+title = "Embedding Ready"
+type = "boolean"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchData.properties.indexed_window_count]
+title = "Indexed Window Count"
+type = "integer"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead]
+additionalProperties = false
+required = [
+    "group_key",
+    "score",
+]
+title = "ChatSemanticSearchMatchRead"
+type = "object"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.space_name]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Space Name"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.thread_name]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Thread Name"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.group_key]
+title = "Group Key"
+type = "string"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.score]
+title = "Score"
+type = "number"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.latest_create_time]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Latest Create Time"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.matched_messages]
+title = "Matched Messages"
+type = "array"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.matched_messages.items]
+"$ref" = "#/$defs/ChatMessageRead"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.evidence_chunks]
+title = "Evidence Chunks"
+type = "array"
+
+[data_queries.output_schema."$defs".ChatSemanticSearchMatchRead.properties.evidence_chunks.items]
+"$ref" = "#/$defs/ChatSemanticEvidenceChunkRead"
+
+[data_queries.output_schema."$defs".FreshnessInfo]
+additionalProperties = false
+title = "FreshnessInfo"
+type = "object"
+
+[data_queries.output_schema."$defs".FreshnessInfo.properties.source_kind]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Source Kind"
+
+[data_queries.output_schema."$defs".FreshnessInfo.properties.last_ingested_at]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Last Ingested At"
+
+[data_queries.output_schema."$defs".FreshnessInfo.properties.next_planned_ingest_at]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Next Planned Ingest At"
+
+[data_queries.output_schema."$defs".JsonValue]
+anyOf = [
+    { type = "boolean" },
+    { type = "integer" },
+    { type = "number" },
+    { type = "string" },
+    { items = { "$ref" = "#/$defs/JsonValue" }, type = "array" },
+    { additionalProperties = { "$ref" = "#/$defs/JsonValue" }, type = "object" },
+    { type = "null" },
+]
+
+[data_queries.output_schema."$defs".PageInfo]
+additionalProperties = false
+title = "PageInfo"
+type = "object"
+
+[data_queries.output_schema."$defs".PageInfo.properties.has_more]
+anyOf = [
+    { type = "boolean" },
+    { type = "null" },
+]
+title = "Has More"
+
+[data_queries.output_schema."$defs".PageInfo.properties.returned]
+anyOf = [
+    { type = "integer" },
+    { type = "null" },
+]
+title = "Returned"
+
+[data_queries.output_schema."$defs".PageInfo.properties.next_page_token]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Next Page Token"
+
+[data_queries.output_schema."$defs".PageInfo.properties.next_cursor]
+anyOf = [
+    { additionalProperties = { "$ref" = "#/$defs/JsonValue" }, type = "object" },
+    { type = "null" },
+]
+title = "Next Cursor"
+
+[data_queries.output_schema."$defs".PageInfo.properties.offset]
+anyOf = [
+    { type = "integer" },
+    { type = "null" },
+]
+title = "Offset"
+
+[data_queries.output_schema."$defs".PageInfo.properties.next_offset]
+anyOf = [
+    { type = "integer" },
+    { type = "null" },
+]
+title = "Next Offset"
+
+[data_queries.output_schema."$defs".ResolutionInfo]
+additionalProperties = false
+title = "ResolutionInfo"
+type = "object"
+
+[data_queries.output_schema."$defs".ResolutionInfo.properties.account_id]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Account Id"
+
+[data_queries.output_schema."$defs".ResolutionInfo.properties.target]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Target"
+
+[data_queries.output_schema."$defs".ResolutionInfo.properties.resolution_kind]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Resolution Kind"
+
+[data_queries.output_schema.properties.data]
+"$ref" = "#/$defs/ChatSemanticSearchData"
+
+[data_queries.output_schema.properties.page_info]
+anyOf = [
+    { "$ref" = "#/$defs/PageInfo" },
+    { type = "null" },
+]
+
+[data_queries.output_schema.properties.freshness]
+anyOf = [
+    { "$ref" = "#/$defs/FreshnessInfo" },
+    { type = "null" },
+]
+
+[data_queries.output_schema.properties.resolution]
+anyOf = [
+    { "$ref" = "#/$defs/ResolutionInfo" },
+    { type = "null" },
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "google_chat.messages.semantic_search"
+preferred_for = [
+    "search",
+    "summary",
+    "topic_lookup",
+]
+
+[[data_queries]]
 name = "google_docs.search_documents_local"
 description = "Search Google Docs metadata and extracted body text from locally ingested changes. Prefer this over remote Docs reads when local data is acceptable."
 result_contract = "read_result"
