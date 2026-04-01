@@ -5,7 +5,7 @@ boxy_tools = []
 
 [[builtin_tools]]
 name = "web_search"
-description = "Search the web"
+description = "Search the public web for internet information. Do not use for private connector or locally ingested user data."
 input_schema = { type = "object", properties = { query = { type = "string" } }, required = ["query"] }
 output_schema = { type = "object", properties = { results = { type = "array", items = { type = "object" } } } }
 

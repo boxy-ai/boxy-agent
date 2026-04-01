@@ -114,7 +114,21 @@ def _build_sdk_wheel(output_dir: Path) -> Path:
     repo_root = Path(__file__).resolve().parents[3]
     project_dir = repo_root / "boxy-agent"
     output_dir.mkdir(parents=True, exist_ok=True)
-    shutil.rmtree(project_dir / "build", ignore_errors=True)
+    stage_dir = output_dir.parent / "sdk-build-stage"
+    shutil.rmtree(stage_dir, ignore_errors=True)
+    shutil.copytree(
+        project_dir,
+        stage_dir,
+        ignore=shutil.ignore_patterns(
+            "build",
+            ".eggs",
+            "*.egg-info",
+            "__pycache__",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+        ),
+    )
     _run(
         [
             sys.executable,
@@ -123,7 +137,7 @@ def _build_sdk_wheel(output_dir: Path) -> Path:
             "--wheel",
             "--outdir",
             str(output_dir),
-            str(project_dir),
+            str(stage_dir),
         ]
     )
     wheels = sorted(output_dir.glob("*.whl"))

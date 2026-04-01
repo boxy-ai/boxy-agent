@@ -2430,6 +2430,300 @@ anyOf = [
 ]
 
 [[data_queries]]
+name = "whatsapp.search_local_chat_shards"
+description = "Search the user's locally ingested WhatsApp chat history for exact words and phrases."
+result_contract = "read_result"
+
+[data_queries.input_schema]
+additionalProperties = false
+required = [
+    "text",
+]
+title = "WhatsappSearchLocalChatShardsInput"
+type = "object"
+
+[data_queries.input_schema.properties.text]
+minLength = 1
+title = "Text"
+type = "string"
+
+[data_queries.input_schema.properties.chat_jid]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Chat Jid"
+
+[data_queries.input_schema.properties.time_start_ms]
+anyOf = [
+    { minimum = 0, type = "integer" },
+    { type = "null" },
+]
+title = "Time Start Ms"
+
+[data_queries.input_schema.properties.time_end_ms]
+anyOf = [
+    { minimum = 0, type = "integer" },
+    { type = "null" },
+]
+title = "Time End Ms"
+
+[data_queries.output_schema]
+additionalProperties = false
+required = [
+    "data",
+]
+title = "ReadResult[WhatsappSearchChatShardsData]"
+type = "object"
+
+[data_queries.output_schema."$defs".FreshnessInfo]
+additionalProperties = false
+title = "FreshnessInfo"
+type = "object"
+
+[data_queries.output_schema."$defs".FreshnessInfo.properties.source_kind]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Source Kind"
+
+[data_queries.output_schema."$defs".FreshnessInfo.properties.last_ingested_at]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Last Ingested At"
+
+[data_queries.output_schema."$defs".FreshnessInfo.properties.next_planned_ingest_at]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Next Planned Ingest At"
+
+[data_queries.output_schema."$defs".JsonValue]
+anyOf = [
+    { type = "boolean" },
+    { type = "integer" },
+    { type = "number" },
+    { type = "string" },
+    { items = { "$ref" = "#/$defs/JsonValue" }, type = "array" },
+    { additionalProperties = { "$ref" = "#/$defs/JsonValue" }, type = "object" },
+    { type = "null" },
+]
+
+[data_queries.output_schema."$defs".PageInfo]
+additionalProperties = false
+title = "PageInfo"
+type = "object"
+
+[data_queries.output_schema."$defs".PageInfo.properties.has_more]
+anyOf = [
+    { type = "boolean" },
+    { type = "null" },
+]
+title = "Has More"
+
+[data_queries.output_schema."$defs".PageInfo.properties.returned]
+anyOf = [
+    { type = "integer" },
+    { type = "null" },
+]
+title = "Returned"
+
+[data_queries.output_schema."$defs".PageInfo.properties.next_page_token]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Next Page Token"
+
+[data_queries.output_schema."$defs".PageInfo.properties.next_cursor]
+anyOf = [
+    { additionalProperties = { "$ref" = "#/$defs/JsonValue" }, type = "object" },
+    { type = "null" },
+]
+title = "Next Cursor"
+
+[data_queries.output_schema."$defs".PageInfo.properties.offset]
+anyOf = [
+    { type = "integer" },
+    { type = "null" },
+]
+title = "Offset"
+
+[data_queries.output_schema."$defs".PageInfo.properties.next_offset]
+anyOf = [
+    { type = "integer" },
+    { type = "null" },
+]
+title = "Next Offset"
+
+[data_queries.output_schema."$defs".ResolutionInfo]
+additionalProperties = false
+title = "ResolutionInfo"
+type = "object"
+
+[data_queries.output_schema."$defs".ResolutionInfo.properties.account_id]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Account Id"
+
+[data_queries.output_schema."$defs".ResolutionInfo.properties.target]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Target"
+
+[data_queries.output_schema."$defs".ResolutionInfo.properties.resolution_kind]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Resolution Kind"
+
+[data_queries.output_schema."$defs".WhatsappChatKind]
+enum = [
+    "direct",
+    "group",
+    "unknown",
+]
+type = "string"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead]
+additionalProperties = false
+required = [
+    "chat_jid",
+    "chat_kind",
+    "doc_id",
+    "shard_index",
+    "message_id_start",
+    "message_id_end",
+    "time_start_ms",
+    "time_end_ms",
+    "message_count",
+    "is_open",
+    "repair_state",
+    "score",
+    "snippet",
+]
+title = "WhatsappSearchChatShardRead"
+type = "object"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.chat_jid]
+title = "Chat Jid"
+type = "string"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.chat_kind]
+"$ref" = "#/$defs/WhatsappChatKind"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.doc_id]
+title = "Doc Id"
+type = "string"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.shard_index]
+title = "Shard Index"
+type = "integer"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.message_id_start]
+title = "Message Id Start"
+type = "string"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.message_id_end]
+title = "Message Id End"
+type = "string"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.time_start_ms]
+title = "Time Start Ms"
+type = "integer"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.time_end_ms]
+title = "Time End Ms"
+type = "integer"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.message_count]
+title = "Message Count"
+type = "integer"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.is_open]
+title = "Is Open"
+type = "boolean"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.repair_state]
+title = "Repair State"
+type = "string"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.score]
+title = "Score"
+type = "number"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.snippet]
+title = "Snippet"
+type = "string"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.title]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Title"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardRead.properties.subtitle]
+anyOf = [
+    { type = "string" },
+    { type = "null" },
+]
+title = "Subtitle"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardsData]
+additionalProperties = false
+title = "WhatsappSearchChatShardsData"
+type = "object"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardsData.properties.shards]
+title = "Shards"
+type = "array"
+
+[data_queries.output_schema."$defs".WhatsappSearchChatShardsData.properties.shards.items]
+"$ref" = "#/$defs/WhatsappSearchChatShardRead"
+
+[data_queries.output_schema.properties.data]
+"$ref" = "#/$defs/WhatsappSearchChatShardsData"
+
+[data_queries.output_schema.properties.page_info]
+anyOf = [
+    { "$ref" = "#/$defs/PageInfo" },
+    { type = "null" },
+]
+
+[data_queries.output_schema.properties.freshness]
+anyOf = [
+    { "$ref" = "#/$defs/FreshnessInfo" },
+    { type = "null" },
+]
+
+[data_queries.output_schema.properties.resolution]
+anyOf = [
+    { "$ref" = "#/$defs/ResolutionInfo" },
+    { type = "null" },
+]
+
+[data_queries.query_capabilities]
+source_kind = "local_ingested"
+selection_group = "whatsapp_local_search"
+preferred_for = [
+    "search",
+    "historical_search",
+    "lexical_search",
+    "chat_scoped_search",
+]
+order_guarantee = "score_asc"
+
+[[data_queries]]
 name = "google_gmail.search_threads_local"
 description = "Search Gmail threads from locally ingested data. Prefer this over remote Gmail tools when local data is acceptable."
 result_contract = "read_result"
@@ -8981,7 +9275,7 @@ anyOf = [
 
 [[builtin_tools]]
 name = "web_search"
-description = "Search the web"
+description = "Search the public web for internet information. Do not use for private connector or locally ingested user data."
 
 [builtin_tools.input_schema]
 type = "object"
