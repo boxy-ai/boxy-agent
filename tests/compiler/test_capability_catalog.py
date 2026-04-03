@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -25,29 +26,37 @@ def test_default_capability_catalog_contains_expected_capabilities() -> None:
 
 
 def test_load_capability_catalog_rejects_invalid_schema(tmp_path: Path) -> None:
-    path = tmp_path / "bad-catalog.toml"
+    path = tmp_path / "bad-catalog.json"
     path.write_text(
-        """
-schema_version = 1
-
-[[data_queries]]
-name = "custom.messages"
-description = "Custom query"
-input_schema = { type = "object", properties = "invalid" }
-output_schema = { type = "array", items = {} }
-
-[[boxy_tools]]
-name = "custom.send"
-description = "Custom tool"
-input_schema = { type = "object" }
-output_schema = { type = "object" }
-
-[[builtin_tools]]
-name = "custom.search"
-description = "Custom built-in"
-input_schema = { type = "object" }
-output_schema = { type = "object" }
-""".strip(),
+        json.dumps(
+            {
+                "schema_version": 1,
+                "data_queries": [
+                    {
+                        "name": "custom.messages",
+                        "description": "Custom query",
+                        "input_schema": {"type": "object", "properties": "invalid"},
+                        "output_schema": {"type": "array", "items": {}},
+                    }
+                ],
+                "boxy_tools": [
+                    {
+                        "name": "custom.send",
+                        "description": "Custom tool",
+                        "input_schema": {"type": "object"},
+                        "output_schema": {"type": "object"},
+                    }
+                ],
+                "builtin_tools": [
+                    {
+                        "name": "custom.search",
+                        "description": "Custom built-in",
+                        "input_schema": {"type": "object"},
+                        "output_schema": {"type": "object"},
+                    }
+                ],
+            }
+        ),
         encoding="utf-8",
     )
 
@@ -55,33 +64,59 @@ output_schema = { type = "object" }
         load_capability_catalog(path)
 
 
-def test_load_capability_catalog_from_toml_file(tmp_path: Path) -> None:
-    path = tmp_path / "catalog.toml"
+def test_load_capability_catalog_from_json_file(tmp_path: Path) -> None:
+    path = tmp_path / "catalog.json"
     path.write_text(
-        """
-schema_version = 1
-
-[[data_queries]]
-name = "custom.messages"
-description = "Custom query"
-input_schema = { type = "object", properties = { fts = { type = "string" } } }
-output_schema = { type = "array", items = { type = "object" } }
-query_capabilities = { source_kind = "local_ingested", selection_group = "custom.messages.search" }
-
-[[boxy_tools]]
-name = "custom.send"
-description = "Custom tool"
-input_schema = { type = "object", properties = { body = { type = "string" } } }
-output_schema = { type = "object", properties = { status = { type = "string" } } }
-side_effect = true
-tool_capabilities = { source_kind = "live_provider", selection_group = "custom.messages.send" }
-
-[[builtin_tools]]
-name = "custom.search"
-description = "Custom built-in"
-input_schema = { type = "object", properties = { query = { type = "string" } } }
-output_schema = { type = "object" }
-""".strip(),
+        json.dumps(
+            {
+                "schema_version": 1,
+                "data_queries": [
+                    {
+                        "name": "custom.messages",
+                        "description": "Custom query",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"fts": {"type": "string"}},
+                        },
+                        "output_schema": {"type": "array", "items": {"type": "object"}},
+                        "query_capabilities": {
+                            "source_kind": "local_ingested",
+                            "selection_group": "custom.messages.search",
+                        },
+                    }
+                ],
+                "boxy_tools": [
+                    {
+                        "name": "custom.send",
+                        "description": "Custom tool",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"body": {"type": "string"}},
+                        },
+                        "output_schema": {
+                            "type": "object",
+                            "properties": {"status": {"type": "string"}},
+                        },
+                        "side_effect": True,
+                        "tool_capabilities": {
+                            "source_kind": "live_provider",
+                            "selection_group": "custom.messages.send",
+                        },
+                    }
+                ],
+                "builtin_tools": [
+                    {
+                        "name": "custom.search",
+                        "description": "Custom built-in",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"query": {"type": "string"}},
+                        },
+                        "output_schema": {"type": "object"},
+                    }
+                ],
+            }
+        ),
         encoding="utf-8",
     )
 

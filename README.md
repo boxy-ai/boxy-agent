@@ -234,6 +234,6 @@ uv run boxy-agent --help
 
 ## Capability Catalog
 
-The CLI and compile/package APIs load the packaged capability catalog from `src/boxy_agent/capability_catalog.toml`.
+The CLI and compile/package APIs load the packaged capability catalog from `src/boxy_agent/capability_catalog.json`.
 
 Treat that catalog as the shipped contract for discoverable data queries, Boxy tools, and built-in tools. It is generated data and should not be edited by hand.

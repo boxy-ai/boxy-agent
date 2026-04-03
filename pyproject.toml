@@ -56,7 +56,7 @@ version = { attr = "boxy_agent._version.__version__" }
 where = ["src"]
 
 [tool.setuptools.package-data]
-boxy_agent = ["builtin_capability.toml", "capability_catalog.toml"]
+boxy_agent = ["builtin_capability.json", "capability_catalog.json"]
 
 [tool.ruff]
 line-length = 100

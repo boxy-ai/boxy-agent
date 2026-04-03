@@ -260,29 +260,49 @@ def test_compile_rejects_main_agent_type(tmp_path: Path) -> None:
 
 
 def test_compile_supports_injected_capability_catalog(tmp_path: Path) -> None:
-    catalog_path = tmp_path / "catalog.toml"
+    catalog_path = tmp_path / "catalog.json"
     catalog_path.write_text(
-        """
-schema_version = 1
-
-[[data_queries]]
-name = "custom.messages"
-description = "Custom message query"
-input_schema = { type = "object", properties = { fts = { type = "string" } } }
-output_schema = { type = "array", items = { type = "object" } }
-
-[[boxy_tools]]
-name = "custom.send"
-description = "Custom send tool"
-input_schema = { type = "object", properties = { body = { type = "string" } } }
-output_schema = { type = "object", properties = { status = { type = "string" } } }
-
-[[builtin_tools]]
-name = "custom.web"
-description = "Custom web search tool"
-input_schema = { type = "object", properties = { query = { type = "string" } } }
-output_schema = { type = "object" }
-""".strip(),
+        json.dumps(
+            {
+                "schema_version": 1,
+                "data_queries": [
+                    {
+                        "name": "custom.messages",
+                        "description": "Custom message query",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"fts": {"type": "string"}},
+                        },
+                        "output_schema": {"type": "array", "items": {"type": "object"}},
+                    }
+                ],
+                "boxy_tools": [
+                    {
+                        "name": "custom.send",
+                        "description": "Custom send tool",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"body": {"type": "string"}},
+                        },
+                        "output_schema": {
+                            "type": "object",
+                            "properties": {"status": {"type": "string"}},
+                        },
+                    }
+                ],
+                "builtin_tools": [
+                    {
+                        "name": "custom.web",
+                        "description": "Custom web search tool",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"query": {"type": "string"}},
+                        },
+                        "output_schema": {"type": "object"},
+                    }
+                ],
+            }
+        ),
         encoding="utf-8",
     )
 

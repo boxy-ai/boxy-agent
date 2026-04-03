@@ -161,5 +161,5 @@ def test_project_config_includes_example_pyproject_package_data() -> None:
         (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text(encoding="utf-8")
     )
     patterns = pyproject["tool"]["setuptools"]["package-data"]["boxy_agent"]
-    assert "builtin_capability.toml" in patterns
-    assert "capability_catalog.toml" in patterns
+    assert "builtin_capability.json" in patterns
+    assert "capability_catalog.json" in patterns

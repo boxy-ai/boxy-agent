@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import tomllib
+import json
 from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
@@ -16,8 +16,8 @@ from boxy_agent.models import DataQueryDescriptor, ResultContract, ToolDescripto
 from boxy_agent.types import JsonValue, ensure_json_value
 
 CATALOG_SCHEMA_VERSION = 1
-DEFAULT_BUILTIN_CAPABILITY_CATALOG_FILE = "builtin_capability.toml"
-DEFAULT_PACKAGED_CAPABILITY_CATALOG_FILE = "capability_catalog.toml"
+DEFAULT_BUILTIN_CAPABILITY_CATALOG_FILE = "builtin_capability.json"
+DEFAULT_PACKAGED_CAPABILITY_CATALOG_FILE = "capability_catalog.json"
 
 
 class CapabilityCatalogError(ValueError):
@@ -63,7 +63,7 @@ class CapabilityCatalog:
 
 
 def load_capability_catalog(path: Path) -> CapabilityCatalog:
-    """Load and validate a capability catalog from a TOML file."""
+    """Load and validate a capability catalog from a JSON file."""
     resolved = path.resolve()
     if not resolved.exists():
         raise CapabilityCatalogError(f"Missing capability catalog file: {resolved}")
@@ -72,14 +72,14 @@ def load_capability_catalog(path: Path) -> CapabilityCatalog:
 
 
 def load_capability_catalog_from_text(text: str, *, source: str = "<memory>") -> CapabilityCatalog:
-    """Load and validate a capability catalog from TOML text."""
+    """Load and validate a capability catalog from JSON text."""
     try:
-        raw = tomllib.loads(text)
-    except tomllib.TOMLDecodeError as exc:
-        raise CapabilityCatalogError(f"Invalid capability catalog TOML ({source}): {exc}") from exc
+        raw = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise CapabilityCatalogError(f"Invalid capability catalog JSON ({source}): {exc}") from exc
 
     if not isinstance(raw, dict):
-        raise CapabilityCatalogError(f"Capability catalog must be a TOML table ({source})")
+        raise CapabilityCatalogError(f"Capability catalog must be a JSON object ({source})")
 
     schema_version = raw.get("schema_version", CATALOG_SCHEMA_VERSION)
     if not isinstance(schema_version, int):
@@ -226,13 +226,13 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
 
 def _require_table(value: object, label: str, *, source: str) -> dict[str, object]:
     if not isinstance(value, dict):
-        raise CapabilityCatalogError(f"{label} must be a TOML table ({source})")
+        raise CapabilityCatalogError(f"{label} must be an object ({source})")
     return cast(dict[str, object], value)
 
 
 def _require_list(value: object, label: str, *, source: str) -> list[object]:
     if not isinstance(value, list):
-        raise CapabilityCatalogError(f"{label} must be an array of TOML tables ({source})")
+        raise CapabilityCatalogError(f"{label} must be an array ({source})")
     return cast(list[object], value)
 
 
@@ -309,7 +309,7 @@ def _require_json_table(
 ) -> dict[str, JsonValue]:
     value = data.get(key)
     if not isinstance(value, dict):
-        raise CapabilityCatalogError(f"{label}.{key} must be a TOML table ({source})")
+        raise CapabilityCatalogError(f"{label}.{key} must be an object ({source})")
     table = cast(dict[str, JsonValue], value)
     ensure_json_value(table, label=f"{label}.{key}")
     return table
@@ -326,7 +326,7 @@ def _optional_json_table(
     if value is None:
         return {}
     if not isinstance(value, dict):
-        raise CapabilityCatalogError(f"{label}.{key} must be a TOML table ({source})")
+        raise CapabilityCatalogError(f"{label}.{key} must be an object ({source})")
     table = cast(dict[str, JsonValue], value)
     ensure_json_value(table, label=f"{label}.{key}")
     return table

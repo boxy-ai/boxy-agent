@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any, cast
 
 import pytest
@@ -373,45 +374,53 @@ def test_runtime_filters_discovery_by_capabilities() -> None:
 
 def test_runtime_filters_discovery_by_live_provider_descriptors() -> None:
     catalog = load_capability_catalog_from_text(
-        """
-schema_version = 1
-
-[[data_queries]]
-name = "enabled.messages"
-description = "Enabled query"
-input_schema = { type = "object" }
-output_schema = { type = "array", items = { type = "object" } }
-
-[[data_queries]]
-name = "disabled.messages"
-description = "Disabled query"
-input_schema = { type = "object" }
-output_schema = { type = "array", items = { type = "object" } }
-
-[[boxy_tools]]
-name = "enabled.send"
-description = "Enabled tool"
-input_schema = { type = "object" }
-output_schema = { type = "object" }
-
-[[boxy_tools]]
-name = "disabled.send"
-description = "Disabled tool"
-input_schema = { type = "object" }
-output_schema = { type = "object" }
-
-[[builtin_tools]]
-name = "enabled.web"
-description = "Enabled built-in"
-input_schema = { type = "object" }
-output_schema = { type = "object" }
-
-[[builtin_tools]]
-name = "disabled.web"
-description = "Disabled built-in"
-input_schema = { type = "object" }
-output_schema = { type = "object" }
-""".strip()
+        json.dumps(
+            {
+                "schema_version": 1,
+                "data_queries": [
+                    {
+                        "name": "enabled.messages",
+                        "description": "Enabled query",
+                        "input_schema": {"type": "object"},
+                        "output_schema": {"type": "array", "items": {"type": "object"}},
+                    },
+                    {
+                        "name": "disabled.messages",
+                        "description": "Disabled query",
+                        "input_schema": {"type": "object"},
+                        "output_schema": {"type": "array", "items": {"type": "object"}},
+                    },
+                ],
+                "boxy_tools": [
+                    {
+                        "name": "enabled.send",
+                        "description": "Enabled tool",
+                        "input_schema": {"type": "object"},
+                        "output_schema": {"type": "object"},
+                    },
+                    {
+                        "name": "disabled.send",
+                        "description": "Disabled tool",
+                        "input_schema": {"type": "object"},
+                        "output_schema": {"type": "object"},
+                    },
+                ],
+                "builtin_tools": [
+                    {
+                        "name": "enabled.web",
+                        "description": "Enabled built-in",
+                        "input_schema": {"type": "object"},
+                        "output_schema": {"type": "object"},
+                    },
+                    {
+                        "name": "disabled.web",
+                        "description": "Disabled built-in",
+                        "input_schema": {"type": "object"},
+                        "output_schema": {"type": "object"},
+                    },
+                ],
+            }
+        )
     )
 
     def handle(context):
@@ -538,27 +547,44 @@ def test_runtime_rejects_invalid_capability_output_schema() -> None:
 
 def test_runtime_supports_injected_capability_catalog() -> None:
     catalog = load_capability_catalog_from_text(
-        """
-schema_version = 1
-
-[[data_queries]]
-name = "custom.messages"
-description = "Custom query"
-input_schema = { type = "object", properties = { fts = { type = "string" } } }
-output_schema = { type = "array", items = { type = "object" } }
-
-[[boxy_tools]]
-name = "custom.send"
-description = "Custom send"
-input_schema = { type = "object", properties = { body = { type = "string" } } }
-output_schema = { type = "object" }
-
-[[builtin_tools]]
-name = "custom.web"
-description = "Custom built-in"
-input_schema = { type = "object", properties = { query = { type = "string" } } }
-output_schema = { type = "object" }
-""".strip()
+        json.dumps(
+            {
+                "schema_version": 1,
+                "data_queries": [
+                    {
+                        "name": "custom.messages",
+                        "description": "Custom query",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"fts": {"type": "string"}},
+                        },
+                        "output_schema": {"type": "array", "items": {"type": "object"}},
+                    }
+                ],
+                "boxy_tools": [
+                    {
+                        "name": "custom.send",
+                        "description": "Custom send",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"body": {"type": "string"}},
+                        },
+                        "output_schema": {"type": "object"},
+                    }
+                ],
+                "builtin_tools": [
+                    {
+                        "name": "custom.web",
+                        "description": "Custom built-in",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"query": {"type": "string"}},
+                        },
+                        "output_schema": {"type": "object"},
+                    }
+                ],
+            }
+        )
     )
 
     def handle(context):
@@ -754,25 +780,35 @@ def test_runtime_chat_complete_requires_chat_complete_implementation() -> None:
 
 def test_runtime_rejects_invalid_datetime_format_input() -> None:
     catalog = load_capability_catalog_from_text(
-        "\n".join(
-            [
-                "schema_version = 1",
-                "boxy_tools = []",
-                "builtin_tools = []",
-                "",
-                "[[data_queries]]",
-                'name = "custom.messages"',
-                'description = "Custom query"',
-                (
-                    'input_schema = { type = "object", properties = { time_range = { '
-                    'type = "object", properties = { start = { type = "string", '
-                    'format = "date-time" }, end = { type = "string", format = '
-                    '"date-time" } }, required = ["start", "end"], '
-                    'additionalProperties = false } }, required = ["time_range"], '
-                    "additionalProperties = false }"
-                ),
-                'output_schema = { type = "array", items = { type = "object" } }',
-            ]
+        json.dumps(
+            {
+                "schema_version": 1,
+                "data_queries": [
+                    {
+                        "name": "custom.messages",
+                        "description": "Custom query",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {
+                                "time_range": {
+                                    "type": "object",
+                                    "properties": {
+                                        "start": {"type": "string", "format": "date-time"},
+                                        "end": {"type": "string", "format": "date-time"},
+                                    },
+                                    "required": ["start", "end"],
+                                    "additionalProperties": False,
+                                }
+                            },
+                            "required": ["time_range"],
+                            "additionalProperties": False,
+                        },
+                        "output_schema": {"type": "array", "items": {"type": "object"}},
+                    }
+                ],
+                "boxy_tools": [],
+                "builtin_tools": [],
+            }
         )
     )
 

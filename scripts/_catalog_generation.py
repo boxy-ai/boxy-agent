@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import sys
 import tempfile
-from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -23,15 +22,11 @@ def agent_package_dir() -> Path:
 
 
 def builtin_capability_catalog_path() -> Path:
-    return agent_package_dir() / "builtin_capability.toml"
+    return agent_package_dir() / "builtin_capability.json"
 
 
 def packaged_capability_catalog_path() -> Path:
-    return agent_package_dir() / "capability_catalog.toml"
-
-
-def desktop_connector_catalog_path() -> Path:
-    return repo_root() / "boxy-desktop" / "connector_capability.toml"
+    return agent_package_dir() / "capability_catalog.json"
 
 
 def _load_capability_helpers():
@@ -43,16 +38,10 @@ def _load_capability_helpers():
     return CapabilityCatalog, load_capability_catalog
 
 
-@dataclass(frozen=True)
-class GeneratedCapabilityCatalogs:
-    connector_catalog: CapabilityCatalog
-    packaged_catalog: CapabilityCatalog
-
-
-def generate_capability_catalogs(
+def generate_packaged_capability_catalog(
     *,
     builtin_catalog_path: Path | None = None,
-) -> GeneratedCapabilityCatalogs:
+) -> CapabilityCatalog:
     CapabilityCatalog, load_capability_catalog = _load_capability_helpers()
     _ensure_monorepo_import_paths()
 
@@ -64,46 +53,34 @@ def generate_capability_catalogs(
     builtin_catalog = load_capability_catalog(
         builtin_catalog_path or builtin_capability_catalog_path()
     )
-    return GeneratedCapabilityCatalogs(
-        connector_catalog=connector_catalog,
-        packaged_catalog=CapabilityCatalog(
-            data_queries=dict(connector_catalog.data_queries),
-            boxy_tools=dict(connector_catalog.boxy_tools),
-            builtin_tools=dict(builtin_catalog.builtin_tools),
-        ),
+    return CapabilityCatalog(
+        data_queries=dict(connector_catalog.data_queries),
+        boxy_tools=dict(connector_catalog.boxy_tools),
+        builtin_tools=dict(builtin_catalog.builtin_tools),
     )
 
 
-def sync_capability_catalogs(
+def sync_packaged_capability_catalog(
     *,
-    connector_output_path: Path | None = None,
     packaged_output_path: Path | None = None,
-) -> tuple[Path, Path]:
+) -> Path:
     _ensure_monorepo_import_paths()
 
-    from boxy_desktop.connector.capability_generator import write_catalog
     from boxy_desktop.worker.capabilities import write_capability_catalog
 
-    generated = generate_capability_catalogs()
-    connector_path = (connector_output_path or desktop_connector_catalog_path()).resolve()
+    generated = generate_packaged_capability_catalog()
     packaged_path = (packaged_output_path or packaged_capability_catalog_path()).resolve()
-    write_catalog(connector_path, generated.connector_catalog)
-    write_capability_catalog(packaged_path, generated.packaged_catalog)
-    return connector_path, packaged_path
+    write_capability_catalog(packaged_path, generated)
+    return packaged_path
 
 
-def generated_catalog_matches_repo_snapshot() -> bool:
+def generated_packaged_catalog_matches_repo_snapshot() -> bool:
     with tempfile.TemporaryDirectory(prefix="boxy-agent-catalog-check-") as temp_dir:
         temp_root = Path(temp_dir)
-        generated_connector_path, generated_packaged_path = sync_capability_catalogs(
-            connector_output_path=temp_root / "connector_capability.toml",
-            packaged_output_path=temp_root / "capability_catalog.toml",
+        generated_packaged_path = sync_packaged_capability_catalog(
+            packaged_output_path=temp_root / "capability_catalog.json"
         )
-        return desktop_connector_catalog_path().read_text(
-            encoding="utf-8"
-        ) == generated_connector_path.read_text(
-            encoding="utf-8"
-        ) and packaged_capability_catalog_path().read_text(
+        return packaged_capability_catalog_path().read_text(
             encoding="utf-8"
         ) == generated_packaged_path.read_text(encoding="utf-8")
 
