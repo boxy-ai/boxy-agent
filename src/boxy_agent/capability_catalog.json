@@ -5984,6 +5984,527 @@
       "result_contract": "read_result"
     },
     {
+      "description": "Keyword-search Google Chat transcript windows from locally ingested data. Prefer this when the user intent is exact-match or phrase-based.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "space_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Space Name"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "time_max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Time Max"
+          },
+          "time_min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Time Min"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "ChatSearchMessagesLocalInput",
+        "type": "object"
+      },
+      "name": "google_chat.search_messages_local",
+      "output_schema": {
+        "$defs": {
+          "ChatLexicalSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "indexed_document_count": {
+                "title": "Indexed Document Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/ChatLexicalSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "indexed_document_count"
+            ],
+            "title": "ChatLexicalSearchData",
+            "type": "object"
+          },
+          "ChatLexicalSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "document_record_id": {
+                "title": "Document Record Id",
+                "type": "string"
+              },
+              "group_key": {
+                "title": "Group Key",
+                "type": "string"
+              },
+              "latest_create_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Latest Create Time"
+              },
+              "matched_messages": {
+                "items": {
+                  "$ref": "#/$defs/ChatMessageRead"
+                },
+                "title": "Matched Messages",
+                "type": "array"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "snippet": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Snippet"
+              },
+              "space_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Space Name"
+              },
+              "thread_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Thread Name"
+              }
+            },
+            "required": [
+              "document_record_id",
+              "group_key",
+              "score"
+            ],
+            "title": "ChatLexicalSearchMatchRead",
+            "type": "object"
+          },
+          "ChatMessageRead": {
+            "additionalProperties": false,
+            "properties": {
+              "create_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Create Time"
+              },
+              "message_name": {
+                "title": "Message Name",
+                "type": "string"
+              },
+              "sender_display_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sender Display Name"
+              },
+              "sender_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sender Name"
+              },
+              "sender_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sender Type"
+              },
+              "space_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Space Name"
+              },
+              "text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Text"
+              },
+              "thread_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Thread Name"
+              }
+            },
+            "required": [
+              "message_name"
+            ],
+            "title": "ChatMessageRead",
+            "type": "object"
+          },
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/ChatLexicalSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[ChatLexicalSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "keyword_lookup"
+        ],
+        "selection_group": "google_chat.messages.search",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
       "description": "Semantically search Google Chat transcript windows from locally ingested data. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching.",
       "input_schema": {
         "additionalProperties": false,
