@@ -60,6 +60,19 @@
             "title": "End",
             "type": "string"
           },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
+            "title": "Idempotency Key"
+          },
           "location": {
             "anyOf": [
               {
@@ -1645,6 +1658,19 @@
             ],
             "default": null,
             "title": "Account Id"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
+            "title": "Idempotency Key"
           },
           "space": {
             "title": "Space",
@@ -3997,6 +4023,19 @@
             ],
             "default": null,
             "title": "Cc"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
+            "title": "Idempotency Key"
           },
           "subject": {
             "title": "Subject",
