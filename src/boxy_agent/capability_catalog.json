@@ -5138,7 +5138,7 @@
   ],
   "data_queries": [
     {
-      "description": "Search Google Calendar events from locally ingested data. Prefer this over remote Calendar tools when local data is acceptable.",
+      "description": "List Google Calendar events from locally ingested data. Prefer this over remote Calendar tools when local data is acceptable for browse, recent, or latest requests.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -5166,18 +5166,6 @@
             "default": null,
             "title": "Include Cancelled"
           },
-          "text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Text"
-          },
           "time_max": {
             "anyOf": [
               {
@@ -5203,10 +5191,10 @@
             "title": "Time Min"
           }
         },
-        "title": "CalendarSearchEventsLocalInput",
+        "title": "CalendarListEventsLocalInput",
         "type": "object"
       },
-      "name": "google_calendar.search_events_local",
+      "name": "google_calendar.list_events_local",
       "output_schema": {
         "$defs": {
           "CalendarEventRead": {
@@ -5599,12 +5587,1016 @@
       },
       "query_capabilities": {
         "preferred_for": [
-          "search",
+          "browse",
           "summary",
           "recent",
           "latest"
         ],
-        "selection_group": "google_calendar.events.search",
+        "selection_group": "google_calendar.events.list",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Keyword-search Google Calendar events from locally ingested data. Prefer this when the user intent is exact-match or phrase-based.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "include_cancelled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Include Cancelled"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "time_max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Time Max"
+          },
+          "time_min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Time Min"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "CalendarSearchEventsLexicalLocalInput",
+        "type": "object"
+      },
+      "name": "google_calendar.search_events_lexical_local",
+      "output_schema": {
+        "$defs": {
+          "CalendarLexicalSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "indexed_document_count": {
+                "title": "Indexed Document Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/CalendarLexicalSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "indexed_document_count"
+            ],
+            "title": "CalendarLexicalSearchData",
+            "type": "object"
+          },
+          "CalendarLexicalSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "attendees": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Attendees",
+                "type": "array"
+              },
+              "calendar_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Calendar Id"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "end": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "End"
+              },
+              "event_id": {
+                "title": "Event Id",
+                "type": "string"
+              },
+              "html_link": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Html Link"
+              },
+              "location": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Location"
+              },
+              "match_snippet": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Match Snippet"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "start": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Start"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "summary": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Summary"
+              },
+              "updated_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Updated At"
+              }
+            },
+            "required": [
+              "event_id",
+              "score"
+            ],
+            "title": "CalendarLexicalSearchMatchRead",
+            "type": "object"
+          },
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/CalendarLexicalSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[CalendarLexicalSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "keyword_lookup"
+        ],
+        "selection_group": "google_calendar.events.keyword_search",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Semantically search Google Calendar events from locally ingested data. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "include_cancelled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Include Cancelled"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "time_max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Time Max"
+          },
+          "time_min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Time Min"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "CalendarSearchEventsSemanticLocalInput",
+        "type": "object"
+      },
+      "name": "google_calendar.search_events_semantic_local",
+      "output_schema": {
+        "$defs": {
+          "CalendarSemanticSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "embedding_ready": {
+                "title": "Embedding Ready",
+                "type": "boolean"
+              },
+              "indexed_window_count": {
+                "title": "Indexed Window Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/CalendarSemanticSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "embedding_ready",
+              "indexed_window_count"
+            ],
+            "title": "CalendarSemanticSearchData",
+            "type": "object"
+          },
+          "CalendarSemanticSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "attendees": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Attendees",
+                "type": "array"
+              },
+              "calendar_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Calendar Id"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "end": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "End"
+              },
+              "event_id": {
+                "title": "Event Id",
+                "type": "string"
+              },
+              "evidence_chunks": {
+                "items": {
+                  "$ref": "#/$defs/SemanticEvidenceChunkRead"
+                },
+                "title": "Evidence Chunks",
+                "type": "array"
+              },
+              "html_link": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Html Link"
+              },
+              "location": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Location"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "start": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Start"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "summary": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Summary"
+              },
+              "updated_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Updated At"
+              }
+            },
+            "required": [
+              "event_id",
+              "score"
+            ],
+            "title": "CalendarSemanticSearchMatchRead",
+            "type": "object"
+          },
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          },
+          "SemanticEvidenceChunkRead": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_record_id": {
+                "title": "Chunk Record Id",
+                "type": "string"
+              },
+              "chunk_text": {
+                "title": "Chunk Text",
+                "type": "string"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              }
+            },
+            "required": [
+              "chunk_record_id",
+              "score",
+              "chunk_text"
+            ],
+            "title": "SemanticEvidenceChunkRead",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/CalendarSemanticSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[CalendarSemanticSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "topic_lookup"
+        ],
+        "selection_group": "google_calendar.events.semantic_search",
         "source_kind": "local_ingested"
       },
       "result_contract": "read_result"
@@ -7839,7 +8831,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "Search Google Docs metadata and extracted body text from locally ingested changes. Prefer this over remote Docs reads when local data is acceptable.",
+      "description": "List Google Docs records from locally ingested changes. Prefer this over remote Docs reads when local data is acceptable for browse, recent, or latest requests.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -7866,41 +8858,17 @@
             ],
             "default": null,
             "title": "Include Removed"
-          },
-          "text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Text"
           }
         },
-        "title": "DocsSearchDocumentsLocalInput",
+        "title": "DocsListDocumentsLocalInput",
         "type": "object"
       },
-      "name": "google_docs.search_documents_local",
+      "name": "google_docs.list_documents_local",
       "output_schema": {
         "$defs": {
-          "DocumentRead": {
+          "DocumentSummaryRead": {
             "additionalProperties": false,
             "properties": {
-              "body_text": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Body Text"
-              },
               "change_id": {
                 "anyOf": [
                   {
@@ -7957,7 +8925,7 @@
             "required": [
               "document_id"
             ],
-            "title": "DocumentRead",
+            "title": "DocumentSummaryRead",
             "type": "object"
           },
           "DocumentsData": {
@@ -7965,7 +8933,7 @@
             "properties": {
               "documents": {
                 "items": {
-                  "$ref": "#/$defs/DocumentRead"
+                  "$ref": "#/$defs/DocumentSummaryRead"
                 },
                 "title": "Documents",
                 "type": "array"
@@ -8221,12 +9189,858 @@
       },
       "query_capabilities": {
         "preferred_for": [
-          "search",
+          "browse",
           "summary",
           "recent",
           "latest"
         ],
-        "selection_group": "google_docs.documents.search",
+        "selection_group": "google_docs.documents.list",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Keyword-search Google Docs metadata and extracted body text from locally ingested changes. Prefer this when the user intent is exact-match or phrase-based.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "include_removed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Include Removed"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "DocsSearchDocumentsLexicalLocalInput",
+        "type": "object"
+      },
+      "name": "google_docs.search_documents_lexical_local",
+      "output_schema": {
+        "$defs": {
+          "DocumentLexicalSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "indexed_document_count": {
+                "title": "Indexed Document Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/DocumentLexicalSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "indexed_document_count"
+            ],
+            "title": "DocumentLexicalSearchData",
+            "type": "object"
+          },
+          "DocumentLexicalSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "body_text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Body Text"
+              },
+              "change_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Change Id"
+              },
+              "document_id": {
+                "title": "Document Id",
+                "type": "string"
+              },
+              "match_snippet": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Match Snippet"
+              },
+              "modified_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Modified Time"
+              },
+              "removed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Removed"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Title"
+              }
+            },
+            "required": [
+              "document_id",
+              "score"
+            ],
+            "title": "DocumentLexicalSearchMatchRead",
+            "type": "object"
+          },
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/DocumentLexicalSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[DocumentLexicalSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "keyword_lookup"
+        ],
+        "selection_group": "google_docs.documents.keyword_search",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Semantically search Google Docs metadata and extracted body text from locally ingested changes. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "include_removed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Include Removed"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "DocsSearchDocumentsSemanticLocalInput",
+        "type": "object"
+      },
+      "name": "google_docs.search_documents_semantic_local",
+      "output_schema": {
+        "$defs": {
+          "DocumentSemanticSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "embedding_ready": {
+                "title": "Embedding Ready",
+                "type": "boolean"
+              },
+              "indexed_window_count": {
+                "title": "Indexed Window Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/DocumentSemanticSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "embedding_ready",
+              "indexed_window_count"
+            ],
+            "title": "DocumentSemanticSearchData",
+            "type": "object"
+          },
+          "DocumentSemanticSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "body_text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Body Text"
+              },
+              "change_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Change Id"
+              },
+              "document_id": {
+                "title": "Document Id",
+                "type": "string"
+              },
+              "evidence_chunks": {
+                "items": {
+                  "$ref": "#/$defs/SemanticEvidenceChunkRead"
+                },
+                "title": "Evidence Chunks",
+                "type": "array"
+              },
+              "modified_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Modified Time"
+              },
+              "removed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Removed"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Title"
+              }
+            },
+            "required": [
+              "document_id",
+              "score"
+            ],
+            "title": "DocumentSemanticSearchMatchRead",
+            "type": "object"
+          },
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          },
+          "SemanticEvidenceChunkRead": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_record_id": {
+                "title": "Chunk Record Id",
+                "type": "string"
+              },
+              "chunk_text": {
+                "title": "Chunk Text",
+                "type": "string"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              }
+            },
+            "required": [
+              "chunk_record_id",
+              "score",
+              "chunk_text"
+            ],
+            "title": "SemanticEvidenceChunkRead",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/DocumentSemanticSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[DocumentSemanticSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "topic_lookup"
+        ],
+        "selection_group": "google_docs.documents.semantic_search",
         "source_kind": "local_ingested"
       },
       "result_contract": "read_result"
@@ -8641,7 +10455,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "Search Google Drive files from locally ingested change metadata. Prefer this over remote Drive reads when local data is acceptable.",
+      "description": "List Google Drive files from locally ingested change metadata. Prefer this over remote Drive reads when local data is acceptable for browse, recent, or latest requests.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -8668,24 +10482,12 @@
             ],
             "default": null,
             "title": "Include Removed"
-          },
-          "text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Text"
           }
         },
-        "title": "DriveSearchFilesLocalInput",
+        "title": "DriveListFilesLocalInput",
         "type": "object"
       },
-      "name": "google_drive.search_files_local",
+      "name": "google_drive.list_files_local",
       "output_schema": {
         "$defs": {
           "DriveFileRead": {
@@ -9054,12 +10856,920 @@
       },
       "query_capabilities": {
         "preferred_for": [
-          "search",
+          "browse",
           "summary",
           "recent",
           "latest"
         ],
-        "selection_group": "google_drive.files.search",
+        "selection_group": "google_drive.files.list",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Keyword-search Google Drive files from locally ingested change metadata. Prefer this when the user intent is exact-match or phrase-based.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "include_removed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Include Removed"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "DriveSearchFilesLexicalLocalInput",
+        "type": "object"
+      },
+      "name": "google_drive.search_files_lexical_local",
+      "output_schema": {
+        "$defs": {
+          "DriveLexicalSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "indexed_document_count": {
+                "title": "Indexed Document Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/DriveLexicalSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "indexed_document_count"
+            ],
+            "title": "DriveLexicalSearchData",
+            "type": "object"
+          },
+          "DriveLexicalSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "change_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Change Id"
+              },
+              "file_id": {
+                "title": "File Id",
+                "type": "string"
+              },
+              "match_snippet": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Match Snippet"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "modified_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Modified Time"
+              },
+              "parent_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Parent Ids",
+                "type": "array"
+              },
+              "removed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Removed"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Title"
+              },
+              "trashed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Trashed"
+              },
+              "web_view_link": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Web View Link"
+              }
+            },
+            "required": [
+              "file_id",
+              "score"
+            ],
+            "title": "DriveLexicalSearchMatchRead",
+            "type": "object"
+          },
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/DriveLexicalSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[DriveLexicalSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "keyword_lookup"
+        ],
+        "selection_group": "google_drive.files.keyword_search",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Semantically search Google Drive files from locally ingested change metadata. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "include_removed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Include Removed"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "DriveSearchFilesSemanticLocalInput",
+        "type": "object"
+      },
+      "name": "google_drive.search_files_semantic_local",
+      "output_schema": {
+        "$defs": {
+          "DriveSemanticSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "embedding_ready": {
+                "title": "Embedding Ready",
+                "type": "boolean"
+              },
+              "indexed_window_count": {
+                "title": "Indexed Window Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/DriveSemanticSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "embedding_ready",
+              "indexed_window_count"
+            ],
+            "title": "DriveSemanticSearchData",
+            "type": "object"
+          },
+          "DriveSemanticSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "change_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Change Id"
+              },
+              "evidence_chunks": {
+                "items": {
+                  "$ref": "#/$defs/SemanticEvidenceChunkRead"
+                },
+                "title": "Evidence Chunks",
+                "type": "array"
+              },
+              "file_id": {
+                "title": "File Id",
+                "type": "string"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "modified_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Modified Time"
+              },
+              "parent_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Parent Ids",
+                "type": "array"
+              },
+              "removed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Removed"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Title"
+              },
+              "trashed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Trashed"
+              },
+              "web_view_link": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Web View Link"
+              }
+            },
+            "required": [
+              "file_id",
+              "score"
+            ],
+            "title": "DriveSemanticSearchMatchRead",
+            "type": "object"
+          },
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          },
+          "SemanticEvidenceChunkRead": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_record_id": {
+                "title": "Chunk Record Id",
+                "type": "string"
+              },
+              "chunk_text": {
+                "title": "Chunk Text",
+                "type": "string"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              }
+            },
+            "required": [
+              "chunk_record_id",
+              "score",
+              "chunk_text"
+            ],
+            "title": "SemanticEvidenceChunkRead",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/DriveSemanticSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[DriveSemanticSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "topic_lookup"
+        ],
+        "selection_group": "google_drive.files.semantic_search",
         "source_kind": "local_ingested"
       },
       "result_contract": "read_result"
@@ -9944,7 +12654,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "Search Gmail threads from locally ingested data. Prefer this over remote Gmail tools when local data is acceptable.",
+      "description": "List Gmail threads from locally ingested data. Prefer this over remote Gmail tools when local data is acceptable for browse, recent, or latest requests.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -10005,18 +12715,6 @@
             "default": null,
             "title": "Mailbox"
           },
-          "text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Text"
-          },
           "unread": {
             "anyOf": [
               {
@@ -10030,10 +12728,10 @@
             "title": "Unread"
           }
         },
-        "title": "GmailSearchThreadsLocalInput",
+        "title": "GmailListThreadsLocalInput",
         "type": "object"
       },
-      "name": "google_gmail.search_threads_local",
+      "name": "google_gmail.list_threads_local",
       "output_schema": {
         "$defs": {
           "FreshnessInfo": {
@@ -10384,12 +13082,922 @@
       "query_capabilities": {
         "order_guarantee": "newest_first",
         "preferred_for": [
-          "search",
+          "browse",
           "summary",
           "recent",
           "latest"
         ],
-        "selection_group": "google_gmail.threads.search",
+        "selection_group": "google_gmail.threads.list",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Keyword-search Gmail threads from locally ingested data. Prefer this when the user intent is exact-match or phrase-based.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "mailbox": {
+            "anyOf": [
+              {
+                "enum": [
+                  "all",
+                  "inbox",
+                  "sent",
+                  "drafts",
+                  "spam",
+                  "trash"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Mailbox"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "unread": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Unread"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "GmailSearchThreadsLexicalLocalInput",
+        "type": "object"
+      },
+      "name": "google_gmail.search_threads_lexical_local",
+      "output_schema": {
+        "$defs": {
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "GmailLexicalSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "indexed_document_count": {
+                "title": "Indexed Document Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/GmailLexicalSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "indexed_document_count"
+            ],
+            "title": "GmailLexicalSearchData",
+            "type": "object"
+          },
+          "GmailLexicalSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "from_address": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "From Address"
+              },
+              "label_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Label Ids",
+                "type": "array"
+              },
+              "latest_internal_date": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Latest Internal Date"
+              },
+              "latest_message_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Latest Message Id"
+              },
+              "match_snippet": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Match Snippet"
+              },
+              "message_count": {
+                "title": "Message Count",
+                "type": "integer"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "snippet": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Snippet"
+              },
+              "subject": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subject"
+              },
+              "thread_id": {
+                "title": "Thread Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "thread_id",
+              "message_count",
+              "score"
+            ],
+            "title": "GmailLexicalSearchMatchRead",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/GmailLexicalSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[GmailLexicalSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "keyword_lookup"
+        ],
+        "selection_group": "google_gmail.threads.keyword_search",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Semantically search Gmail threads from locally ingested data. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "mailbox": {
+            "anyOf": [
+              {
+                "enum": [
+                  "all",
+                  "inbox",
+                  "sent",
+                  "drafts",
+                  "spam",
+                  "trash"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Mailbox"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "unread": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Unread"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "GmailSearchThreadsSemanticLocalInput",
+        "type": "object"
+      },
+      "name": "google_gmail.search_threads_semantic_local",
+      "output_schema": {
+        "$defs": {
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "GmailSemanticSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "embedding_ready": {
+                "title": "Embedding Ready",
+                "type": "boolean"
+              },
+              "indexed_window_count": {
+                "title": "Indexed Window Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/GmailSemanticSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "embedding_ready",
+              "indexed_window_count"
+            ],
+            "title": "GmailSemanticSearchData",
+            "type": "object"
+          },
+          "GmailSemanticSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "evidence_chunks": {
+                "items": {
+                  "$ref": "#/$defs/SemanticEvidenceChunkRead"
+                },
+                "title": "Evidence Chunks",
+                "type": "array"
+              },
+              "from_address": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "From Address"
+              },
+              "label_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Label Ids",
+                "type": "array"
+              },
+              "latest_internal_date": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Latest Internal Date"
+              },
+              "latest_message_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Latest Message Id"
+              },
+              "message_count": {
+                "title": "Message Count",
+                "type": "integer"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "snippet": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Snippet"
+              },
+              "subject": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subject"
+              },
+              "thread_id": {
+                "title": "Thread Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "thread_id",
+              "message_count",
+              "score"
+            ],
+            "title": "GmailSemanticSearchMatchRead",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          },
+          "SemanticEvidenceChunkRead": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_record_id": {
+                "title": "Chunk Record Id",
+                "type": "string"
+              },
+              "chunk_text": {
+                "title": "Chunk Text",
+                "type": "string"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              }
+            },
+            "required": [
+              "chunk_record_id",
+              "score",
+              "chunk_text"
+            ],
+            "title": "SemanticEvidenceChunkRead",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/GmailSemanticSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[GmailSemanticSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "topic_lookup"
+        ],
+        "selection_group": "google_gmail.threads.semantic_search",
         "source_kind": "local_ingested"
       },
       "result_contract": "read_result"
@@ -10762,10 +14370,18 @@
         "title": "ReadResult[SpreadsheetData]",
         "type": "object"
       },
+      "query_capabilities": {
+        "preferred_for": [
+          "lookup",
+          "summary"
+        ],
+        "selection_group": "google_sheets.spreadsheet.get",
+        "source_kind": "local_ingested"
+      },
       "result_contract": "read_result"
     },
     {
-      "description": "Search Google Sheets metadata from locally ingested changes. Prefer this over remote Sheets metadata reads when local data is acceptable.",
+      "description": "List Google Sheets metadata from locally ingested changes. Prefer this over remote Sheets metadata reads when local data is acceptable for browse, recent, or latest requests.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -10792,24 +14408,12 @@
             ],
             "default": null,
             "title": "Include Removed"
-          },
-          "text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Text"
           }
         },
-        "title": "SheetsSearchSpreadsheetsLocalInput",
+        "title": "SheetsListSpreadsheetsLocalInput",
         "type": "object"
       },
-      "name": "google_sheets.search_spreadsheets_local",
+      "name": "google_sheets.list_spreadsheets_local",
       "output_schema": {
         "$defs": {
           "FreshnessInfo": {
@@ -11144,6 +14748,862 @@
         ],
         "title": "ReadResult[SpreadsheetsData]",
         "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "browse",
+          "summary",
+          "recent",
+          "latest"
+        ],
+        "selection_group": "google_sheets.spreadsheets.list",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Keyword-search Google Sheets metadata from locally ingested changes. Prefer this when the user intent is exact-match or phrase-based.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "include_removed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Include Removed"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "SheetsSearchSpreadsheetsLexicalLocalInput",
+        "type": "object"
+      },
+      "name": "google_sheets.search_spreadsheets_lexical_local",
+      "output_schema": {
+        "$defs": {
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          },
+          "SpreadsheetLexicalSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "indexed_document_count": {
+                "title": "Indexed Document Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/SpreadsheetLexicalSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "indexed_document_count"
+            ],
+            "title": "SpreadsheetLexicalSearchData",
+            "type": "object"
+          },
+          "SpreadsheetLexicalSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "change_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Change Id"
+              },
+              "match_snippet": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Match Snippet"
+              },
+              "modified_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Modified Time"
+              },
+              "removed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Removed"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "sheet_count": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sheet Count"
+              },
+              "spreadsheet_id": {
+                "title": "Spreadsheet Id",
+                "type": "string"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Title"
+              }
+            },
+            "required": [
+              "spreadsheet_id",
+              "score"
+            ],
+            "title": "SpreadsheetLexicalSearchMatchRead",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/SpreadsheetLexicalSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[SpreadsheetLexicalSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "keyword_lookup"
+        ],
+        "selection_group": "google_sheets.spreadsheets.keyword_search",
+        "source_kind": "local_ingested"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "description": "Semantically search Google Sheets metadata from locally ingested changes. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Account Id"
+          },
+          "include_removed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Include Removed"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "SheetsSearchSpreadsheetsSemanticLocalInput",
+        "type": "object"
+      },
+      "name": "google_sheets.search_spreadsheets_semantic_local",
+      "output_schema": {
+        "$defs": {
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          },
+          "SemanticEvidenceChunkRead": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_record_id": {
+                "title": "Chunk Record Id",
+                "type": "string"
+              },
+              "chunk_text": {
+                "title": "Chunk Text",
+                "type": "string"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              }
+            },
+            "required": [
+              "chunk_record_id",
+              "score",
+              "chunk_text"
+            ],
+            "title": "SemanticEvidenceChunkRead",
+            "type": "object"
+          },
+          "SpreadsheetSemanticSearchData": {
+            "additionalProperties": false,
+            "properties": {
+              "embedding_ready": {
+                "title": "Embedding Ready",
+                "type": "boolean"
+              },
+              "indexed_window_count": {
+                "title": "Indexed Window Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/SpreadsheetSemanticSearchMatchRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "embedding_ready",
+              "indexed_window_count"
+            ],
+            "title": "SpreadsheetSemanticSearchData",
+            "type": "object"
+          },
+          "SpreadsheetSemanticSearchMatchRead": {
+            "additionalProperties": false,
+            "properties": {
+              "change_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Change Id"
+              },
+              "evidence_chunks": {
+                "items": {
+                  "$ref": "#/$defs/SemanticEvidenceChunkRead"
+                },
+                "title": "Evidence Chunks",
+                "type": "array"
+              },
+              "modified_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Modified Time"
+              },
+              "removed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Removed"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "sheet_count": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sheet Count"
+              },
+              "spreadsheet_id": {
+                "title": "Spreadsheet Id",
+                "type": "string"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Title"
+              }
+            },
+            "required": [
+              "spreadsheet_id",
+              "score"
+            ],
+            "title": "SpreadsheetSemanticSearchMatchRead",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/SpreadsheetSemanticSearchData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[SpreadsheetSemanticSearchData]",
+        "type": "object"
+      },
+      "query_capabilities": {
+        "preferred_for": [
+          "search",
+          "summary",
+          "topic_lookup"
+        ],
+        "selection_group": "google_sheets.spreadsheets.semantic_search",
+        "source_kind": "local_ingested"
       },
       "result_contract": "read_result"
     },
