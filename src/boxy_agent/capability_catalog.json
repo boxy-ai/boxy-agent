@@ -4558,23 +4558,10 @@
       "result_contract": "read_result"
     },
     {
-      "description": "Dispatch a single-line WeChat plain-text message (max 4096 chars). Requires idempotency_key for safe deduplication/replay; `status=sent` is dispatch-only (not delivery-confirmed), and `unknown_delivery` requires retry with a new idempotency key.",
+      "description": "Dispatch a single-line WeChat plain-text message (max 4096 chars). Use the exact visible chat label that WeChat UI search should select first. Requires idempotency_key for safe deduplication/replay; `status=sent` is dispatch-only (not delivery-confirmed), and `unknown_delivery` requires retry with a new idempotency key.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "allow_cua_fallback": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Accepted for compatibility but ignored in this MVP.",
-            "title": "Allow Cua Fallback"
-          },
           "display_id": {
             "anyOf": [
               {
@@ -4600,7 +4587,7 @@
             "type": "string"
           },
           "target": {
-            "description": "Non-empty WeChat target username (for example `wxid_alice`).",
+            "description": "Non-empty exact visible WeChat chat label that UI search should select first.",
             "title": "Target",
             "type": "string"
           }
