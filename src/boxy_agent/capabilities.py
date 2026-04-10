@@ -156,9 +156,9 @@ def _load_data_queries(value: object, *, source: str) -> dict[str, DataQueryDesc
             label=f"data_queries[{index}]",
             source=source,
         )
-        query_capabilities = _optional_json_table(
+        max_limit = _optional_positive_int(
             table,
-            "query_capabilities",
+            "max_limit",
             label=f"data_queries[{index}]",
             source=source,
         )
@@ -168,7 +168,7 @@ def _load_data_queries(value: object, *, source: str) -> dict[str, DataQueryDesc
             input_schema=input_schema,
             output_schema=output_schema,
             result_contract=result_contract,
-            query_capabilities=query_capabilities,
+            max_limit=max_limit,
         )
     return by_name
 
@@ -206,12 +206,6 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             label=f"{label}[{index}]",
             source=source,
         )
-        tool_capabilities = _optional_json_table(
-            table,
-            "tool_capabilities",
-            label=f"{label}[{index}]",
-            source=source,
-        )
         by_name[name] = ToolDescriptor(
             name=name,
             description=description,
@@ -219,7 +213,6 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             output_schema=output_schema,
             result_contract=result_contract,
             side_effect=side_effect,
-            tool_capabilities=tool_capabilities,
         )
     return by_name
 
@@ -256,6 +249,23 @@ def _optional_bool(
     value = data.get(key, False)
     if not isinstance(value, bool):
         raise CapabilityCatalogError(f"{label}.{key} must be a boolean ({source})")
+    return value
+
+
+def _optional_positive_int(
+    data: dict[str, object],
+    key: str,
+    *,
+    label: str,
+    source: str,
+) -> int | None:
+    value = data.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, int):
+        raise CapabilityCatalogError(f"{label}.{key} must be an integer ({source})")
+    if value < 1:
+        raise CapabilityCatalogError(f"{label}.{key} must be >= 1 ({source})")
     return value
 
 

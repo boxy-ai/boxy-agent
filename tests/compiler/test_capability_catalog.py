@@ -14,6 +14,8 @@ from test_helpers.capabilities import (
 from boxy_agent.capabilities import (
     CapabilityCatalogError,
     load_capability_catalog,
+    load_packaged_builtin_capability_catalog,
+    load_packaged_capability_catalog,
 )
 
 
@@ -79,10 +81,7 @@ def test_load_capability_catalog_from_json_file(tmp_path: Path) -> None:
                             "properties": {"fts": {"type": "string"}},
                         },
                         "output_schema": {"type": "array", "items": {"type": "object"}},
-                        "query_capabilities": {
-                            "source_kind": "local_ingested",
-                            "selection_group": "custom.messages.search",
-                        },
+                        "max_limit": 25,
                     }
                 ],
                 "boxy_tools": [
@@ -98,10 +97,6 @@ def test_load_capability_catalog_from_json_file(tmp_path: Path) -> None:
                             "properties": {"status": {"type": "string"}},
                         },
                         "side_effect": True,
-                        "tool_capabilities": {
-                            "source_kind": "live_provider",
-                            "selection_group": "custom.messages.send",
-                        },
                     }
                 ],
                 "builtin_tools": [
@@ -125,12 +120,26 @@ def test_load_capability_catalog_from_json_file(tmp_path: Path) -> None:
     assert list(catalog.data_queries) == ["custom.messages"]
     assert list(catalog.boxy_tools) == ["custom.send"]
     assert list(catalog.builtin_tools) == ["custom.search"]
-    assert catalog.data_queries["custom.messages"].query_capabilities == {
-        "source_kind": "local_ingested",
-        "selection_group": "custom.messages.search",
-    }
+    assert catalog.data_queries["custom.messages"].max_limit == 25
     assert catalog.boxy_tools["custom.send"].side_effect is True
-    assert catalog.boxy_tools["custom.send"].tool_capabilities == {
-        "source_kind": "live_provider",
-        "selection_group": "custom.messages.send",
-    }
+
+
+def test_packaged_builtin_catalog_carries_builtin_tool_usage_guidance() -> None:
+    catalog = load_packaged_builtin_capability_catalog()
+
+    python_exec = catalog.builtin_tools["python_exec"]
+    assert "Do not use it to fetch network data, call Boxy tools" in python_exec.description
+
+    web_search = catalog.builtin_tools["web_search"]
+    assert (
+        "Do not use for private connector or locally ingested user data" in web_search.description
+    )
+
+
+def test_packaged_catalog_carries_google_chat_semantic_fallback_guidance() -> None:
+    catalog = load_packaged_capability_catalog()
+
+    descriptor = catalog.data_queries["google_chat.search_messages_semantic_local"]
+    assert "embedding_ready=false" in descriptor.description
+    assert "search_spaces_local" in descriptor.description
+    assert "get_space_messages_local" in descriptor.description

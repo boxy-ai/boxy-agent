@@ -2,7 +2,7 @@
   "boxy_tools": [],
   "builtin_tools": [
     {
-      "description": "Search the public web for internet information. Do not use for private connector or locally ingested user data.",
+      "description": "Search the public web for internet information. Do not use for private connector or locally ingested user data when a connector or local read tool already fits the request.",
       "input_schema": {
         "properties": {
           "query": {
@@ -28,7 +28,7 @@
       }
     },
     {
-      "description": "Execute simple local Python computations in a constrained environment. No network access and no general stdlib/runtime access; use it for small local calculations and transformations only.",
+      "description": "Execute simple local Python computations in a constrained environment. No network access and no general stdlib/runtime access; use it only for small local calculations and transformations. Do not use it to fetch network data, call Boxy tools, or replace connector or API reads.",
       "input_schema": {
         "properties": {
           "code": {

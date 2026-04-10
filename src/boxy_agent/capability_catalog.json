@@ -1,7 +1,7 @@
 {
   "boxy_tools": [
     {
-      "description": "Create a Google Calendar event",
+      "description": "Create a Google Calendar event in the selected calendar via the live API. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -15,6 +15,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "attendees": {
@@ -30,6 +31,7 @@
               }
             ],
             "default": null,
+            "description": "Optional attendee email addresses for the new event.",
             "title": "Attendees"
           },
           "calendar_id": {
@@ -42,6 +44,7 @@
               }
             ],
             "default": null,
+            "description": "Optional calendar ID where the event should be created.",
             "title": "Calendar Id"
           },
           "description": {
@@ -54,9 +57,11 @@
               }
             ],
             "default": null,
+            "description": "Optional event description or agenda text.",
             "title": "Description"
           },
           "end": {
+            "description": "Event end time as an RFC 3339 timestamp.",
             "title": "End",
             "type": "string"
           },
@@ -83,13 +88,16 @@
               }
             ],
             "default": null,
+            "description": "Optional location string for the event.",
             "title": "Location"
           },
           "start": {
+            "description": "Event start time as an RFC 3339 timestamp.",
             "title": "Start",
             "type": "string"
           },
           "summary": {
+            "description": "Title of the calendar event to create.",
             "title": "Summary",
             "type": "string"
           }
@@ -367,6 +375,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "calendar_id": {
@@ -379,6 +388,7 @@
               }
             ],
             "default": null,
+            "description": "Optional calendar ID. Omit to use the primary calendar.",
             "title": "Calendar Id"
           },
           "limit": {
@@ -393,6 +403,7 @@
               }
             ],
             "default": null,
+            "description": "Maximum number of calendar events to return, between 1 and 250.",
             "title": "Limit"
           },
           "page_token": {
@@ -405,6 +416,7 @@
               }
             ],
             "default": null,
+            "description": "Optional continuation token from a previous Calendar list response. Copy it exactly when requesting the next page.",
             "title": "Page Token"
           },
           "query": {
@@ -417,6 +429,7 @@
               }
             ],
             "default": null,
+            "description": "Optional free-text query for live Calendar events.",
             "title": "Query"
           },
           "time_max": {
@@ -429,6 +442,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exclusive RFC 3339 upper time bound for live Calendar events.",
             "title": "Time Max"
           },
           "time_min": {
@@ -441,6 +455,7 @@
               }
             ],
             "default": null,
+            "description": "Optional inclusive RFC 3339 lower time bound for live Calendar events.",
             "title": "Time Min"
           }
         },
@@ -838,15 +853,7 @@
         "title": "ReadResult[CalendarEventsData]",
         "type": "object"
       },
-      "result_contract": "read_result",
-      "tool_capabilities": {
-        "preferred_for": [
-          "explicit_live_read"
-        ],
-        "requires_explicit_live_opt_in": true,
-        "selection_group": "google_calendar.events.search",
-        "source_kind": "live_provider"
-      }
+      "result_contract": "read_result"
     },
     {
       "description": "List Google Chat messages directly via the Google Chat API. Provider page order follows Google defaults and is not reliable for recent/latest message summaries. Prefer locally ingested Chat message queries unless the user explicitly asks for a live provider read.",
@@ -863,6 +870,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "limit": {
@@ -877,6 +885,7 @@
               }
             ],
             "default": null,
+            "description": "Maximum number of Chat messages to return, between 1 and 100.",
             "title": "Limit"
           },
           "page_token": {
@@ -889,9 +898,11 @@
               }
             ],
             "default": null,
+            "description": "Optional continuation token from a previous Chat messages response. Copy it exactly when requesting the next page.",
             "title": "Page Token"
           },
           "space": {
+            "description": "Google Chat space name whose messages should be listed.",
             "title": "Space",
             "type": "string"
           }
@@ -1262,16 +1273,7 @@
         "title": "ReadResult[ChatMessagesData]",
         "type": "object"
       },
-      "result_contract": "read_result",
-      "tool_capabilities": {
-        "order_guarantee": "provider_default",
-        "preferred_for": [
-          "explicit_live_read"
-        ],
-        "requires_explicit_live_opt_in": true,
-        "selection_group": "google_chat.messages.get",
-        "source_kind": "live_provider"
-      }
+      "result_contract": "read_result"
     },
     {
       "description": "List Google Chat spaces directly via the Google Chat API. Prefer locally ingested Chat space queries unless the user explicitly asks for a live provider read.",
@@ -1288,6 +1290,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "limit": {
@@ -1302,6 +1305,7 @@
               }
             ],
             "default": null,
+            "description": "Maximum number of Chat spaces to return, between 1 and 100.",
             "title": "Limit"
           },
           "page_token": {
@@ -1314,6 +1318,7 @@
               }
             ],
             "default": null,
+            "description": "Optional continuation token from a previous Chat spaces response. Copy it exactly when requesting the next page.",
             "title": "Page Token"
           }
         },
@@ -1632,18 +1637,10 @@
         "title": "ReadResult[ChatSpaceReadData]",
         "type": "object"
       },
-      "result_contract": "read_result",
-      "tool_capabilities": {
-        "preferred_for": [
-          "explicit_live_read"
-        ],
-        "requires_explicit_live_opt_in": true,
-        "selection_group": "google_chat.spaces.search",
-        "source_kind": "live_provider"
-      }
+      "result_contract": "read_result"
     },
     {
-      "description": "Send a Google Chat message to a space",
+      "description": "Send a Google Chat message to a space via the live Google Chat API. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -1657,6 +1654,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "idempotency_key": {
@@ -1673,10 +1671,12 @@
             "title": "Idempotency Key"
           },
           "space": {
+            "description": "Google Chat space name where the message should be sent.",
             "title": "Space",
             "type": "string"
           },
           "text": {
+            "description": "Plain-text Google Chat message body.",
             "title": "Text",
             "type": "string"
           },
@@ -1690,6 +1690,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google Chat thread name for replying in an existing thread.",
             "title": "Thread Name"
           }
         },
@@ -1934,9 +1935,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "document_id": {
+            "description": "Google Docs document ID to fetch from the live API.",
             "title": "Document Id",
             "type": "string"
           }
@@ -2287,15 +2290,7 @@
         "title": "ReadResult[DocumentData]",
         "type": "object"
       },
-      "result_contract": "read_result",
-      "tool_capabilities": {
-        "preferred_for": [
-          "explicit_live_read"
-        ],
-        "requires_explicit_live_opt_in": true,
-        "selection_group": "google_docs.document.get",
-        "source_kind": "live_provider"
-      }
+      "result_contract": "read_result"
     },
     {
       "description": "Fetch Google Drive file metadata directly via Google. Prefer locally ingested Drive queries unless the user explicitly asks for a live provider read.",
@@ -2312,6 +2307,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "fields": {
@@ -2324,9 +2320,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google Drive partial-response fields selector.",
             "title": "Fields"
           },
           "file_id": {
+            "description": "Google Drive file ID to fetch from the live API.",
             "title": "File Id",
             "type": "string"
           }
@@ -2708,15 +2706,7 @@
         "title": "ReadResult[DriveFileData]",
         "type": "object"
       },
-      "result_contract": "read_result",
-      "tool_capabilities": {
-        "preferred_for": [
-          "explicit_live_read"
-        ],
-        "requires_explicit_live_opt_in": true,
-        "selection_group": "google_drive.file.get",
-        "source_kind": "live_provider"
-      }
+      "result_contract": "read_result"
     },
     {
       "description": "Search Google Drive files directly via Google. Prefer locally ingested Drive queries unless the user explicitly asks for a live provider read.",
@@ -2733,6 +2723,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "limit": {
@@ -2747,6 +2738,7 @@
               }
             ],
             "default": null,
+            "description": "Maximum number of Drive files to return, between 1 and 100.",
             "title": "Limit"
           },
           "page_token": {
@@ -2759,6 +2751,7 @@
               }
             ],
             "default": null,
+            "description": "Optional continuation token from a previous Drive files response. Copy it exactly when requesting the next page.",
             "title": "Page Token"
           },
           "q": {
@@ -2771,6 +2764,7 @@
               }
             ],
             "default": null,
+            "description": "Google Drive query string for the live Drive API.",
             "title": "Q"
           }
         },
@@ -3144,15 +3138,7 @@
         "title": "ReadResult[DriveFilesData]",
         "type": "object"
       },
-      "result_contract": "read_result",
-      "tool_capabilities": {
-        "preferred_for": [
-          "explicit_live_read"
-        ],
-        "requires_explicit_live_opt_in": true,
-        "selection_group": "google_drive.files.search",
-        "source_kind": "live_provider"
-      }
+      "result_contract": "read_result"
     },
     {
       "description": "Fetch Gmail thread details via Google. Prefer local Gmail data queries when available; this is slower but may be slightly fresher.",
@@ -3169,6 +3155,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "format": {
@@ -3186,9 +3173,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Gmail response format for the fetched thread.",
             "title": "Format"
           },
           "thread_id": {
+            "description": "Gmail thread ID from a prior Gmail search result.",
             "title": "Thread Id",
             "type": "string"
           }
@@ -3594,15 +3583,7 @@
         "title": "ReadResult[GmailGetThreadData]",
         "type": "object"
       },
-      "result_contract": "read_result",
-      "tool_capabilities": {
-        "preferred_for": [
-          "explicit_live_read"
-        ],
-        "requires_explicit_live_opt_in": true,
-        "selection_group": "google_gmail.thread.get",
-        "source_kind": "live_provider"
-      }
+      "result_contract": "read_result"
     },
     {
       "description": "Search Gmail threads via Google. Prefer local Gmail data queries when available; this is slower but may be slightly fresher.",
@@ -3619,6 +3600,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "limit": {
@@ -3633,6 +3615,7 @@
               }
             ],
             "default": null,
+            "description": "Maximum number of Gmail threads to return, between 1 and 100.",
             "title": "Limit"
           },
           "page_token": {
@@ -3645,6 +3628,7 @@
               }
             ],
             "default": null,
+            "description": "Optional continuation token from a previous live Gmail search response. Copy the prior `page_token` value exactly when requesting the next page.",
             "title": "Page Token"
           },
           "query": {
@@ -3657,6 +3641,7 @@
               }
             ],
             "default": null,
+            "description": "Free-text Gmail search query for the live Gmail API.",
             "title": "Query"
           }
         },
@@ -3963,18 +3948,10 @@
         "title": "ReadResult[GmailSearchThreadHitsData]",
         "type": "object"
       },
-      "result_contract": "read_result",
-      "tool_capabilities": {
-        "preferred_for": [
-          "explicit_live_read"
-        ],
-        "requires_explicit_live_opt_in": true,
-        "selection_group": "google_gmail.threads.search",
-        "source_kind": "live_provider"
-      }
+      "result_contract": "read_result"
     },
     {
-      "description": "Send Gmail email",
+      "description": "Send a Gmail email message to one or more recipients via the live Gmail API. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -3988,6 +3965,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "bcc": {
@@ -4003,9 +3981,11 @@
               }
             ],
             "default": null,
+            "description": "Optional BCC recipient email addresses.",
             "title": "Bcc"
           },
           "body_text": {
+            "description": "Plain-text body content for the outgoing Gmail message.",
             "title": "Body Text",
             "type": "string"
           },
@@ -4022,6 +4002,7 @@
               }
             ],
             "default": null,
+            "description": "Optional CC recipient email addresses.",
             "title": "Cc"
           },
           "idempotency_key": {
@@ -4038,6 +4019,7 @@
             "title": "Idempotency Key"
           },
           "subject": {
+            "description": "Subject line for the outgoing Gmail message.",
             "title": "Subject",
             "type": "string"
           },
@@ -4051,9 +4033,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Gmail thread ID to reply within an existing thread.",
             "title": "Thread Id"
           },
           "to": {
+            "description": "Recipient email addresses for the outgoing Gmail message.",
             "items": {
               "type": "string"
             },
@@ -4231,13 +4215,16 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "range_a1": {
+            "description": "A1 notation range to fetch from the spreadsheet.",
             "title": "Range A1",
             "type": "string"
           },
           "spreadsheet_id": {
+            "description": "Google Sheets spreadsheet ID to read from.",
             "title": "Spreadsheet Id",
             "type": "string"
           }
@@ -4558,7 +4545,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "Dispatch a single-line WeChat plain-text message (max 4096 chars). Use the exact visible chat label that WeChat UI search should select first. Requires idempotency_key for safe deduplication/replay; `status=sent` is dispatch-only (not delivery-confirmed), and `unknown_delivery` requires retry with a new idempotency key.",
+      "description": "Dispatch a single-line WeChat plain-text message (max 4096 chars). Use the exact visible chat label that WeChat UI search should select first. Requires idempotency_key for safe deduplication/replay; `status=sent` is dispatch-only (not delivery-confirmed), and `unknown_delivery` requires retry with a new idempotency key. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -4832,7 +4819,7 @@
       "side_effect": true
     },
     {
-      "description": "Send one WhatsApp text message via whatsapp-runtime. Uses idempotency_key as runtime clientMessageId and retries 409 conflicts using Retry-After.",
+      "description": "Send one WhatsApp text message via whatsapp-runtime. Uses idempotency_key as runtime clientMessageId and retries 409 conflicts using Retry-After. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -4842,13 +4829,13 @@
             "type": "string"
           },
           "message_content": {
-            "description": "Plain-text message body.",
+            "description": "Plain-text WhatsApp message body.",
             "maxLength": 4096,
             "title": "Message Content",
             "type": "string"
           },
           "target": {
-            "description": "Target phone or jid accepted by whatsapp-runtime /messages/send.",
+            "description": "Target phone number or chat JID accepted by whatsapp-runtime /messages/send.",
             "title": "Target",
             "type": "string"
           }
@@ -5070,7 +5057,7 @@
   ],
   "builtin_tools": [
     {
-      "description": "Execute simple local Python computations in a constrained environment. No network access and no general stdlib/runtime access; use it for small local calculations and transformations only.",
+      "description": "Execute simple local Python computations in a constrained environment. No network access and no general stdlib/runtime access; use it only for small local calculations and transformations. Do not use it to fetch network data, call Boxy tools, or replace connector or API reads.",
       "input_schema": {
         "properties": {
           "code": {
@@ -5097,7 +5084,7 @@
       }
     },
     {
-      "description": "Search the public web for internet information. Do not use for private connector or locally ingested user data.",
+      "description": "Search the public web for internet information. Do not use for private connector or locally ingested user data when a connector or local read tool already fits the request.",
       "input_schema": {
         "properties": {
           "query": {
@@ -5139,6 +5126,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_cancelled": {
@@ -5151,7 +5139,23 @@
               }
             ],
             "default": null,
+            "description": "Whether cancelled events should be included in the local search.",
             "title": "Include Cancelled"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local calendar events to return, between 1 and 100.",
+            "title": "Limit"
           },
           "time_max": {
             "anyOf": [
@@ -5163,6 +5167,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exclusive RFC 3339 upper time bound for local calendar events.",
             "title": "Time Max"
           },
           "time_min": {
@@ -5175,12 +5180,14 @@
               }
             ],
             "default": null,
+            "description": "Optional inclusive RFC 3339 lower time bound for local calendar events.",
             "title": "Time Min"
           }
         },
         "title": "CalendarListEventsLocalInput",
         "type": "object"
       },
+      "max_limit": 100,
       "name": "google_calendar.list_events_local",
       "output_schema": {
         "$defs": {
@@ -5572,16 +5579,6 @@
         "title": "ReadResult[CalendarEventsData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "browse",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_calendar.events.list",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -5599,6 +5596,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_cancelled": {
@@ -5611,9 +5609,26 @@
               }
             ],
             "default": null,
+            "description": "Whether cancelled events should be included in the local lexical search.",
             "title": "Include Cancelled"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of lexical calendar event matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Keyword query for locally ingested Google Calendar events.",
             "title": "Text",
             "type": "string"
           },
@@ -5627,6 +5642,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exclusive RFC 3339 upper time bound for local calendar events.",
             "title": "Time Max"
           },
           "time_min": {
@@ -5639,6 +5655,7 @@
               }
             ],
             "default": null,
+            "description": "Optional inclusive RFC 3339 lower time bound for local calendar events.",
             "title": "Time Min"
           }
         },
@@ -5648,6 +5665,7 @@
         "title": "CalendarSearchEventsLexicalLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_calendar.search_events_lexical_local",
       "output_schema": {
         "$defs": {
@@ -6063,15 +6081,6 @@
         "title": "ReadResult[CalendarLexicalSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "keyword_lookup"
-        ],
-        "selection_group": "google_calendar.events.keyword_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -6089,6 +6098,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_cancelled": {
@@ -6101,9 +6111,26 @@
               }
             ],
             "default": null,
+            "description": "Whether cancelled events should be included in the local semantic search.",
             "title": "Include Cancelled"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of semantic calendar event matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Semantic query for locally ingested Google Calendar events.",
             "title": "Text",
             "type": "string"
           },
@@ -6117,6 +6144,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exclusive RFC 3339 upper time bound for semantic calendar search.",
             "title": "Time Max"
           },
           "time_min": {
@@ -6129,6 +6157,7 @@
               }
             ],
             "default": null,
+            "description": "Optional inclusive RFC 3339 lower time bound for semantic calendar search.",
             "title": "Time Min"
           }
         },
@@ -6138,6 +6167,7 @@
         "title": "CalendarSearchEventsSemanticLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_calendar.search_events_semantic_local",
       "output_schema": {
         "$defs": {
@@ -6577,15 +6607,6 @@
         "title": "ReadResult[CalendarSemanticSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "topic_lookup"
-        ],
-        "selection_group": "google_calendar.events.semantic_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -6603,9 +6624,26 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local Google Chat messages to return, between 1 and 200.",
+            "title": "Limit"
+          },
           "space_name": {
+            "description": "Google Chat space name from a prior space listing or message result.",
             "title": "Space Name",
             "type": "string"
           },
@@ -6619,6 +6657,7 @@
               }
             ],
             "default": null,
+            "description": "Optional keyword filter applied within the selected local Chat space.",
             "title": "Text"
           }
         },
@@ -6628,6 +6667,7 @@
         "title": "ChatGetSpaceMessagesLocalInput",
         "type": "object"
       },
+      "max_limit": 200,
       "name": "google_chat.get_space_messages_local",
       "output_schema": {
         "$defs": {
@@ -6988,17 +7028,6 @@
         "title": "ReadResult[ChatMessagesData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "order_guarantee": "newest_first",
-        "preferred_for": [
-          "lookup",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_chat.messages.get",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -7016,7 +7045,23 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local Google Chat search matches to return, between 1 and 20.",
+            "title": "Limit"
           },
           "space_name": {
             "anyOf": [
@@ -7028,9 +7073,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google Chat space name to restrict the local message search.",
             "title": "Space Name"
           },
           "text": {
+            "description": "Keyword query for locally ingested Google Chat messages.",
             "title": "Text",
             "type": "string"
           },
@@ -7044,6 +7091,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exclusive RFC 3339 upper time bound for local Chat messages.",
             "title": "Time Max"
           },
           "time_min": {
@@ -7056,6 +7104,7 @@
               }
             ],
             "default": null,
+            "description": "Optional inclusive RFC 3339 lower time bound for local Chat messages.",
             "title": "Time Min"
           }
         },
@@ -7065,6 +7114,7 @@
         "title": "ChatSearchMessagesLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_chat.search_messages_local",
       "output_schema": {
         "$defs": {
@@ -7511,19 +7561,10 @@
         "title": "ReadResult[ChatLexicalSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "keyword_lookup"
-        ],
-        "selection_group": "google_chat.messages.search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
-      "description": "Semantically search Google Chat transcript windows from locally ingested data. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching.",
+      "description": "Semantically search Google Chat transcript windows from locally ingested data. Prefer this when the user intent is topical or meaning-based rather than strict keyword matching. If a result reports `embedding_ready=false` or `indexed_window_count=0`, do not immediately retry this capability in the same interaction; fall back to `search_spaces_local` or `get_space_messages_local`.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -7537,7 +7578,23 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local semantic Google Chat matches to return, between 1 and 20.",
+            "title": "Limit"
           },
           "space_name": {
             "anyOf": [
@@ -7549,9 +7606,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google Chat space name to restrict the semantic search.",
             "title": "Space Name"
           },
           "text": {
+            "description": "Semantic search query for locally ingested Google Chat data.",
             "title": "Text",
             "type": "string"
           },
@@ -7565,6 +7624,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exclusive RFC 3339 upper time bound for semantic Chat search.",
             "title": "Time Max"
           },
           "time_min": {
@@ -7577,6 +7637,7 @@
               }
             ],
             "default": null,
+            "description": "Optional inclusive RFC 3339 lower time bound for semantic Chat search.",
             "title": "Time Min"
           }
         },
@@ -7586,6 +7647,7 @@
         "title": "ChatSearchMessagesSemanticLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_chat.search_messages_semantic_local",
       "output_schema": {
         "$defs": {
@@ -8051,15 +8113,6 @@
         "title": "ReadResult[ChatSemanticSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "topic_lookup"
-        ],
-        "selection_group": "google_chat.messages.semantic_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -8077,7 +8130,23 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local Google Chat spaces to return, between 1 and 100.",
+            "title": "Limit"
           },
           "text": {
             "anyOf": [
@@ -8089,12 +8158,14 @@
               }
             ],
             "default": null,
+            "description": "Optional free-text query for locally ingested Google Chat spaces.",
             "title": "Text"
           }
         },
         "title": "ChatSearchSpacesLocalInput",
         "type": "object"
       },
+      "max_limit": 100,
       "name": "google_chat.search_spaces_local",
       "output_schema": {
         "$defs": {
@@ -8424,17 +8495,6 @@
         "title": "ReadResult[ChatSpacesData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "order_guarantee": "newest_first",
-        "preferred_for": [
-          "search",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_chat.spaces.search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -8452,9 +8512,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "document_id": {
+            "description": "Google Docs document ID from a prior Docs search or document result.",
             "title": "Document Id",
             "type": "string"
           }
@@ -8465,6 +8527,7 @@
         "title": "DocsGetDocumentLocalInput",
         "type": "object"
       },
+      "max_limit": 1,
       "name": "google_docs.get_document_local",
       "output_schema": {
         "$defs": {
@@ -8805,20 +8868,10 @@
         "title": "ReadResult[DocumentData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "lookup",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_docs.document.get",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
-      "description": "List Google Docs records from locally ingested changes. Prefer this over remote Docs reads when local data is acceptable for browse, recent, or latest requests.",
+      "description": "List Google Docs metadata and extracted body text from locally ingested changes. Prefer this over remote Docs reads when local data is acceptable for browse, recent, or latest requests.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -8832,6 +8885,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -8844,12 +8898,29 @@
               }
             ],
             "default": null,
+            "description": "Whether removed Google Docs documents should be included.",
             "title": "Include Removed"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local Google Docs documents to return, between 1 and 100.",
+            "title": "Limit"
           }
         },
         "title": "DocsListDocumentsLocalInput",
         "type": "object"
       },
+      "max_limit": 100,
       "name": "google_docs.list_documents_local",
       "output_schema": {
         "$defs": {
@@ -9174,16 +9245,6 @@
         "title": "ReadResult[DocumentsData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "browse",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_docs.documents.list",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -9201,6 +9262,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -9213,9 +9275,26 @@
               }
             ],
             "default": null,
+            "description": "Whether removed Google Docs documents should be included.",
             "title": "Include Removed"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of lexical Google Docs matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Keyword query for locally ingested Google Docs documents.",
             "title": "Text",
             "type": "string"
           }
@@ -9226,6 +9305,7 @@
         "title": "DocsSearchDocumentsLexicalLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_docs.search_documents_lexical_local",
       "output_schema": {
         "$defs": {
@@ -9586,15 +9666,6 @@
         "title": "ReadResult[DocumentLexicalSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "keyword_lookup"
-        ],
-        "selection_group": "google_docs.documents.keyword_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -9612,6 +9683,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -9624,9 +9696,26 @@
               }
             ],
             "default": null,
+            "description": "Whether removed Google Docs documents should be included.",
             "title": "Include Removed"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of semantic Google Docs matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Semantic query for locally ingested Google Docs documents.",
             "title": "Text",
             "type": "string"
           }
@@ -9637,6 +9726,7 @@
         "title": "DocsSearchDocumentsSemanticLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_docs.search_documents_semantic_local",
       "output_schema": {
         "$defs": {
@@ -10021,15 +10111,6 @@
         "title": "ReadResult[DocumentSemanticSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "topic_lookup"
-        ],
-        "selection_group": "google_docs.documents.semantic_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -10047,9 +10128,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "file_id": {
+            "description": "Google Drive file ID from a prior Drive search or file result.",
             "title": "File Id",
             "type": "string"
           }
@@ -10060,6 +10143,7 @@
         "title": "DriveGetFileLocalInput",
         "type": "object"
       },
+      "max_limit": 1,
       "name": "google_drive.get_file_local",
       "output_schema": {
         "$defs": {
@@ -10431,14 +10515,6 @@
         "title": "ReadResult[DriveFileData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "lookup",
-          "summary"
-        ],
-        "selection_group": "google_drive.file.get",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -10456,6 +10532,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -10468,12 +10545,29 @@
               }
             ],
             "default": null,
+            "description": "Whether removed files should be included in the local Drive search.",
             "title": "Include Removed"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local Google Drive files to return, between 1 and 100.",
+            "title": "Limit"
           }
         },
         "title": "DriveListFilesLocalInput",
         "type": "object"
       },
+      "max_limit": 100,
       "name": "google_drive.list_files_local",
       "output_schema": {
         "$defs": {
@@ -10841,16 +10935,6 @@
         "title": "ReadResult[DriveFilesData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "browse",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_drive.files.list",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -10868,6 +10952,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -10880,9 +10965,26 @@
               }
             ],
             "default": null,
+            "description": "Whether removed files should be included in the local Drive lexical search.",
             "title": "Include Removed"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of lexical Drive file matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Keyword query for locally ingested Google Drive files.",
             "title": "Text",
             "type": "string"
           }
@@ -10893,6 +10995,7 @@
         "title": "DriveSearchFilesLexicalLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_drive.search_files_lexical_local",
       "output_schema": {
         "$defs": {
@@ -11284,15 +11387,6 @@
         "title": "ReadResult[DriveLexicalSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "keyword_lookup"
-        ],
-        "selection_group": "google_drive.files.keyword_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -11310,6 +11404,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -11322,9 +11417,26 @@
               }
             ],
             "default": null,
+            "description": "Whether removed files should be included in the local Drive semantic search.",
             "title": "Include Removed"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of semantic Drive file matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Semantic query for locally ingested Google Drive files.",
             "title": "Text",
             "type": "string"
           }
@@ -11335,6 +11447,7 @@
         "title": "DriveSearchFilesSemanticLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_drive.search_files_semantic_local",
       "output_schema": {
         "$defs": {
@@ -11750,15 +11863,6 @@
         "title": "ReadResult[DriveSemanticSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "topic_lookup"
-        ],
-        "selection_group": "google_drive.files.semantic_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -11776,9 +11880,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "thread_id": {
+            "description": "Gmail thread ID from a prior local Gmail search or thread result.",
             "title": "Thread Id",
             "type": "string"
           }
@@ -11789,6 +11895,7 @@
         "title": "GmailGetThreadLocalInput",
         "type": "object"
       },
+      "max_limit": 1,
       "name": "google_gmail.get_thread_local",
       "output_schema": {
         "$defs": {
@@ -12184,16 +12291,6 @@
         "title": "ReadResult[GmailGetThreadData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "lookup",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_gmail.thread.get",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -12211,9 +12308,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "thread_ids": {
+            "description": "One or more Gmail thread IDs to fetch from local Gmail data.",
             "items": {
               "type": "string"
             },
@@ -12229,6 +12328,7 @@
         "title": "GmailGetThreadsLocalInput",
         "type": "object"
       },
+      "max_limit": 25,
       "name": "google_gmail.get_threads_local",
       "output_schema": {
         "$defs": {
@@ -12655,6 +12755,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "before_internal_date": {
@@ -12668,6 +12769,7 @@
               }
             ],
             "default": null,
+            "description": "Optional cursor boundary from a previous local Gmail search result. Copy the prior `before_internal_date` value exactly when continuing to older threads.",
             "title": "Before Internal Date"
           },
           "before_thread_id": {
@@ -12680,7 +12782,23 @@
               }
             ],
             "default": null,
+            "description": "Optional cursor boundary from a previous local Gmail search result. Copy the prior `before_thread_id` value exactly when continuing to older threads.",
             "title": "Before Thread Id"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local Gmail threads to return, between 1 and 100.",
+            "title": "Limit"
           },
           "mailbox": {
             "anyOf": [
@@ -12700,6 +12818,7 @@
               }
             ],
             "default": null,
+            "description": "Optional mailbox filter for the local Gmail search.",
             "title": "Mailbox"
           },
           "unread": {
@@ -12712,12 +12831,14 @@
               }
             ],
             "default": null,
+            "description": "Optional unread filter for the local Gmail search.",
             "title": "Unread"
           }
         },
         "title": "GmailListThreadsLocalInput",
         "type": "object"
       },
+      "max_limit": 100,
       "name": "google_gmail.list_threads_local",
       "output_schema": {
         "$defs": {
@@ -13066,17 +13187,6 @@
         "title": "ReadResult[GmailSearchThreadsData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "order_guarantee": "newest_first",
-        "preferred_for": [
-          "browse",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_gmail.threads.list",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -13094,7 +13204,23 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of lexical Gmail thread matches to return, between 1 and 20.",
+            "title": "Limit"
           },
           "mailbox": {
             "anyOf": [
@@ -13114,9 +13240,11 @@
               }
             ],
             "default": null,
+            "description": "Optional mailbox filter for the local Gmail lexical search.",
             "title": "Mailbox"
           },
           "text": {
+            "description": "Keyword query for locally ingested Gmail threads.",
             "title": "Text",
             "type": "string"
           },
@@ -13130,6 +13258,7 @@
               }
             ],
             "default": null,
+            "description": "Optional unread filter for the local Gmail lexical search.",
             "title": "Unread"
           }
         },
@@ -13139,6 +13268,7 @@
         "title": "GmailSearchThreadsLexicalLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_gmail.search_threads_lexical_local",
       "output_schema": {
         "$defs": {
@@ -13511,15 +13641,6 @@
         "title": "ReadResult[GmailLexicalSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "keyword_lookup"
-        ],
-        "selection_group": "google_gmail.threads.keyword_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -13537,7 +13658,23 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of semantic Gmail thread matches to return, between 1 and 20.",
+            "title": "Limit"
           },
           "mailbox": {
             "anyOf": [
@@ -13557,9 +13694,11 @@
               }
             ],
             "default": null,
+            "description": "Optional mailbox filter for the local Gmail semantic search.",
             "title": "Mailbox"
           },
           "text": {
+            "description": "Semantic query for locally ingested Gmail threads.",
             "title": "Text",
             "type": "string"
           },
@@ -13573,6 +13712,7 @@
               }
             ],
             "default": null,
+            "description": "Optional unread filter for the local Gmail semantic search.",
             "title": "Unread"
           }
         },
@@ -13582,6 +13722,7 @@
         "title": "GmailSearchThreadsSemanticLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_gmail.search_threads_semantic_local",
       "output_schema": {
         "$defs": {
@@ -13978,15 +14119,6 @@
         "title": "ReadResult[GmailSemanticSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "topic_lookup"
-        ],
-        "selection_group": "google_gmail.threads.semantic_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -14004,9 +14136,11 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "spreadsheet_id": {
+            "description": "Google Sheets spreadsheet ID from a prior Sheets search or result.",
             "title": "Spreadsheet Id",
             "type": "string"
           }
@@ -14017,6 +14151,7 @@
         "title": "SheetsGetSpreadsheetLocalInput",
         "type": "object"
       },
+      "max_limit": 1,
       "name": "google_sheets.get_spreadsheet_local",
       "output_schema": {
         "$defs": {
@@ -14357,14 +14492,6 @@
         "title": "ReadResult[SpreadsheetData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "lookup",
-          "summary"
-        ],
-        "selection_group": "google_sheets.spreadsheet.get",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -14382,6 +14509,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -14394,12 +14522,29 @@
               }
             ],
             "default": null,
+            "description": "Whether removed spreadsheets should be included in the local search.",
             "title": "Include Removed"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of local Google Sheets files to return, between 1 and 100.",
+            "title": "Limit"
           }
         },
         "title": "SheetsListSpreadsheetsLocalInput",
         "type": "object"
       },
+      "max_limit": 100,
       "name": "google_sheets.list_spreadsheets_local",
       "output_schema": {
         "$defs": {
@@ -14736,16 +14881,6 @@
         "title": "ReadResult[SpreadsheetsData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "browse",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "google_sheets.spreadsheets.list",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -14763,6 +14898,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -14775,9 +14911,26 @@
               }
             ],
             "default": null,
+            "description": "Whether removed spreadsheets should be included in the local lexical search.",
             "title": "Include Removed"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of lexical Google Sheets matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Keyword query for locally ingested Google Sheets files.",
             "title": "Text",
             "type": "string"
           }
@@ -14788,6 +14941,7 @@
         "title": "SheetsSearchSpreadsheetsLexicalLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_sheets.search_spreadsheets_lexical_local",
       "output_schema": {
         "$defs": {
@@ -15148,15 +15302,6 @@
         "title": "ReadResult[SpreadsheetLexicalSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "keyword_lookup"
-        ],
-        "selection_group": "google_sheets.spreadsheets.keyword_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -15174,6 +15319,7 @@
               }
             ],
             "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
             "title": "Account Id"
           },
           "include_removed": {
@@ -15186,9 +15332,26 @@
               }
             ],
             "default": null,
+            "description": "Whether removed spreadsheets should be included in the local semantic search.",
             "title": "Include Removed"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of semantic Google Sheets matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Semantic query for locally ingested Google Sheets files.",
             "title": "Text",
             "type": "string"
           }
@@ -15199,6 +15362,7 @@
         "title": "SheetsSearchSpreadsheetsSemanticLocalInput",
         "type": "object"
       },
+      "max_limit": 20,
       "name": "google_sheets.search_spreadsheets_semantic_local",
       "output_schema": {
         "$defs": {
@@ -15583,15 +15747,6 @@
         "title": "ReadResult[SpreadsheetSemanticSearchData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "preferred_for": [
-          "search",
-          "summary",
-          "topic_lookup"
-        ],
-        "selection_group": "google_sheets.spreadsheets.semantic_search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -15623,6 +15778,7 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor timestamp from a previous get_messages result.",
             "title": "Before Create Time"
           },
           "before_local_id": {
@@ -15636,11 +15792,28 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor local message id from a previous get_messages result.",
             "title": "Before Local Id"
           },
           "contact_username": {
+            "description": "Exact WeChat contact username for the conversation to read.",
             "title": "Contact Username",
             "type": "string"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WeChat messages to return, between 1 and 200.",
+            "title": "Limit"
           }
         },
         "required": [
@@ -15649,6 +15822,7 @@
         "title": "WechatGetMessagesInput",
         "type": "object"
       },
+      "max_limit": 200,
       "name": "wechat.get_messages",
       "output_schema": {
         "$defs": {
@@ -16132,20 +16306,6 @@
         "title": "ReadResult[WechatConversationMessagesData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "argument_guidance": {
-          "account_id": "Optional exact WeChat owner account id such as `wxid_owner`. Omit when unknown. Do not pass login `session_id` values or unrelated opaque session identifiers."
-        },
-        "order_guarantee": "newest_first",
-        "preferred_for": [
-          "summary",
-          "recent",
-          "latest",
-          "lookup"
-        ],
-        "selection_group": "wechat.messages.get",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -16176,6 +16336,7 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor contact username from a previous list_conversations result.",
             "title": "Before Contact Username"
           },
           "before_latest_create_time": {
@@ -16189,6 +16350,7 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor timestamp from a previous list_conversations result.",
             "title": "Before Latest Create Time"
           },
           "before_latest_local_id": {
@@ -16202,6 +16364,7 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor local message id from a previous list_conversations result.",
             "title": "Before Latest Local Id"
           },
           "contact_username": {
@@ -16214,7 +16377,23 @@
               }
             ],
             "default": null,
+            "description": "Optional exact WeChat contact username to narrow to one conversation.",
             "title": "Contact Username"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 500,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WeChat conversations to return, between 1 and 500.",
+            "title": "Limit"
           },
           "query": {
             "anyOf": [
@@ -16226,12 +16405,14 @@
               }
             ],
             "default": null,
+            "description": "Optional keyword filter for WeChat conversations.",
             "title": "Query"
           }
         },
         "title": "WechatListConversationsInput",
         "type": "object"
       },
+      "max_limit": 500,
       "name": "wechat.list_conversations",
       "output_schema": {
         "$defs": {
@@ -16700,19 +16881,6 @@
         "title": "ReadResult[WechatConversationsData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "argument_guidance": {
-          "account_id": "Optional exact WeChat owner account id such as `wxid_owner`. Omit when unknown. Do not pass login `session_id` values or unrelated opaque session identifiers."
-        },
-        "order_guarantee": "newest_first",
-        "preferred_for": [
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "wechat.conversations.list",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -16733,7 +16901,23 @@
             "description": "Optional exact WeChat owner account id such as `wxid_owner`. Omit when unknown so the connector can resolve from local WeChat data. Do not pass login `session_id` values or unrelated app/session identifiers.",
             "title": "Account Id"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WeChat resolution candidates to return, between 1 and 100.",
+            "title": "Limit"
+          },
           "query": {
+            "description": "Free-text query used to resolve likely WeChat contacts or chats.",
             "title": "Query",
             "type": "string"
           }
@@ -16744,6 +16928,7 @@
         "title": "WechatResolveTargetsInput",
         "type": "object"
       },
+      "max_limit": 100,
       "name": "wechat.resolve_targets",
       "output_schema": {
         "$defs": {
@@ -17099,18 +17284,6 @@
         "title": "ReadResult[WechatResolveTargetsData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "argument_guidance": {
-          "account_id": "Optional exact WeChat owner account id such as `wxid_owner`. Omit when unknown. Do not pass login `session_id` values or unrelated opaque session identifiers."
-        },
-        "preferred_for": [
-          "search",
-          "lookup",
-          "summary"
-        ],
-        "selection_group": "wechat.targets.resolve",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
@@ -17141,6 +17314,7 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor account id from a previous search_messages result.",
             "title": "Before Account Id"
           },
           "before_contact_username": {
@@ -17153,6 +17327,7 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor contact username from a previous search_messages result.",
             "title": "Before Contact Username"
           },
           "before_create_time": {
@@ -17166,6 +17341,7 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor timestamp from a previous search_messages result.",
             "title": "Before Create Time"
           },
           "before_local_id": {
@@ -17179,6 +17355,7 @@
               }
             ],
             "default": null,
+            "description": "Optional seek cursor local message id from a previous search_messages result.",
             "title": "Before Local Id"
           },
           "contact_username": {
@@ -17191,9 +17368,26 @@
               }
             ],
             "default": null,
+            "description": "Optional exact WeChat contact username to restrict the message search.",
             "title": "Contact Username"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WeChat search matches to return, between 1 and 200.",
+            "title": "Limit"
+          },
           "query": {
+            "description": "Free-text keyword query for persisted WeChat messages.",
             "title": "Query",
             "type": "string"
           }
@@ -17204,6 +17398,7 @@
         "title": "WechatSearchMessagesInput",
         "type": "object"
       },
+      "max_limit": 200,
       "name": "wechat.search_messages",
       "output_schema": {
         "$defs": {
@@ -17631,24 +17826,10 @@
         "title": "ReadResult[WechatSearchMessagesData]",
         "type": "object"
       },
-      "query_capabilities": {
-        "argument_guidance": {
-          "account_id": "Optional exact WeChat owner account id such as `wxid_owner`. Omit when unknown. Do not pass login `session_id` values or unrelated opaque session identifiers."
-        },
-        "order_guarantee": "newest_first",
-        "preferred_for": [
-          "search",
-          "summary",
-          "recent",
-          "latest"
-        ],
-        "selection_group": "wechat.messages.search",
-        "source_kind": "local_ingested"
-      },
       "result_contract": "read_result"
     },
     {
-      "description": "Load latest visible chat message context from derived tables.",
+      "description": "Load recent message context for one WhatsApp chat from locally ingested data. Use this after you already know the chat_jid from a prior list or search result, and copy that chat_jid exactly. If the result is empty and there is no continuation token, treat that as no locally available message context for this chat rather than evidence that the chat was retrieved.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -17663,6 +17844,7 @@
               }
             ],
             "default": null,
+            "description": "Optional cursor boundary from a prior chat_context result. Copy the previous `before_message_id` value exactly when continuing to older messages.",
             "title": "Before Message Id"
           },
           "before_ts_ms": {
@@ -17676,11 +17858,28 @@
               }
             ],
             "default": null,
+            "description": "Optional cursor boundary from a prior chat_context result. Copy the previous `before_ts_ms` value exactly when continuing to older messages.",
             "title": "Before Ts Ms"
           },
           "chat_jid": {
+            "description": "WhatsApp chat JID copied verbatim from a prior list or search result field such as `chats[].chat_jid`. Copy this exact value; never invent, normalize, or replace it with a display name, title hint, phone number, or email address.",
             "title": "Chat Jid",
             "type": "string"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WhatsApp messages to return, between 1 and 200.",
+            "title": "Limit"
           }
         },
         "required": [
@@ -17689,6 +17888,7 @@
         "title": "WhatsappChatContextInput",
         "type": "object"
       },
+      "max_limit": 200,
       "name": "whatsapp.chat_context",
       "output_schema": {
         "$defs": {
@@ -18073,7 +18273,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "List latest-state chat rows from the WhatsApp connector.",
+      "description": "List the most recently active WhatsApp chats from locally ingested data. Use this to identify candidate conversations before fetching chat context. When you drill into one chat, copy the returned `chats[].chat_jid` value exactly into `whatsapp_chat_context`.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -18087,6 +18287,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exact chat JID filter for one WhatsApp chat row. When narrowing to one known chat, copy a prior result's `chat_jid` exactly.",
             "title": "Chat Jid"
           },
           "include_inactive": {
@@ -18099,7 +18300,23 @@
               }
             ],
             "default": null,
+            "description": "Whether inactive chats should be included in the result.",
             "title": "Include Inactive"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 500,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WhatsApp chat rows to return, between 1 and 500.",
+            "title": "Limit"
           },
           "offset": {
             "anyOf": [
@@ -18112,6 +18329,7 @@
               }
             ],
             "default": null,
+            "description": "Optional offset from a previous list_chats_latest page.",
             "title": "Offset"
           },
           "query": {
@@ -18124,12 +18342,14 @@
               }
             ],
             "default": null,
+            "description": "Optional keyword filter applied to recent WhatsApp chats.",
             "title": "Query"
           }
         },
         "title": "WhatsappListChatsLatestInput",
         "type": "object"
       },
+      "max_limit": 500,
       "name": "whatsapp.list_chats_latest",
       "output_schema": {
         "$defs": {
@@ -18527,7 +18747,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "List latest-state address-book rows from the WhatsApp connector.",
+      "description": "List latest-state WhatsApp contacts from locally ingested data.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -18541,6 +18761,7 @@
               }
             ],
             "default": null,
+            "description": "Whether inactive contacts should be included in the result.",
             "title": "Include Inactive"
           },
           "jid": {
@@ -18553,7 +18774,23 @@
               }
             ],
             "default": null,
+            "description": "Optional exact WhatsApp JID filter for one contact row.",
             "title": "Jid"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 500,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WhatsApp contacts to return, between 1 and 500.",
+            "title": "Limit"
           },
           "offset": {
             "anyOf": [
@@ -18566,6 +18803,7 @@
               }
             ],
             "default": null,
+            "description": "Optional offset from a previous contacts page.",
             "title": "Offset"
           },
           "query": {
@@ -18578,12 +18816,14 @@
               }
             ],
             "default": null,
+            "description": "Optional keyword filter applied to latest WhatsApp contacts.",
             "title": "Query"
           }
         },
         "title": "WhatsappListContactsLatestInput",
         "type": "object"
       },
+      "max_limit": 500,
       "name": "whatsapp.list_contacts_latest",
       "output_schema": {
         "$defs": {
@@ -18964,7 +19204,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "List latest-state directory rows resolved from raw truth tables.",
+      "description": "List latest-state WhatsApp directory mappings resolved from locally ingested data.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -18978,6 +19218,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exact chat JID filter for one directory mapping row. When narrowing to one known chat, copy a prior result's `chat_jid` exactly.",
             "title": "Chat Jid"
           },
           "include_inactive": {
@@ -18990,7 +19231,23 @@
               }
             ],
             "default": null,
+            "description": "Whether inactive directory mappings should be included in the result.",
             "title": "Include Inactive"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 500,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WhatsApp directory mappings to return, between 1 and 500.",
+            "title": "Limit"
           },
           "offset": {
             "anyOf": [
@@ -19003,6 +19260,7 @@
               }
             ],
             "default": null,
+            "description": "Optional offset from a previous directory-mapping page.",
             "title": "Offset"
           },
           "query": {
@@ -19015,12 +19273,14 @@
               }
             ],
             "default": null,
+            "description": "Optional keyword filter applied to latest directory mappings.",
             "title": "Query"
           }
         },
         "title": "WhatsappListDirectoryMappingLatestInput",
         "type": "object"
       },
+      "max_limit": 500,
       "name": "whatsapp.list_directory_mapping_latest",
       "output_schema": {
         "$defs": {
@@ -19399,7 +19659,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "Search the user's locally ingested WhatsApp chat history for exact words and phrases.",
+      "description": "Search the user's locally ingested WhatsApp chat history for exact words and phrases. Use this for lexical keyword search across chats or within one known chat_jid. When restricting the search to one chat, copy that `chat_jid` exactly from a prior result.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -19413,9 +19673,26 @@
               }
             ],
             "default": null,
+            "description": "Optional chat JID to restrict the local search to one WhatsApp chat. Copy a prior result's `chat_jid` exactly; do not substitute display names, phone numbers, or email addresses.",
             "title": "Chat Jid"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WhatsApp lexical search matches to return, between 1 and 100.",
+            "title": "Limit"
+          },
           "text": {
+            "description": "Exact word or phrase query for locally ingested WhatsApp chat history.",
             "minLength": 1,
             "title": "Text",
             "type": "string"
@@ -19431,6 +19708,7 @@
               }
             ],
             "default": null,
+            "description": "Optional exclusive upper timestamp bound in milliseconds.",
             "title": "Time End Ms"
           },
           "time_start_ms": {
@@ -19444,6 +19722,7 @@
               }
             ],
             "default": null,
+            "description": "Optional inclusive lower timestamp bound in milliseconds.",
             "title": "Time Start Ms"
           }
         },
@@ -19453,6 +19732,7 @@
         "title": "WhatsappSearchLocalChatShardsInput",
         "type": "object"
       },
+      "max_limit": 100,
       "name": "whatsapp.search_local_chat_shards",
       "output_schema": {
         "$defs": {
@@ -19819,17 +20099,6 @@
         ],
         "title": "ReadResult[WhatsappSearchChatShardsData]",
         "type": "object"
-      },
-      "query_capabilities": {
-        "order_guarantee": "score_asc",
-        "preferred_for": [
-          "search",
-          "historical_search",
-          "lexical_search",
-          "chat_scoped_search"
-        ],
-        "selection_group": "whatsapp_local_search",
-        "source_kind": "local_ingested"
       },
       "result_contract": "read_result"
     }

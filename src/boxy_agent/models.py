@@ -29,7 +29,7 @@ class DataQueryDescriptor:
         }
     )
     result_contract: ResultContract = "raw"
-    query_capabilities: dict[str, JsonValue] = field(default_factory=dict)
+    max_limit: int | None = None
 
     def __post_init__(self) -> None:
         _require_non_empty("name", self.name)
@@ -41,9 +41,8 @@ class DataQueryDescriptor:
             _require_non_empty("output schema key", key)
             ensure_json_value(value, label=f"output schema value for {self.name}:{key}")
         _require_result_contract(self.result_contract, label=f"result contract for {self.name}")
-        for key, value in self.query_capabilities.items():
-            _require_non_empty("query capability key", key)
-            ensure_json_value(value, label=f"query capability value for {self.name}:{key}")
+        if self.max_limit is not None and self.max_limit < 1:
+            raise ValueError("max_limit must be >= 1 when provided")
 
 
 @dataclass(frozen=True)
@@ -61,7 +60,6 @@ class ToolDescriptor:
     output_schema: dict[str, JsonValue] = field(default_factory=dict)
     result_contract: ResultContract = "raw"
     side_effect: bool = False
-    tool_capabilities: dict[str, JsonValue] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         _require_non_empty("name", self.name)
@@ -75,9 +73,6 @@ class ToolDescriptor:
             _require_non_empty("output schema key", key)
             ensure_json_value(value, label=f"output schema value for {self.name}:{key}")
         _require_result_contract(self.result_contract, label=f"result contract for {self.name}")
-        for key, value in self.tool_capabilities.items():
-            _require_non_empty("tool capability key", key)
-            ensure_json_value(value, label=f"tool capability value for {self.name}:{key}")
 
 
 @dataclass(frozen=True)
