@@ -20101,6 +20101,488 @@
         "type": "object"
       },
       "result_contract": "read_result"
+    },
+    {
+      "description": "Search the user's locally ingested WhatsApp chat history by semantic meaning. Use this when exact keywords are not enough, and restrict to one known `chat_jid` when you already have that exact value.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "chat_jid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional chat JID to restrict the semantic search to one WhatsApp chat. Copy a prior result's `chat_jid` exactly; do not substitute display names, phone numbers, or email addresses.",
+            "title": "Chat Jid"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Maximum number of WhatsApp semantic search matches to return, between 1 and 20.",
+            "title": "Limit"
+          },
+          "text": {
+            "description": "Semantic search query for locally ingested WhatsApp chat history.",
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "time_end_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional exclusive upper timestamp bound in milliseconds.",
+            "title": "Time End Ms"
+          },
+          "time_start_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional inclusive lower timestamp bound in milliseconds.",
+            "title": "Time Start Ms"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "WhatsappSearchLocalChatShardsSemanticInput",
+        "type": "object"
+      },
+      "max_limit": 20,
+      "name": "whatsapp.search_local_chat_shards_semantic",
+      "output_schema": {
+        "$defs": {
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          },
+          "WhatsappChatKind": {
+            "enum": [
+              "direct",
+              "group",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "WhatsappSemanticEvidenceChunkRead": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_record_id": {
+                "title": "Chunk Record Id",
+                "type": "string"
+              },
+              "chunk_text": {
+                "title": "Chunk Text",
+                "type": "string"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              }
+            },
+            "required": [
+              "chunk_record_id",
+              "score",
+              "chunk_text"
+            ],
+            "title": "WhatsappSemanticEvidenceChunkRead",
+            "type": "object"
+          },
+          "WhatsappSemanticSearchChatShardRead": {
+            "additionalProperties": false,
+            "properties": {
+              "chat_jid": {
+                "title": "Chat Jid",
+                "type": "string"
+              },
+              "chat_kind": {
+                "$ref": "#/$defs/WhatsappChatKind"
+              },
+              "doc_id": {
+                "title": "Doc Id",
+                "type": "string"
+              },
+              "evidence_chunks": {
+                "items": {
+                  "$ref": "#/$defs/WhatsappSemanticEvidenceChunkRead"
+                },
+                "title": "Evidence Chunks",
+                "type": "array"
+              },
+              "is_open": {
+                "title": "Is Open",
+                "type": "boolean"
+              },
+              "message_count": {
+                "title": "Message Count",
+                "type": "integer"
+              },
+              "message_id_end": {
+                "title": "Message Id End",
+                "type": "string"
+              },
+              "message_id_start": {
+                "title": "Message Id Start",
+                "type": "string"
+              },
+              "repair_state": {
+                "title": "Repair State",
+                "type": "string"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "shard_index": {
+                "title": "Shard Index",
+                "type": "integer"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "time_end_ms": {
+                "title": "Time End Ms",
+                "type": "integer"
+              },
+              "time_start_ms": {
+                "title": "Time Start Ms",
+                "type": "integer"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Title"
+              }
+            },
+            "required": [
+              "chat_jid",
+              "chat_kind",
+              "doc_id",
+              "shard_index",
+              "message_id_start",
+              "message_id_end",
+              "time_start_ms",
+              "time_end_ms",
+              "message_count",
+              "is_open",
+              "repair_state",
+              "score"
+            ],
+            "title": "WhatsappSemanticSearchChatShardRead",
+            "type": "object"
+          },
+          "WhatsappSemanticSearchChatShardsData": {
+            "additionalProperties": false,
+            "properties": {
+              "embedding_ready": {
+                "title": "Embedding Ready",
+                "type": "boolean"
+              },
+              "indexed_window_count": {
+                "title": "Indexed Window Count",
+                "type": "integer"
+              },
+              "matches": {
+                "items": {
+                  "$ref": "#/$defs/WhatsappSemanticSearchChatShardRead"
+                },
+                "title": "Matches",
+                "type": "array"
+              }
+            },
+            "required": [
+              "embedding_ready",
+              "indexed_window_count"
+            ],
+            "title": "WhatsappSemanticSearchChatShardsData",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/WhatsappSemanticSearchChatShardsData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[WhatsappSemanticSearchChatShardsData]",
+        "type": "object"
+      },
+      "result_contract": "read_result"
     }
   ],
   "schema_version": 1
