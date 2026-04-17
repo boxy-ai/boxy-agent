@@ -6,8 +6,14 @@ import tomllib
 from pathlib import Path
 from typing import cast
 
+from boxy_agent._version import __version__ as BOXY_AGENT_VERSION
 from boxy_agent.agent_contract import validate_agent_type_contract
 from boxy_agent.capabilities import CapabilityCatalog
+from boxy_agent.compatibility import (
+    CompatibilityError,
+    extract_boxy_agent_requirement,
+    require_boxy_agent_requirement_satisfied,
+)
 from boxy_agent.models import AgentCapabilities, AgentMetadata, parse_agent_type
 
 METADATA_FILE_NAME = "pyproject.toml"
@@ -34,6 +40,21 @@ def load_agent_metadata(
     data = tomllib.loads(metadata_path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise MetadataValidationError("Metadata file must contain a TOML table")
+
+    project_table = _require_table(data, "project")
+    dependencies = _optional_string_list(project_table, "dependencies")
+    try:
+        boxy_agent_requirement = extract_boxy_agent_requirement(
+            dependencies=dependencies,
+            source=f"{metadata_path} [project].dependencies",
+        )
+        require_boxy_agent_requirement_satisfied(
+            specifier=boxy_agent_requirement,
+            sdk_version=BOXY_AGENT_VERSION,
+            source=f"{metadata_path} [project].dependencies",
+        )
+    except CompatibilityError as exc:
+        raise MetadataValidationError(str(exc)) from exc
 
     tool_table = _require_table(data, "tool")
     boxy_table = _require_table(tool_table, "boxy_agent")
@@ -90,6 +111,7 @@ def load_agent_metadata(
         name=name,
         description=description,
         version=version,
+        boxy_agent_requirement=boxy_agent_requirement,
         agent_type=agent_type,
         module=module,
         expected_event_types=expected_event_types,

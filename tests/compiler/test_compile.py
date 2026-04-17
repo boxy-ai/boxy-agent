@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+from packaging.specifiers import SpecifierSet
 from support import write_agent_project
 from test_helpers.capabilities import (
     DEFAULT_BOXY_TOOL_NAME,
@@ -11,10 +12,13 @@ from test_helpers.capabilities import (
     default_capability_catalog,
 )
 
+from boxy_agent._version import __version__ as BOXY_AGENT_VERSION
 from boxy_agent.capabilities import load_capability_catalog
+from boxy_agent.compatibility import BOXY_AGENT_DISTRIBUTION_NAME
 from boxy_agent.compiler import compile_agent
 from boxy_agent.compiler.compile import CompilationError
 from boxy_agent.compiler.metadata import MetadataValidationError
+from boxy_agent.compiler.models import MANIFEST_SCHEMA_VERSION
 
 READ_ONLY_BOXY_TOOL_NAME = "google_gmail.gmail_search_threads"
 
@@ -73,8 +77,13 @@ def test_compile_agent_writes_manifest(tmp_path: Path) -> None:
     assert compiled.manifest.entrypoint.function == "handle"
 
     payload = json.loads(compiled.manifest_path.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MANIFEST_SCHEMA_VERSION
     assert payload["name"] == "test-agent"
     assert payload["type"] == "automation"
+    assert SpecifierSet(payload["requires"][BOXY_AGENT_DISTRIBUTION_NAME]) == SpecifierSet(
+        f">={BOXY_AGENT_VERSION},<0.3.0"
+    )
+    assert payload["built_with"][BOXY_AGENT_DISTRIBUTION_NAME] == BOXY_AGENT_VERSION
     assert payload["capabilities"]["data_queries"] == [DEFAULT_DATA_QUERY_NAME]
     assert payload["capabilities"]["event_emitters"] == []
 
@@ -111,6 +120,55 @@ enabled = true
     )
 
     with pytest.raises(MetadataValidationError, match="boxy_agent"):
+        compile_agent(
+            project_dir=project_dir,
+            output_dir=tmp_path / "output",
+            capability_catalog=default_capability_catalog(),
+        )
+
+
+def test_compile_rejects_missing_boxy_agent_dependency(tmp_path: Path) -> None:
+    metadata = BASE_METADATA
+    project_dir = _make_project(tmp_path, metadata=metadata)
+    pyproject_path = project_dir / "pyproject.toml"
+    pyproject_path.write_text(
+        pyproject_path.read_text(encoding="utf-8").replace(
+            f'dependencies = ["boxy-agent>={BOXY_AGENT_VERSION},<0.3.0"]\n',
+            "",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MetadataValidationError, match="boxy-agent dependency"):
+        compile_agent(
+            project_dir=project_dir,
+            output_dir=tmp_path / "output",
+            capability_catalog=default_capability_catalog(),
+        )
+
+
+@pytest.mark.parametrize(
+    "dependency",
+    [
+        "boxy-agent>=0.3,<0.4",
+        "boxy-agent>=0.2.0,<0.3.0",
+    ],
+)
+def test_compile_rejects_boxy_agent_dependency_excluding_compiler_sdk(
+    tmp_path: Path,
+    dependency: str,
+) -> None:
+    project_dir = _make_project(tmp_path)
+    pyproject_path = project_dir / "pyproject.toml"
+    pyproject_path.write_text(
+        pyproject_path.read_text(encoding="utf-8").replace(
+            f"boxy-agent>={BOXY_AGENT_VERSION},<0.3.0",
+            dependency,
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MetadataValidationError, match="compiler SDK .*does not satisfy"):
         compile_agent(
             project_dir=project_dir,
             output_dir=tmp_path / "output",

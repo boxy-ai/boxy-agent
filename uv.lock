@@ -25,6 +25,7 @@ name = "boxy-agent"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
+    { name = "packaging" },
     { name = "pydantic" },
     { name = "pydantic-monty" },
 ]
@@ -52,6 +53,7 @@ dev = [
 requires-dist = [
     { name = "build", marker = "extra == 'packaging'", specifier = "==1.2.2.post1" },
     { name = "jsonschema", specifier = "==4.23.0" },
+    { name = "packaging", specifier = ">=26.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pydantic-monty", specifier = ">=0.0.7" },
     { name = "setuptools", marker = "extra == 'packaging'", specifier = "==69.5.1" },

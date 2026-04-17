@@ -6,10 +6,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
+from boxy_agent._version import __version__ as BOXY_AGENT_VERSION
 from boxy_agent.models import AgentCapabilities, AgentMetadata, AgentType
 from boxy_agent.types import JsonValue
 
-MANIFEST_SCHEMA_VERSION = 1
+MANIFEST_SCHEMA_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,8 @@ class CompiledManifest:
     description: str
     version: str
     agent_type: AgentType
+    requires: dict[str, str]
+    built_with: dict[str, str]
     entrypoint: CompiledEntrypoint
     expected_event_types: tuple[str, ...]
     capabilities: AgentCapabilities
@@ -47,6 +50,8 @@ class CompiledManifest:
             description=metadata.description,
             version=metadata.version,
             agent_type=metadata.agent_type,
+            requires={"boxy-agent": metadata.boxy_agent_requirement},
+            built_with={"boxy-agent": BOXY_AGENT_VERSION},
             entrypoint=CompiledEntrypoint(module=metadata.module, function=entrypoint_function),
             expected_event_types=metadata.expected_event_types,
             capabilities=metadata.capabilities,
@@ -62,6 +67,8 @@ class CompiledManifest:
                 "description": self.description,
                 "version": self.version,
                 "type": self.agent_type,
+                "requires": dict(sorted(self.requires.items())),
+                "built_with": dict(sorted(self.built_with.items())),
                 "entrypoint": {
                     "module": self.entrypoint.module,
                     "function": self.entrypoint.function,

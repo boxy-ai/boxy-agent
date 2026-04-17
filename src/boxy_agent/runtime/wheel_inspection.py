@@ -9,6 +9,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
+from boxy_agent.compatibility import (
+    CompatibilityError,
+    current_boxy_agent_version,
+    require_agent_sdk_compatible,
+)
+from boxy_agent.compiler.models import MANIFEST_SCHEMA_VERSION
 from boxy_agent.models import AgentCapabilities, parse_agent_type
 from boxy_agent.runtime.errors import RegistrationError
 from boxy_agent.runtime.models import InstalledAgent
@@ -42,6 +48,15 @@ def inspect_wheel_artifact(
         manifest_module_name=manifest_module_name,
     )
     expected_name = agent_name or _require_string(manifest, "name", agent_name=manifest_label)
+    _require_manifest_schema_version(manifest, agent_name=expected_name)
+    try:
+        require_agent_sdk_compatible(
+            agent_manifest=manifest,
+            sdk_version=current_boxy_agent_version(),
+            agent_name=expected_name,
+        )
+    except CompatibilityError as exc:
+        raise RegistrationError(str(exc)) from exc
     installed = _installed_agent_from_manifest(name=expected_name, payload=manifest)
     return InspectedWheelArtifact(
         wheel_path=resolved_wheel_path,
@@ -310,6 +325,22 @@ def _require_string(data: dict[str, object], key: str, *, agent_name: str) -> st
             f"Manifest key '{key}' must be a non-empty string for agent '{agent_name}'"
         )
     return value.strip()
+
+
+def _require_int(data: dict[str, object], key: str, *, agent_name: str) -> int:
+    value = data.get(key)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise RegistrationError(f"Manifest key '{key}' must be an integer for agent '{agent_name}'")
+    return value
+
+
+def _require_manifest_schema_version(manifest: dict[str, object], *, agent_name: str) -> None:
+    schema_version = _require_int(manifest, "schema_version", agent_name=agent_name)
+    if schema_version != MANIFEST_SCHEMA_VERSION:
+        raise RegistrationError(
+            f"Unsupported manifest schema_version for agent '{agent_name}': "
+            f"{schema_version} (expected {MANIFEST_SCHEMA_VERSION})"
+        )
 
 
 def _optional_string_list(data: dict[str, object], key: str, *, agent_name: str) -> list[str]:

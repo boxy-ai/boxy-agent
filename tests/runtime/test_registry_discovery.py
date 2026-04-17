@@ -6,7 +6,9 @@ from pathlib import Path
 import pytest
 from test_helpers.capabilities import empty_capability_catalog
 
+from boxy_agent._version import __version__ as BOXY_AGENT_VERSION
 from boxy_agent.compiler import package_agent
+from boxy_agent.compiler.models import MANIFEST_SCHEMA_VERSION
 from boxy_agent.runtime import AgentRuntime
 from boxy_agent.runtime.discovery import discover_registered_agents, validate_wheel_entrypoint
 from boxy_agent.runtime.errors import RegistrationError
@@ -153,13 +155,97 @@ def _wheel_with_noncallable_entrypoint(tmp_path: Path) -> Path:
                     "from __future__ import annotations",
                     "",
                     "COMPILED_AGENT_MANIFEST = {",
-                    '    "schema_version": 1,',
+                    f'    "schema_version": {MANIFEST_SCHEMA_VERSION},',
                     '    "name": "main",',
                     '    "description": "main agent",',
                     '    "version": "0.1.0",',
                     '    "type": "automation",',
+                    '    "requires": {',
+                    f'        "boxy-agent": ">={BOXY_AGENT_VERSION},<0.3.0",',
+                    "    },",
+                    '    "built_with": {',
+                    f'        "boxy-agent": "{BOXY_AGENT_VERSION}",',
+                    "    },",
                     '    "entrypoint": {',
                     '        "module": "invalid_entrypoint.agent",',
+                    '        "function": "handle",',
+                    "    },",
+                    '    "expected_event_types": ["start"],',
+                    '    "capabilities": {',
+                    '        "data_queries": [],',
+                    '        "boxy_tools": [],',
+                    '        "builtin_tools": [],',
+                    '        "event_emitters": [],',
+                    "    },",
+                    "}",
+                    "",
+                ]
+            ),
+        )
+    return wheel_path
+
+
+def _wheel_requiring_incompatible_sdk(tmp_path: Path) -> Path:
+    wheel_path = tmp_path / "incompatible-sdk-0.1.0-py3-none-any.whl"
+    with zipfile.ZipFile(wheel_path, mode="w") as wheel:
+        wheel.writestr("incompatible_sdk/__init__.py", "")
+        wheel.writestr("incompatible_sdk/agent.py", "def handle(_context):\n    return None\n")
+        wheel.writestr(
+            "incompatible_sdk/boxy_agent_compiled_manifest.py",
+            "\n".join(
+                [
+                    "from __future__ import annotations",
+                    "",
+                    "COMPILED_AGENT_MANIFEST = {",
+                    f'    "schema_version": {MANIFEST_SCHEMA_VERSION},',
+                    '    "name": "incompatible-sdk",',
+                    '    "description": "incompatible agent",',
+                    '    "version": "0.1.0",',
+                    '    "type": "automation",',
+                    '    "requires": {',
+                    '        "boxy-agent": ">=0.3.0,<0.4.0",',
+                    "    },",
+                    '    "built_with": {',
+                    f'        "boxy-agent": "{BOXY_AGENT_VERSION}",',
+                    "    },",
+                    '    "entrypoint": {',
+                    '        "module": "incompatible_sdk.agent",',
+                    '        "function": "handle",',
+                    "    },",
+                    '    "expected_event_types": ["start"],',
+                    '    "capabilities": {',
+                    '        "data_queries": [],',
+                    '        "boxy_tools": [],',
+                    '        "builtin_tools": [],',
+                    '        "event_emitters": [],',
+                    "    },",
+                    "}",
+                    "",
+                ]
+            ),
+        )
+    return wheel_path
+
+
+def _wheel_with_schema_one_manifest(tmp_path: Path) -> Path:
+    wheel_path = tmp_path / "schema-one-0.1.0-py3-none-any.whl"
+    with zipfile.ZipFile(wheel_path, mode="w") as wheel:
+        wheel.writestr("schema_one/__init__.py", "")
+        wheel.writestr("schema_one/agent.py", "def handle(_context):\n    return None\n")
+        wheel.writestr(
+            "schema_one/boxy_agent_compiled_manifest.py",
+            "\n".join(
+                [
+                    "from __future__ import annotations",
+                    "",
+                    "COMPILED_AGENT_MANIFEST = {",
+                    '    "schema_version": 1,',
+                    '    "name": "schema-one",',
+                    '    "description": "old schema agent",',
+                    '    "version": "0.1.0",',
+                    '    "type": "automation",',
+                    '    "entrypoint": {',
+                    '        "module": "schema_one.agent",',
                     '        "function": "handle",',
                     "    },",
                     '    "expected_event_types": ["start"],',
@@ -278,6 +364,22 @@ def test_inspect_wheel_artifact_rejects_invalid_manifest_payload(tmp_path: Path)
         inspect_wheel_artifact(
             wheel_path=_wheel_with_invalid_manifest_payload(tmp_path),
             agent_name="main",
+        )
+
+
+def test_inspect_wheel_artifact_rejects_schema_one_manifest(tmp_path: Path) -> None:
+    with pytest.raises(RegistrationError, match="Unsupported manifest schema_version"):
+        inspect_wheel_artifact(
+            wheel_path=_wheel_with_schema_one_manifest(tmp_path),
+            agent_name="schema-one",
+        )
+
+
+def test_inspect_wheel_artifact_rejects_incompatible_sdk_requirement(tmp_path: Path) -> None:
+    with pytest.raises(RegistrationError, match="does not satisfy"):
+        inspect_wheel_artifact(
+            wheel_path=_wheel_requiring_incompatible_sdk(tmp_path),
+            agent_name="incompatible-sdk",
         )
 
 

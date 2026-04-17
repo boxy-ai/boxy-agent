@@ -108,6 +108,7 @@ class AgentMetadata:
     name: str
     description: str
     version: str
+    boxy_agent_requirement: str
     agent_type: AgentType
     module: str
     expected_event_types: tuple[str, ...]
@@ -117,6 +118,7 @@ class AgentMetadata:
         _require_non_empty("name", self.name)
         _require_non_empty("description", self.description)
         _require_non_empty("version", self.version)
+        _require_non_empty("boxy_agent_requirement", self.boxy_agent_requirement)
         _require_non_empty("module", self.module)
         if self.agent_type not in {"automation", "data_mining"}:
             raise ValueError(f"Unsupported agent_type: {self.agent_type}")

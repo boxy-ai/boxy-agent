@@ -21,7 +21,7 @@ from boxy_agent.sdk.interfaces import AgentExecutionContext
 from boxy_agent.types import JsonValue
 
 from . import sdk as sdk
-from ._version import __version__
+from ._version import __requires_boxy__, __version__
 
 __all__ = [
     "AgentCapabilities",
@@ -50,6 +50,7 @@ __all__ = [
     "sdk",
     "terminate",
     "trace",
+    "__requires_boxy__",
     "__version__",
 ]
 
