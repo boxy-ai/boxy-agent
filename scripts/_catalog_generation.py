@@ -90,7 +90,6 @@ def _ensure_monorepo_import_paths() -> None:
     for path in (
         repo / "boxy-agent" / "src",
         repo / "boxy-desktop" / "src",
-        repo / "boxy-vm-contracts" / "src",
     ):
         rendered = str(path)
         if rendered not in sys.path:
