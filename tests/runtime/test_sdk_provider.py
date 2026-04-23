@@ -61,6 +61,12 @@ class _RecordingLlmClient:
         self.requests.append(request)
         return {"choices": [{"message": {"role": "assistant", "content": "ok"}}]}
 
+    def chat_complete_stream(
+        self, request: dict[str, JsonValue], on_partial
+    ) -> dict[str, JsonValue]:
+        _ = on_partial
+        return self.chat_complete(request)
+
 
 class _SessionAwareLlmProvider(MockAgentSdkProvider):
     def __init__(self, *, llm_client: LlmClient) -> None:

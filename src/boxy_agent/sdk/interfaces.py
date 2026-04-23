@@ -55,6 +55,14 @@ class LlmClient(Protocol):
         """Return a chat completion payload."""
         ...
 
+    def chat_complete_stream(
+        self,
+        request: dict[str, JsonValue],
+        on_partial: Callable[[dict[str, JsonValue]], None],
+    ) -> dict[str, JsonValue]:
+        """Return a final chat completion payload while streaming partial updates."""
+        ...
+
 
 class MemoryStore(Protocol):
     """Interface for session and persistent memory storage."""
@@ -81,6 +89,14 @@ class RuntimeBindings(Protocol):
 
     def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
         """Complete an LLM chat request with optional tool-calling payload."""
+        ...
+
+    def llm_chat_complete_stream(
+        self,
+        request: dict[str, JsonValue],
+        on_partial: Callable[[dict[str, JsonValue]], None],
+    ) -> dict[str, JsonValue]:
+        """Complete an LLM chat request while streaming partial updates."""
         ...
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:

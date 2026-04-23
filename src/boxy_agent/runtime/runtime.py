@@ -183,6 +183,13 @@ class _ContextRuntimeBindings:
     def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
         return self.llm_client.chat_complete(request)
 
+    def llm_chat_complete_stream(
+        self,
+        request: dict[str, JsonValue],
+        on_partial: Callable[[dict[str, JsonValue]], None],
+    ) -> dict[str, JsonValue]:
+        return self.llm_client.chat_complete_stream(request, on_partial)
+
     def list_data_queries(self) -> list[DataQueryDescriptor]:
         return _filter_discoverable_descriptors(
             allowed=self.capabilities.data_queries,

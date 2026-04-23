@@ -83,6 +83,14 @@ class MockLlmClient(LlmClient):
     def chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
         return {"mock": request, "text": self._static_response}
 
+    def chat_complete_stream(
+        self,
+        request: dict[str, JsonValue],
+        on_partial,
+    ) -> dict[str, JsonValue]:
+        _ = on_partial
+        return self.chat_complete(request)
+
 
 def default_data_query_client(
     *,

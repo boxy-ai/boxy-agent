@@ -30,6 +30,12 @@ class _NoopBindings:
     def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
         raise AssertionError("registry discovery handler should not call llm runtime bindings")
 
+    def llm_chat_complete_stream(
+        self, request: dict[str, JsonValue], on_partial
+    ) -> dict[str, JsonValue]:
+        _ = on_partial
+        raise AssertionError("registry discovery handler should not call llm runtime bindings")
+
     def list_data_queries(self) -> list[models.DataQueryDescriptor]:
         return []
 

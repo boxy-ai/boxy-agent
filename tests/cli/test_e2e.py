@@ -121,12 +121,16 @@ def _build_sdk_wheel(output_dir: Path) -> Path:
         stage_dir,
         ignore=shutil.ignore_patterns(
             "build",
+            "dist",
             ".eggs",
             "*.egg-info",
             "__pycache__",
             ".pytest_cache",
             ".mypy_cache",
             ".ruff_cache",
+            ".venv",
+            "venv",
+            ".uv-cache",
         ),
     )
     _run(
@@ -135,6 +139,7 @@ def _build_sdk_wheel(output_dir: Path) -> Path:
             "-m",
             "build",
             "--wheel",
+            "--no-isolation",
             "--outdir",
             str(output_dir),
             str(stage_dir),
@@ -146,7 +151,11 @@ def _build_sdk_wheel(output_dir: Path) -> Path:
 
 
 def _run(command: list[str]) -> None:
-    subprocess.run(command, check=True, text=True, capture_output=True)
+    result = subprocess.run(command, check=False, text=True, capture_output=True)
+    if result.returncode != 0:
+        raise AssertionError(
+            f"Command failed: {command}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
 
 
 def _run_json(command: list[str]) -> list[str]:

@@ -36,6 +36,12 @@ class _FakeBindings:
     def llm_chat_complete(self, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
         return {"echo": request}
 
+    def llm_chat_complete_stream(
+        self, request: dict[str, JsonValue], on_partial
+    ) -> dict[str, JsonValue]:
+        _ = on_partial
+        return self.llm_chat_complete(request)
+
     def list_data_queries(self):
         return [data_query_registry()[DEFAULT_DATA_QUERY_NAME]]
 

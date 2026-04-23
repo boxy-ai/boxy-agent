@@ -26,6 +26,14 @@ class UnconfiguredLlmClient(LlmClient):
         # TODO(boxy-agent): add an optional BYOK OpenRouter-backed LLM client for local SDK tests.
         raise UnconfiguredClientError("No LLM client configured")
 
+    def chat_complete_stream(
+        self,
+        request: dict[str, JsonValue],
+        on_partial,
+    ) -> dict[str, JsonValue]:
+        _ = request, on_partial
+        raise UnconfiguredClientError("No LLM client configured")
+
 
 class StaticDataQueryClient(DataQueryClient):
     """Static data query client with explicit canned responses."""
