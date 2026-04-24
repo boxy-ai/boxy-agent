@@ -919,6 +919,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "create_time": {
                 "anyOf": [
                   {
@@ -935,6 +946,13 @@
                 "title": "Message Name",
                 "type": "string"
               },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
               "sender_display_name": {
                 "anyOf": [
                   {
@@ -946,6 +964,17 @@
                 ],
                 "default": null,
                 "title": "Sender Display Name"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "sender_name": {
                 "anyOf": [
@@ -1069,6 +1098,42 @@
               }
             },
             "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
             "type": "object"
           },
           "JsonValue": {
@@ -1707,6 +1772,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "create_time": {
                 "anyOf": [
                   {
@@ -1723,6 +1799,13 @@
                 "title": "Message Name",
                 "type": "string"
               },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
               "sender_display_name": {
                 "anyOf": [
                   {
@@ -1734,6 +1817,17 @@
                 ],
                 "default": null,
                 "title": "Sender Display Name"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "sender_name": {
                 "anyOf": [
@@ -1800,6 +1894,42 @@
               "message_name"
             ],
             "title": "ChatMessageRead",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
             "type": "object"
           },
           "ResolutionInfo": {
@@ -3284,6 +3414,17 @@
                 "title": "Cc",
                 "type": "array"
               },
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "from_address": {
                 "anyOf": [
                   {
@@ -3330,6 +3471,24 @@
               "message_id": {
                 "title": "Message Id",
                 "type": "string"
+              },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "snippet": {
                 "anyOf": [
@@ -3379,6 +3538,42 @@
               "message_id"
             ],
             "title": "GmailMessageRead",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
             "type": "object"
           },
           "JsonValue": {
@@ -6400,6 +6595,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "create_time": {
                 "anyOf": [
                   {
@@ -6416,6 +6622,13 @@
                 "title": "Message Name",
                 "type": "string"
               },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
               "sender_display_name": {
                 "anyOf": [
                   {
@@ -6427,6 +6640,17 @@
                 ],
                 "default": null,
                 "title": "Sender Display Name"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "sender_name": {
                 "anyOf": [
@@ -6550,6 +6774,42 @@
               }
             },
             "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
             "type": "object"
           },
           "JsonValue": {
@@ -6947,6 +7207,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "create_time": {
                 "anyOf": [
                   {
@@ -6963,6 +7234,13 @@
                 "title": "Message Name",
                 "type": "string"
               },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
               "sender_display_name": {
                 "anyOf": [
                   {
@@ -6974,6 +7252,17 @@
                 ],
                 "default": null,
                 "title": "Sender Display Name"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "sender_name": {
                 "anyOf": [
@@ -7083,6 +7372,42 @@
               }
             },
             "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
             "type": "object"
           },
           "JsonValue": {
@@ -7380,6 +7705,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "create_time": {
                 "anyOf": [
                   {
@@ -7396,6 +7732,13 @@
                 "title": "Message Name",
                 "type": "string"
               },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
               "sender_display_name": {
                 "anyOf": [
                   {
@@ -7407,6 +7750,17 @@
                 ],
                 "default": null,
                 "title": "Sender Display Name"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "sender_name": {
                 "anyOf": [
@@ -7635,6 +7989,42 @@
               }
             },
             "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
             "type": "object"
           },
           "JsonValue": {
@@ -11718,6 +12108,17 @@
                 "title": "Cc",
                 "type": "array"
               },
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "from_address": {
                 "anyOf": [
                   {
@@ -11764,6 +12165,24 @@
               "message_id": {
                 "title": "Message Id",
                 "type": "string"
+              },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "snippet": {
                 "anyOf": [
@@ -11813,6 +12232,42 @@
               "message_id"
             ],
             "title": "GmailMessageRead",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
             "type": "object"
           },
           "JsonValue": {
@@ -12144,6 +12599,17 @@
                 "title": "Cc",
                 "type": "array"
               },
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "from_address": {
                 "anyOf": [
                   {
@@ -12190,6 +12656,24 @@
               "message_id": {
                 "title": "Message Id",
                 "type": "string"
+              },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "snippet": {
                 "anyOf": [
@@ -12260,6 +12744,42 @@
               "thread_id"
             ],
             "title": "GmailThreadRead",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
             "type": "object"
           },
           "JsonValue": {
@@ -15582,6 +16102,42 @@
             "title": "FreshnessInfo",
             "type": "object"
           },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
+            "type": "object"
+          },
           "JsonValue": {
             "anyOf": [
               {
@@ -15790,6 +16346,17 @@
                 "title": "Chat Jid",
                 "type": "string"
               },
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "first_observed_at_ms": {
                 "title": "First Observed At Ms",
                 "type": "integer"
@@ -15818,6 +16385,13 @@
                 "title": "Message Type",
                 "type": "string"
               },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
               "sender_display_name_hint": {
                 "anyOf": [
                   {
@@ -15829,6 +16403,17 @@
                 ],
                 "default": null,
                 "title": "Sender Display Name Hint"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "sender_jid": {
                 "title": "Sender Jid",
