@@ -8,6 +8,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Protocol, cast
 
+from boxy_agent.execution_affinity import ExecutionAffinity
 from boxy_agent.models import ToolDescriptor
 from boxy_agent.runtime.providers.clients import BuiltinToolError, UnconfiguredClientError
 from boxy_agent.sdk.interfaces import ToolClient
@@ -20,6 +21,9 @@ _PYTHON_MAX_TIMEOUT_SECONDS = 30.0
 _PYTHON_MAX_STD_STREAM_CHARS = 64 * 1024
 _PYTHON_MAX_RESULT_BYTES = 256 * 1024
 _PYTHON_RESULT_PREVIEW_CHARS = 4096
+_BUILTIN_TOOL_EXECUTION_AFFINITIES: dict[str, ExecutionAffinity] = {
+    "web_search": "worker_thread_safe",
+}
 
 
 @dataclass(frozen=True)
@@ -92,6 +96,13 @@ class BuiltinToolClient(ToolClient):
 
     def list_tools(self) -> list[ToolDescriptor]:
         return [self._descriptors[name] for name in self._handlers]
+
+    def tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return {
+            name: affinity
+            for name, affinity in _BUILTIN_TOOL_EXECUTION_AFFINITIES.items()
+            if name in self._handlers
+        }
 
     def call_tool(
         self,

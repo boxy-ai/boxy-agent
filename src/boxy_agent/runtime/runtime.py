@@ -12,6 +12,7 @@ from jsonschema.exceptions import FormatError, ValidationError
 
 from boxy_agent.agent_contract import validate_agent_type_contract
 from boxy_agent.capabilities import CapabilityCatalog
+from boxy_agent.execution_affinity import ExecutionAffinity
 from boxy_agent.models import (
     AgentCapabilities,
     AgentEvent,
@@ -197,6 +198,12 @@ class _ContextRuntimeBindings:
             discoverable_names=_discoverable_names(self.data_client.list_data_queries()),
         )
 
+    def data_query_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return _filter_allowed_execution_affinities(
+            allowed=self.capabilities.data_queries,
+            execution_affinities=self.data_client.data_query_execution_affinities(),
+        )
+
     def query_data(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         self._ensure_capability(
             name=name, allowed=self.capabilities.data_queries, kind="data query"
@@ -216,6 +223,12 @@ class _ContextRuntimeBindings:
             allowed=self.capabilities.boxy_tools,
             catalog=self.capability_catalog.boxy_tools,
             discoverable_names=_discoverable_names(self.boxy_tool_client.list_tools()),
+        )
+
+    def boxy_tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return _filter_allowed_execution_affinities(
+            allowed=self.capabilities.boxy_tools,
+            execution_affinities=self.boxy_tool_client.tool_execution_affinities(),
         )
 
     def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
@@ -238,6 +251,12 @@ class _ContextRuntimeBindings:
             allowed=self.capabilities.builtin_tools,
             catalog=self.capability_catalog.builtin_tools,
             discoverable_names=_discoverable_names(self.builtin_tool_client.list_tools()),
+        )
+
+    def builtin_tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return _filter_allowed_execution_affinities(
+            allowed=self.capabilities.builtin_tools,
+            execution_affinities=self.builtin_tool_client.tool_execution_affinities(),
         )
 
     def call_builtin_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
@@ -638,6 +657,14 @@ def _filter_discoverable_descriptors[TDescriptor](
         for name in sorted(allowed)
         if name in discoverable_names and (descriptor := catalog.get(name)) is not None
     ]
+
+
+def _filter_allowed_execution_affinities(
+    *,
+    allowed: frozenset[str],
+    execution_affinities: Mapping[str, ExecutionAffinity],
+) -> dict[str, ExecutionAffinity]:
+    return {name: affinity for name, affinity in execution_affinities.items() if name in allowed}
 
 
 def _discoverable_names(

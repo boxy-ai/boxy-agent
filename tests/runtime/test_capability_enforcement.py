@@ -24,6 +24,7 @@ from boxy_agent import (
     query_data,
 )
 from boxy_agent.capabilities import CapabilityCatalog, load_capability_catalog_from_text
+from boxy_agent.execution_affinity import ExecutionAffinity
 from boxy_agent.runtime import AgentRuntime
 from boxy_agent.runtime.errors import (
     AgentExecutionError,
@@ -122,6 +123,9 @@ class _RecordingToolClient:
     def list_tools(self):
         return []
 
+    def tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return {}
+
     def call_tool(
         self,
         name: str,
@@ -140,6 +144,9 @@ class _RecordingDataQueryClient:
 
     def list_data_queries(self):
         return []
+
+    def data_query_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return {}
 
     def query_data(
         self,

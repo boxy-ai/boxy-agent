@@ -6,6 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Protocol
 
+from boxy_agent.execution_affinity import ExecutionAffinity
 from boxy_agent.models import AgentEvent, AgentResult, DataQueryDescriptor, ToolDescriptor
 from boxy_agent.types import JsonValue
 
@@ -15,6 +16,10 @@ class DataQueryClient(Protocol):
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:
         """List discoverable data queries."""
+        ...
+
+    def data_query_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        """Return runtime-owned execution affinity metadata by data query name."""
         ...
 
     def query_data(
@@ -34,6 +39,10 @@ class ToolClient(Protocol):
 
     def list_tools(self) -> list[ToolDescriptor]:
         """List discoverable tools."""
+        ...
+
+    def tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        """Return runtime-owned execution affinity metadata by tool name."""
         ...
 
     def call_tool(
@@ -103,6 +112,10 @@ class RuntimeBindings(Protocol):
         """List discoverable data queries."""
         ...
 
+    def data_query_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        """Return runtime-owned execution affinities for discoverable data queries."""
+        ...
+
     def query_data(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         """Execute a data query."""
         ...
@@ -111,12 +124,20 @@ class RuntimeBindings(Protocol):
         """List discoverable Boxy tools."""
         ...
 
+    def boxy_tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        """Return runtime-owned execution affinities for discoverable Boxy tools."""
+        ...
+
     def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         """Execute a Boxy tool."""
         ...
 
     def list_builtin_tools(self) -> list[ToolDescriptor]:
         """List discoverable built-in tools."""
+        ...
+
+    def builtin_tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        """Return runtime-owned execution affinities for discoverable built-in tools."""
         ...
 
     def call_builtin_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:

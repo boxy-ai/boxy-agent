@@ -45,6 +45,9 @@ class _FakeBindings:
     def list_data_queries(self):
         return [data_query_registry()[DEFAULT_DATA_QUERY_NAME]]
 
+    def data_query_execution_affinities(self):
+        return {}
+
     def query_data(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         if name != DEFAULT_DATA_QUERY_NAME:
             raise CapabilityViolationError(f"forbidden query: {name}")
@@ -53,6 +56,9 @@ class _FakeBindings:
     def list_boxy_tools(self):
         return [boxy_tool_registry()[DEFAULT_BOXY_TOOL_NAME]]
 
+    def boxy_tool_execution_affinities(self):
+        return {}
+
     def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         if name != DEFAULT_BOXY_TOOL_NAME:
             raise CapabilityViolationError(f"forbidden boxy tool: {name}")
@@ -60,6 +66,9 @@ class _FakeBindings:
 
     def list_builtin_tools(self):
         return [builtin_tool_registry()[DEFAULT_BUILTIN_TOOL_NAME]]
+
+    def builtin_tool_execution_affinities(self):
+        return {}
 
     def call_builtin_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         if name != DEFAULT_BUILTIN_TOOL_NAME:

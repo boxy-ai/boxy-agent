@@ -9,6 +9,7 @@ from test_helpers.capabilities import empty_capability_catalog
 from boxy_agent._version import __version__ as BOXY_AGENT_VERSION
 from boxy_agent.compiler import package_agent
 from boxy_agent.compiler.models import MANIFEST_SCHEMA_VERSION
+from boxy_agent.execution_affinity import ExecutionAffinity
 from boxy_agent.runtime import AgentRuntime
 from boxy_agent.runtime.discovery import discover_registered_agents, validate_wheel_entrypoint
 from boxy_agent.runtime.errors import RegistrationError
@@ -39,17 +40,26 @@ class _NoopBindings:
     def list_data_queries(self) -> list[models.DataQueryDescriptor]:
         return []
 
+    def data_query_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return {}
+
     def query_data(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         raise AssertionError(f"registry discovery handler should not query data: {name}")
 
     def list_boxy_tools(self) -> list[models.ToolDescriptor]:
         return []
 
+    def boxy_tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return {}
+
     def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         raise AssertionError(f"registry discovery handler should not call boxy tool: {name}")
 
     def list_builtin_tools(self) -> list[models.ToolDescriptor]:
         return []
+
+    def builtin_tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return {}
 
     def call_builtin_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
         raise AssertionError(f"registry discovery handler should not call built-in tool: {name}")
