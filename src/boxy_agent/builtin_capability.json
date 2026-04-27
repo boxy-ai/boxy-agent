@@ -2,32 +2,6 @@
   "boxy_tools": [],
   "builtin_tools": [
     {
-      "description": "Search the public web for internet information. Do not use for private connector or locally ingested user data when a connector or local read tool already fits the request.",
-      "input_schema": {
-        "properties": {
-          "query": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "query"
-        ],
-        "type": "object"
-      },
-      "name": "web_search",
-      "output_schema": {
-        "properties": {
-          "results": {
-            "items": {
-              "type": "object"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      }
-    },
-    {
       "description": "Execute simple local Python computations in a constrained environment. No network access and no general stdlib/runtime access; use it only for small local calculations and transformations. Do not use it to fetch network data, call Boxy tools, or replace connector or API reads.",
       "input_schema": {
         "properties": {
@@ -49,6 +23,32 @@
           },
           "stdout": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "description": "Search the public web for internet information. Do not use for private connector or locally ingested user data when a connector or local read tool already fits the request.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "web_search",
+      "output_schema": {
+        "properties": {
+          "results": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
           }
         },
         "type": "object"

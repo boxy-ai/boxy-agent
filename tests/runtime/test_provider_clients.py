@@ -38,9 +38,11 @@ def test_static_data_query_client_contract() -> None:
                 }
             ]
         },
+        execution_affinities={DEFAULT_DATA_QUERY_NAME: "main_thread"},
     )
 
     assert [item.name for item in client.list_data_queries()] == [DEFAULT_DATA_QUERY_NAME]
+    assert client.data_query_execution_affinities() == {DEFAULT_DATA_QUERY_NAME: "main_thread"}
     assert client.query_data(
         DEFAULT_DATA_QUERY_NAME,
         {"chat_jid": "chat-1"},
@@ -83,9 +85,11 @@ def test_static_tool_client_contract() -> None:
                 "details": {},
             }
         },
+        execution_affinities={DEFAULT_BOXY_TOOL_NAME: "main_thread"},
     )
 
     assert [item.name for item in client.list_tools()] == [DEFAULT_BOXY_TOOL_NAME]
+    assert client.tool_execution_affinities() == {DEFAULT_BOXY_TOOL_NAME: "main_thread"}
     assert client.call_tool(
         DEFAULT_BOXY_TOOL_NAME,
         {
@@ -133,6 +137,7 @@ def test_builtin_tool_client_web_search_contract() -> None:
     )
 
     assert [item.name for item in client.list_tools()] == ["web_search"]
+    assert client.tool_execution_affinities() == {"web_search": "worker_thread_safe"}
     with pytest.raises(
         UnconfiguredClientError,
         match="web_search is not implemented in boxy-agent runtime; integrate via boxy-cloud",

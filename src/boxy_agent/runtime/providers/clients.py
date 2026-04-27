@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
+from boxy_agent.execution_affinity import ExecutionAffinity
 from boxy_agent.models import DataQueryDescriptor, ToolDescriptor
 from boxy_agent.runtime.errors import AgentRuntimeError
 from boxy_agent.sdk.interfaces import DataQueryClient, LlmClient, MemoryStore, ToolClient
@@ -43,13 +44,18 @@ class StaticDataQueryClient(DataQueryClient):
         *,
         descriptors: Sequence[DataQueryDescriptor] | None = None,
         query_results: Mapping[str, JsonValue] | None = None,
+        execution_affinities: Mapping[str, ExecutionAffinity] | None = None,
     ) -> None:
         source_descriptors = descriptors or []
         self._descriptors = {descriptor.name: descriptor for descriptor in source_descriptors}
         self._query_results = dict(query_results or {})
+        self._execution_affinities: dict[str, ExecutionAffinity] = dict(execution_affinities or {})
 
     def list_data_queries(self) -> list[DataQueryDescriptor]:
         return list(self._descriptors.values())
+
+    def data_query_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return dict(self._execution_affinities)
 
     def query_data(
         self,
@@ -73,13 +79,18 @@ class StaticToolClient(ToolClient):
         *,
         descriptors: Sequence[ToolDescriptor] | None = None,
         execution_results: Mapping[str, JsonValue] | None = None,
+        execution_affinities: Mapping[str, ExecutionAffinity] | None = None,
     ) -> None:
         source_descriptors = descriptors or []
         self._descriptors = {descriptor.name: descriptor for descriptor in source_descriptors}
         self._execution_results = dict(execution_results or {})
+        self._execution_affinities: dict[str, ExecutionAffinity] = dict(execution_affinities or {})
 
     def list_tools(self) -> list[ToolDescriptor]:
         return list(self._descriptors.values())
+
+    def tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
+        return dict(self._execution_affinities)
 
     def call_tool(
         self,
