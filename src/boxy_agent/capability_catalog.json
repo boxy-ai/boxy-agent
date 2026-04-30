@@ -1105,6 +1105,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -1116,6 +1117,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -1124,6 +1126,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
@@ -1901,6 +1904,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -1912,6 +1916,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -1920,6 +1925,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
@@ -3545,6 +3551,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -3556,6 +3563,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -3564,6 +3572,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
@@ -6781,6 +6790,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -6792,6 +6802,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -6800,6 +6811,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
@@ -7379,6 +7391,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -7390,6 +7403,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -7398,6 +7412,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
@@ -7996,6 +8011,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -8007,6 +8023,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -8015,6 +8032,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
@@ -12239,6 +12257,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -12250,6 +12269,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -12258,6 +12278,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
@@ -12751,6 +12772,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -12762,6 +12784,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -12770,6 +12793,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
@@ -16107,6 +16131,7 @@
             "description": "Stable normalized identity reference on an external platform.",
             "properties": {
               "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
                 "enum": [
                   "email",
                   "google_chat_user",
@@ -16118,6 +16143,7 @@
                 "type": "string"
               },
               "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
                   "whatsapp"
@@ -16126,6 +16152,7 @@
                 "type": "string"
               },
               "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
                 "title": "Value",
                 "type": "string"
               }
