@@ -12,7 +12,14 @@ from typing import cast
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
-from boxy_agent.models import DataQueryDescriptor, ResultContract, ToolDescriptor
+from boxy_agent.models import (
+    ApprovalMetadataContract,
+    ApprovalPresentationKind,
+    CommunicationChannel,
+    DataQueryDescriptor,
+    ResultContract,
+    ToolDescriptor,
+)
 from boxy_agent.types import JsonValue, ensure_json_value
 
 CATALOG_SCHEMA_VERSION = 1
@@ -206,6 +213,24 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             label=f"{label}[{index}]",
             source=source,
         )
+        communication_channel = _optional_communication_channel(
+            table,
+            "communication_channel",
+            label=f"{label}[{index}]",
+            source=source,
+        )
+        approval_presentation_kind = _optional_approval_presentation_kind(
+            table,
+            "approval_presentation_kind",
+            label=f"{label}[{index}]",
+            source=source,
+        )
+        approval_metadata_contract = _optional_approval_metadata_contract(
+            table,
+            "approval_metadata_contract",
+            label=f"{label}[{index}]",
+            source=source,
+        )
         by_name[name] = ToolDescriptor(
             name=name,
             description=description,
@@ -213,6 +238,9 @@ def _load_tools(value: object, *, source: str, label: str) -> dict[str, ToolDesc
             output_schema=output_schema,
             result_contract=result_contract,
             side_effect=side_effect,
+            communication_channel=communication_channel,
+            approval_presentation_kind=approval_presentation_kind,
+            approval_metadata_contract=approval_metadata_contract,
         )
     return by_name
 
@@ -286,6 +314,64 @@ def _optional_result_contract(
     }:
         raise CapabilityCatalogError(f"{label}.{key} has unsupported value {value!r} ({source})")
     return cast(ResultContract, value)
+
+
+def _optional_communication_channel(
+    data: dict[str, object],
+    key: str,
+    *,
+    label: str,
+    source: str,
+) -> CommunicationChannel | None:
+    value = data.get(key)
+    if value is None:
+        return None
+    if value not in {"email", "google_chat", "whatsapp"}:
+        raise CapabilityCatalogError(f"{label}.{key} has unsupported value {value!r} ({source})")
+    return cast(CommunicationChannel, value)
+
+
+def _optional_approval_presentation_kind(
+    data: dict[str, object],
+    key: str,
+    *,
+    label: str,
+    source: str,
+) -> ApprovalPresentationKind | None:
+    value = data.get(key)
+    if value is None:
+        return None
+    if value not in {"email_message", "google_chat_message", "whatsapp_message"}:
+        raise CapabilityCatalogError(f"{label}.{key} has unsupported value {value!r} ({source})")
+    return cast(ApprovalPresentationKind, value)
+
+
+def _optional_approval_metadata_contract(
+    data: dict[str, object],
+    key: str,
+    *,
+    label: str,
+    source: str,
+) -> ApprovalMetadataContract | None:
+    value = data.get(key)
+    if value is None:
+        return None
+    contract = _require_table(value, f"{label}.{key}", source=source)
+    contract_key = _require_string(contract, "key", label=f"{label}.{key}")
+    schema = _require_schema(
+        contract,
+        "schema",
+        capability_name=f"{label}.{key}",
+        source=source,
+    )
+    prompt_value = contract.get("prompt", "")
+    if not isinstance(prompt_value, str):
+        raise CapabilityCatalogError(f"{label}.{key}.prompt must be a string ({source})")
+    return ApprovalMetadataContract(
+        key=contract_key,
+        schema=schema,
+        prompt=prompt_value.strip(),
+    )
 
 
 def _require_schema(

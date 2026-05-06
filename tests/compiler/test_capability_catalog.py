@@ -97,6 +97,17 @@ def test_load_capability_catalog_from_json_file(tmp_path: Path) -> None:
                             "properties": {"status": {"type": "string"}},
                         },
                         "side_effect": True,
+                        "communication_channel": "email",
+                        "approval_presentation_kind": "email_message",
+                        "approval_metadata_contract": {
+                            "key": "custom_email_review",
+                            "schema": {
+                                "type": "object",
+                                "properties": {"context_used": {"type": "string"}},
+                                "additionalProperties": False,
+                            },
+                            "prompt": "Use context_used for review context.",
+                        },
                     }
                 ],
                 "builtin_tools": [
@@ -122,6 +133,10 @@ def test_load_capability_catalog_from_json_file(tmp_path: Path) -> None:
     assert list(catalog.builtin_tools) == ["custom.search"]
     assert catalog.data_queries["custom.messages"].max_limit == 25
     assert catalog.boxy_tools["custom.send"].side_effect is True
+    assert catalog.boxy_tools["custom.send"].communication_channel == "email"
+    assert catalog.boxy_tools["custom.send"].approval_presentation_kind == "email_message"
+    assert catalog.boxy_tools["custom.send"].approval_metadata_contract is not None
+    assert catalog.boxy_tools["custom.send"].approval_metadata_contract.key == "custom_email_review"
 
 
 def test_packaged_builtin_catalog_carries_builtin_tool_usage_guidance() -> None:

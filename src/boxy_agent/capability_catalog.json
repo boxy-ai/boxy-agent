@@ -1708,7 +1708,491 @@
       "result_contract": "read_result"
     },
     {
-      "description": "Send a Google Chat message to a space via the live Google Chat API. This mutates external state and requires user approval before execution.",
+      "description": "Translate a selected google_chat_user IdentityRef into a stable Google Chat direct-message target before approval. For human names like 'Guyu', first use directory_search to find the right google_workspace/google_chat_user identity, then pass that full `identity` object as `recipient_identity`. Copy the returned `space` exactly to chat_send_direct_message or chat_send_message.",
+      "input_schema": {
+        "$defs": {
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
+            "title": "Account Id"
+          },
+          "recipient_identity": {
+            "$ref": "#/$defs/IdentityRef",
+            "description": "Full google_workspace/google_chat_user IdentityRef selected from directory_search or directory_lookup_identity, for example {\"provider\":\"google_workspace\",\"kind\":\"google_chat_user\",\"value\":\"users/123\"}. Do not pass human names here; resolve names through the directory first."
+          }
+        },
+        "required": [
+          "recipient_identity"
+        ],
+        "title": "ChatResolveDirectMessageRecipientToolInput",
+        "type": "object"
+      },
+      "name": "google_chat.chat_resolve_direct_message_recipient",
+      "output_schema": {
+        "$defs": {
+          "ChatDirectMessageTargetData": {
+            "additionalProperties": false,
+            "properties": {
+              "recipient_identity": {
+                "$ref": "#/$defs/IdentityRef"
+              },
+              "recipient_user": {
+                "title": "Recipient User",
+                "type": "string"
+              },
+              "space": {
+                "title": "Space",
+                "type": "string"
+              }
+            },
+            "required": [
+              "recipient_identity",
+              "recipient_user",
+              "space"
+            ],
+            "title": "ChatDirectMessageTargetData",
+            "type": "object"
+          },
+          "FreshnessInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "last_ingested_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Last Ingested At"
+              },
+              "next_planned_ingest_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Planned Ingest At"
+              },
+              "source_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Kind"
+              }
+            },
+            "title": "FreshnessInfo",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
+            "type": "object"
+          },
+          "JsonValue": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "PageInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Has More"
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Cursor"
+              },
+              "next_offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Offset"
+              },
+              "next_page_token": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Next Page Token"
+              },
+              "offset": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Offset"
+              },
+              "returned": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Returned"
+              }
+            },
+            "title": "PageInfo",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/ChatDirectMessageTargetData"
+          },
+          "freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FreshnessInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "page_info": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReadResult[ChatDirectMessageTargetData]",
+        "type": "object"
+      },
+      "result_contract": "read_result"
+    },
+    {
+      "approval_metadata_contract": {
+        "key": "google_chat_message",
+        "prompt": "Use approval_metadata only for communication-card context that helps the user understand why this approved message is being proposed.\nAllowed fields are the selected tool's approval_metadata_contract.schema fields only.\nDo not include executable values already present in display_arguments or the approved tool arguments: draft/body/message text, email subject, Chat/WhatsApp targets, channel IDs, spaces, JIDs, or idempotency keys.\ntarget_label is required. It must be the human-facing destination or counterparty label the user should recognize, such as a person name, room name, group name, or '3 recipients'. Do not use opaque executable identifiers such as spaces/..., thread IDs, JIDs, raw channel IDs, tokens, or idempotency keys as target_label. Use a plain email address only when no better display name is available.\nFor approval tweaks or replacement approvals, preserve the same target_label from previous_approval.approval_metadata.target_label unless the user explicitly changes the destination.\nUse source_app, target_label, received_at, title, a scan-ready summary, reply_strategy, review_tags, incoming_kind/incoming_text from source_message_candidates, and context_used.\nFor incoming_kind=\"message\", incoming_text must be copied exactly from one source_message_candidates[].text value. Use incoming_kind=\"trigger\" and set incoming_text to null when there is no exact external source message.",
+        "schema": {
+          "additionalProperties": false,
+          "description": "Communication approval card context, excluding executable message fields.",
+          "properties": {
+            "context_used": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Context Used",
+              "type": "string"
+            },
+            "incoming_kind": {
+              "enum": [
+                "message",
+                "trigger"
+              ],
+              "title": "Incoming Kind",
+              "type": "string"
+            },
+            "incoming_text": {
+              "anyOf": [
+                {
+                  "maxLength": 4000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Incoming Text"
+            },
+            "received_at": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Received At"
+            },
+            "reply_strategy": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Reply Strategy",
+              "type": "string"
+            },
+            "review_tags": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 8,
+              "title": "Review Tags",
+              "type": "array"
+            },
+            "source_app": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Source App",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 500,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            },
+            "target_label": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Target Label",
+              "type": "string"
+            },
+            "title": {
+              "maxLength": 160,
+              "minLength": 1,
+              "title": "Title",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_app",
+            "target_label",
+            "received_at",
+            "title",
+            "summary",
+            "reply_strategy",
+            "review_tags",
+            "incoming_kind",
+            "incoming_text",
+            "context_used"
+          ],
+          "title": "CommunicationApprovalMetadata",
+          "type": "object"
+        }
+      },
+      "approval_presentation_kind": "google_chat_message",
+      "communication_channel": "google_chat",
+      "description": "Send a Google Chat direct message to an already-resolved direct-message space. For human names like 'Guyu', first use directory_search to select a google_workspace/google_chat_user IdentityRef, then call the read-only chat_resolve_direct_message_recipient tool with that identity and copy its returned `space` exactly. This tool does not resolve names during execution. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {
@@ -1739,7 +2223,445 @@
             "title": "Idempotency Key"
           },
           "space": {
-            "description": "Google Chat space name where the message should be sent.",
+            "description": "Stable Google Chat direct-message space name where the message should be sent, for example 'spaces/DM_abc'. For human names, first use directory_search to select a google_workspace/google_chat_user IdentityRef, then pass that identity to chat_resolve_direct_message_recipient and copy its returned space. Do not pass a person name here.",
+            "title": "Space",
+            "type": "string"
+          },
+          "text": {
+            "description": "Plain-text Google Chat message body.",
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "space",
+          "text"
+        ],
+        "title": "ChatSendDirectMessageToolInput",
+        "type": "object"
+      },
+      "name": "google_chat.chat_send_direct_message",
+      "output_schema": {
+        "$defs": {
+          "ChatMessageRead": {
+            "additionalProperties": false,
+            "properties": {
+              "conversation_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "create_time": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Create Time"
+              },
+              "message_name": {
+                "title": "Message Name",
+                "type": "string"
+              },
+              "recipient_identities": {
+                "items": {
+                  "$ref": "#/$defs/IdentityRef"
+                },
+                "title": "Recipient Identities",
+                "type": "array"
+              },
+              "sender_display_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sender Display Name"
+              },
+              "sender_identity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/IdentityRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "sender_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sender Name"
+              },
+              "sender_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sender Type"
+              },
+              "space_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Space Name"
+              },
+              "text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Text"
+              },
+              "thread_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Thread Name"
+              }
+            },
+            "required": [
+              "message_name"
+            ],
+            "title": "ChatMessageRead",
+            "type": "object"
+          },
+          "IdentityRef": {
+            "additionalProperties": false,
+            "description": "Stable normalized identity reference on an external platform.",
+            "properties": {
+              "kind": {
+                "description": "Identity kind within the provider (e.g. 'email', 'google_chat_user', 'google_chat_space', 'whatsapp_jid', 'whatsapp_chat').",
+                "enum": [
+                  "email",
+                  "google_chat_user",
+                  "google_chat_space",
+                  "whatsapp_jid",
+                  "whatsapp_chat"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "provider": {
+                "description": "External platform that issued this identity (e.g. 'google_workspace').",
+                "enum": [
+                  "google_workspace",
+                  "whatsapp"
+                ],
+                "title": "Provider",
+                "type": "string"
+              },
+              "value": {
+                "description": "Provider-native identifier string, copied verbatim from a connector result (e.g. 'alice@example.com', 'users/109489855061976544117', 'spaces/AAA').",
+                "title": "Value",
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "kind",
+              "value"
+            ],
+            "title": "IdentityRef",
+            "type": "object"
+          },
+          "ResolutionInfo": {
+            "additionalProperties": false,
+            "properties": {
+              "account_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Account Id"
+              },
+              "resolution_kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Resolution Kind"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Target"
+              }
+            },
+            "title": "ResolutionInfo",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ChatMessageRead"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "message_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Message Ref"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ResolutionInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sent At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "target_resolved": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Target Resolved"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "MutationResult[ChatMessageRead]",
+        "type": "object"
+      },
+      "result_contract": "mutation_result",
+      "side_effect": true
+    },
+    {
+      "approval_metadata_contract": {
+        "key": "google_chat_message",
+        "prompt": "Use approval_metadata only for communication-card context that helps the user understand why this approved message is being proposed.\nAllowed fields are the selected tool's approval_metadata_contract.schema fields only.\nDo not include executable values already present in display_arguments or the approved tool arguments: draft/body/message text, email subject, Chat/WhatsApp targets, channel IDs, spaces, JIDs, or idempotency keys.\ntarget_label is required. It must be the human-facing destination or counterparty label the user should recognize, such as a person name, room name, group name, or '3 recipients'. Do not use opaque executable identifiers such as spaces/..., thread IDs, JIDs, raw channel IDs, tokens, or idempotency keys as target_label. Use a plain email address only when no better display name is available.\nFor approval tweaks or replacement approvals, preserve the same target_label from previous_approval.approval_metadata.target_label unless the user explicitly changes the destination.\nUse source_app, target_label, received_at, title, a scan-ready summary, reply_strategy, review_tags, incoming_kind/incoming_text from source_message_candidates, and context_used.\nFor incoming_kind=\"message\", incoming_text must be copied exactly from one source_message_candidates[].text value. Use incoming_kind=\"trigger\" and set incoming_text to null when there is no exact external source message.",
+        "schema": {
+          "additionalProperties": false,
+          "description": "Communication approval card context, excluding executable message fields.",
+          "properties": {
+            "context_used": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Context Used",
+              "type": "string"
+            },
+            "incoming_kind": {
+              "enum": [
+                "message",
+                "trigger"
+              ],
+              "title": "Incoming Kind",
+              "type": "string"
+            },
+            "incoming_text": {
+              "anyOf": [
+                {
+                  "maxLength": 4000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Incoming Text"
+            },
+            "received_at": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Received At"
+            },
+            "reply_strategy": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Reply Strategy",
+              "type": "string"
+            },
+            "review_tags": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 8,
+              "title": "Review Tags",
+              "type": "array"
+            },
+            "source_app": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Source App",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 500,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            },
+            "target_label": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Target Label",
+              "type": "string"
+            },
+            "title": {
+              "maxLength": 160,
+              "minLength": 1,
+              "title": "Title",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_app",
+            "target_label",
+            "received_at",
+            "title",
+            "summary",
+            "reply_strategy",
+            "review_tags",
+            "incoming_kind",
+            "incoming_text",
+            "context_used"
+          ],
+          "title": "CommunicationApprovalMetadata",
+          "type": "object"
+        }
+      },
+      "approval_presentation_kind": "google_chat_message",
+      "communication_channel": "google_chat",
+      "description": "Send a Google Chat message to a canonical space via the live Google Chat API. For default replies to Chat events, use the event `space_name` and omit `thread_name`; include `thread_name` only when the user explicitly asks for an in-thread reply in a named threaded space. This mutates external state and requires user approval before execution.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
+            "title": "Account Id"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
+            "title": "Idempotency Key"
+          },
+          "space": {
+            "description": "Canonical Google Chat space resource name where the message should be sent, for example the `space_name` from a Chat event or a resolved direct-message `space`.",
             "title": "Space",
             "type": "string"
           },
@@ -1758,7 +2680,7 @@
               }
             ],
             "default": null,
-            "description": "Optional Google Chat thread name for replying in an existing thread.",
+            "description": "Optional Google Chat thread resource name. Omit this for direct messages, group chats, and the default reply-to-space behavior. Only include it when the user explicitly asks for an in-thread reply in a named threaded space, using the form 'spaces/.../threads/...'.",
             "title": "Thread Name"
           }
         },
@@ -4155,6 +5077,108 @@
       "result_contract": "read_result"
     },
     {
+      "approval_metadata_contract": {
+        "key": "email_message",
+        "prompt": "Use approval_metadata only for communication-card context that helps the user understand why this approved message is being proposed.\nAllowed fields are the selected tool's approval_metadata_contract.schema fields only.\nDo not include executable values already present in display_arguments or the approved tool arguments: draft/body/message text, email subject, Chat/WhatsApp targets, channel IDs, spaces, JIDs, or idempotency keys.\ntarget_label is required. It must be the human-facing destination or counterparty label the user should recognize, such as a person name, room name, group name, or '3 recipients'. Do not use opaque executable identifiers such as spaces/..., thread IDs, JIDs, raw channel IDs, tokens, or idempotency keys as target_label. Use a plain email address only when no better display name is available.\nFor approval tweaks or replacement approvals, preserve the same target_label from previous_approval.approval_metadata.target_label unless the user explicitly changes the destination.\nUse source_app, target_label, received_at, title, a scan-ready summary, reply_strategy, review_tags, incoming_kind/incoming_text from source_message_candidates, and context_used.\nFor incoming_kind=\"message\", incoming_text must be copied exactly from one source_message_candidates[].text value. Use incoming_kind=\"trigger\" and set incoming_text to null when there is no exact external source message.",
+        "schema": {
+          "additionalProperties": false,
+          "description": "Communication approval card context, excluding executable message fields.",
+          "properties": {
+            "context_used": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Context Used",
+              "type": "string"
+            },
+            "incoming_kind": {
+              "enum": [
+                "message",
+                "trigger"
+              ],
+              "title": "Incoming Kind",
+              "type": "string"
+            },
+            "incoming_text": {
+              "anyOf": [
+                {
+                  "maxLength": 4000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Incoming Text"
+            },
+            "received_at": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Received At"
+            },
+            "reply_strategy": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Reply Strategy",
+              "type": "string"
+            },
+            "review_tags": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 8,
+              "title": "Review Tags",
+              "type": "array"
+            },
+            "source_app": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Source App",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 500,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            },
+            "target_label": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Target Label",
+              "type": "string"
+            },
+            "title": {
+              "maxLength": 160,
+              "minLength": 1,
+              "title": "Title",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_app",
+            "target_label",
+            "received_at",
+            "title",
+            "summary",
+            "reply_strategy",
+            "review_tags",
+            "incoming_kind",
+            "incoming_text",
+            "context_used"
+          ],
+          "title": "CommunicationApprovalMetadata",
+          "type": "object"
+        }
+      },
+      "approval_presentation_kind": "email_message",
+      "communication_channel": "email",
       "description": "Send a Gmail email message to one or more recipients via the live Gmail API. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "additionalProperties": false,
@@ -4749,6 +5773,108 @@
       "result_contract": "read_result"
     },
     {
+      "approval_metadata_contract": {
+        "key": "whatsapp_message",
+        "prompt": "Use approval_metadata only for communication-card context that helps the user understand why this approved message is being proposed.\nAllowed fields are the selected tool's approval_metadata_contract.schema fields only.\nDo not include executable values already present in display_arguments or the approved tool arguments: draft/body/message text, email subject, Chat/WhatsApp targets, channel IDs, spaces, JIDs, or idempotency keys.\ntarget_label is required. It must be the human-facing destination or counterparty label the user should recognize, such as a person name, room name, group name, or '3 recipients'. Do not use opaque executable identifiers such as spaces/..., thread IDs, JIDs, raw channel IDs, tokens, or idempotency keys as target_label. Use a plain email address only when no better display name is available.\nFor approval tweaks or replacement approvals, preserve the same target_label from previous_approval.approval_metadata.target_label unless the user explicitly changes the destination.\nUse source_app, target_label, received_at, title, a scan-ready summary, reply_strategy, review_tags, incoming_kind/incoming_text from source_message_candidates, and context_used.\nFor incoming_kind=\"message\", incoming_text must be copied exactly from one source_message_candidates[].text value. Use incoming_kind=\"trigger\" and set incoming_text to null when there is no exact external source message.",
+        "schema": {
+          "additionalProperties": false,
+          "description": "Communication approval card context, excluding executable message fields.",
+          "properties": {
+            "context_used": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Context Used",
+              "type": "string"
+            },
+            "incoming_kind": {
+              "enum": [
+                "message",
+                "trigger"
+              ],
+              "title": "Incoming Kind",
+              "type": "string"
+            },
+            "incoming_text": {
+              "anyOf": [
+                {
+                  "maxLength": 4000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Incoming Text"
+            },
+            "received_at": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Received At"
+            },
+            "reply_strategy": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Reply Strategy",
+              "type": "string"
+            },
+            "review_tags": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 8,
+              "title": "Review Tags",
+              "type": "array"
+            },
+            "source_app": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Source App",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 500,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            },
+            "target_label": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Target Label",
+              "type": "string"
+            },
+            "title": {
+              "maxLength": 160,
+              "minLength": 1,
+              "title": "Title",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_app",
+            "target_label",
+            "received_at",
+            "title",
+            "summary",
+            "reply_strategy",
+            "review_tags",
+            "incoming_kind",
+            "incoming_text",
+            "context_used"
+          ],
+          "title": "CommunicationApprovalMetadata",
+          "type": "object"
+        }
+      },
+      "approval_presentation_kind": "whatsapp_message",
+      "communication_channel": "whatsapp",
       "description": "Send one WhatsApp text message via whatsapp-runtime. Uses idempotency_key as runtime clientMessageId and retries 409 conflicts using Retry-After. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "additionalProperties": false,
