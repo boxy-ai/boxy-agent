@@ -1110,6 +1110,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -1120,6 +1122,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -1721,6 +1724,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -1731,6 +1736,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -1856,6 +1862,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -1866,6 +1874,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -2380,6 +2389,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -2390,6 +2401,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -2831,6 +2843,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -2841,6 +2855,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -4478,6 +4493,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -4488,6 +4505,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -7921,6 +7939,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -7931,6 +7951,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -8522,6 +8543,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -8532,6 +8555,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -9142,6 +9166,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -9152,6 +9178,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -13388,6 +13415,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -13398,6 +13427,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -13903,6 +13933,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -13913,6 +13945,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
@@ -17262,6 +17295,8 @@
                   "email",
                   "google_chat_user",
                   "google_chat_space",
+                  "linkedin_member",
+                  "linkedin_conversation",
                   "whatsapp_jid",
                   "whatsapp_chat"
                 ],
@@ -17272,6 +17307,7 @@
                 "description": "External platform that issued this identity (e.g. 'google_workspace').",
                 "enum": [
                   "google_workspace",
+                  "linkedin",
                   "whatsapp"
                 ],
                 "title": "Provider",
