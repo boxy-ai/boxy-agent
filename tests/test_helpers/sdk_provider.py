@@ -7,7 +7,10 @@ from test_helpers.capabilities import (
     DEFAULT_BOXY_TOOL_NAME,
     DEFAULT_BUILTIN_TOOL_NAME,
     DEFAULT_DATA_QUERY_NAME,
+    DEFAULT_WHATSAPP_ACCOUNT_ID,
+    DEFAULT_WHATSAPP_CHAT_JID,
     default_capability_catalog,
+    default_whatsapp_conversation_context,
 )
 
 from boxy_agent.capabilities import CapabilityCatalog
@@ -24,10 +27,10 @@ from boxy_agent.types import JsonValue
 DEFAULT_QUERY_RESULTS: dict[str, JsonValue] = {
     DEFAULT_DATA_QUERY_NAME: {
         "data": {
-            "chat_jid": "chat-1",
+            "conversation_context": default_whatsapp_conversation_context(),
             "messages": [
                 {
-                    "chat_jid": "chat-1",
+                    "conversation_context": default_whatsapp_conversation_context(),
                     "message_id": "msg-1",
                     "from_me": False,
                     "sender_jid": "contact-1",
@@ -48,8 +51,8 @@ DEFAULT_QUERY_RESULTS: dict[str, JsonValue] = {
             "returned": 1,
         },
         "resolution": {
-            "account_id": "acct-1",
-            "target": "chat-1",
+            "account_id": DEFAULT_WHATSAPP_ACCOUNT_ID,
+            "target": DEFAULT_WHATSAPP_CHAT_JID,
         },
     }
 }
@@ -57,10 +60,10 @@ DEFAULT_QUERY_RESULTS: dict[str, JsonValue] = {
 DEFAULT_BOXY_TOOL_RESULTS: dict[str, JsonValue] = {
     DEFAULT_BOXY_TOOL_NAME: {
         "status": "sent",
-        "target_resolved": "chat-1",
+        "target_resolved": DEFAULT_WHATSAPP_CHAT_JID,
         "message_ref": "out-1",
         "sent_at": "2026-01-01T00:00:00Z",
-        "data": {},
+        "data": {"conversation_context": default_whatsapp_conversation_context()},
     }
 }
 

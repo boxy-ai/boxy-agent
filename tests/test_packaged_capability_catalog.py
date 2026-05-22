@@ -17,13 +17,6 @@ def test_packaged_capability_catalog_contains_shipping_connector_and_builtin_cap
     assert "whatsapp.send_message" in catalog.boxy_tools
     assert catalog.boxy_tools["whatsapp.send_message"].side_effect is True
     assert catalog.boxy_tools["whatsapp.send_message"].communication_channel == "whatsapp"
-    assert (
-        catalog.boxy_tools["whatsapp.send_message"].approval_presentation_kind == "whatsapp_message"
-    )
-    assert catalog.boxy_tools["whatsapp.send_message"].approval_metadata_contract is not None
-    assert catalog.boxy_tools["whatsapp.send_message"].approval_metadata_contract.key == (
-        "whatsapp_message"
-    )
     assert "reference.reference_echo" not in catalog.boxy_tools
     assert "web_search" in catalog.builtin_tools
 

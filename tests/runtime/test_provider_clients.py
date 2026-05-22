@@ -4,7 +4,9 @@ import pytest
 from test_helpers.capabilities import (
     DEFAULT_BOXY_TOOL_NAME,
     DEFAULT_DATA_QUERY_NAME,
+    DEFAULT_WHATSAPP_CHAT_JID,
     default_capability_catalog,
+    default_whatsapp_conversation_context,
 )
 
 from boxy_agent.models import ToolDescriptor
@@ -79,10 +81,10 @@ def test_static_tool_client_contract() -> None:
         execution_results={
             DEFAULT_BOXY_TOOL_NAME: {
                 "status": "sent",
-                "target_resolved": "chat-1",
+                "target_resolved": DEFAULT_WHATSAPP_CHAT_JID,
                 "message_ref": "out-1",
                 "sent_at": "2026-01-01T00:00:00Z",
-                "details": {},
+                "data": {"conversation_context": default_whatsapp_conversation_context()},
             }
         },
         execution_affinities={DEFAULT_BOXY_TOOL_NAME: "main_thread"},
@@ -93,18 +95,17 @@ def test_static_tool_client_contract() -> None:
     assert client.call_tool(
         DEFAULT_BOXY_TOOL_NAME,
         {
-            "target": "chat-1",
+            "conversation_context": default_whatsapp_conversation_context(),
             "message_content": "hello",
-            "idempotency_key": "idemp-1",
         },
         session_id="session-1",
         actor_principal="agent:test:session:session-1",
     ) == {
         "status": "sent",
-        "target_resolved": "chat-1",
+        "target_resolved": DEFAULT_WHATSAPP_CHAT_JID,
         "message_ref": "out-1",
         "sent_at": "2026-01-01T00:00:00Z",
-        "details": {},
+        "data": {"conversation_context": default_whatsapp_conversation_context()},
     }
 
     with pytest.raises(UnconfiguredClientError, match="No tool result configured"):

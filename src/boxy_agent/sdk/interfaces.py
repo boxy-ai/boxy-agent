@@ -128,7 +128,11 @@ class RuntimeBindings(Protocol):
         """Return runtime-owned execution affinities for discoverable Boxy tools."""
         ...
 
-    def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
+    def call_boxy_tool(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+    ) -> JsonValue:
         """Execute a Boxy tool."""
         ...
 

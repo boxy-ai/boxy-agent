@@ -9,7 +9,10 @@ from test_helpers.capabilities import (
     DEFAULT_BOXY_TOOL_NAME,
     DEFAULT_BUILTIN_TOOL_NAME,
     DEFAULT_DATA_QUERY_NAME,
+    DEFAULT_WHATSAPP_ACCOUNT_ID,
+    DEFAULT_WHATSAPP_CHAT_JID,
     default_capability_catalog,
+    default_whatsapp_conversation_context,
 )
 from test_helpers.sdk_provider import MockAgentSdkProvider
 
@@ -62,16 +65,16 @@ def _runtime_with_default_catalog(**kwargs) -> AgentRuntime:
 
 
 def _default_query_params() -> dict[str, JsonValue]:
-    return {"chat_jid": "chat-1"}
+    return {"chat_jid": DEFAULT_WHATSAPP_CHAT_JID}
 
 
 def _default_query_rows() -> dict[str, JsonValue]:
     return {
         "data": {
-            "chat_jid": "chat-1",
+            "conversation_context": default_whatsapp_conversation_context(),
             "messages": [
                 {
-                    "chat_jid": "chat-1",
+                    "conversation_context": default_whatsapp_conversation_context(),
                     "message_id": "msg-1",
                     "from_me": False,
                     "sender_jid": "contact-1",
@@ -92,27 +95,26 @@ def _default_query_rows() -> dict[str, JsonValue]:
             "returned": 1,
         },
         "resolution": {
-            "account_id": "acct-1",
-            "target": "chat-1",
+            "account_id": DEFAULT_WHATSAPP_ACCOUNT_ID,
+            "target": DEFAULT_WHATSAPP_CHAT_JID,
         },
     }
 
 
 def _default_tool_params() -> dict[str, JsonValue]:
     return {
-        "target": "chat-1",
+        "conversation_context": default_whatsapp_conversation_context(),
         "message_content": "Hello",
-        "idempotency_key": "idemp-1",
     }
 
 
 def _default_tool_result() -> dict[str, JsonValue]:
     return {
         "status": "sent",
-        "target_resolved": "chat-1",
+        "target_resolved": DEFAULT_WHATSAPP_CHAT_JID,
         "message_ref": "msg-1",
         "sent_at": "2026-01-01T00:00:00Z",
-        "data": {},
+        "data": {"conversation_context": default_whatsapp_conversation_context()},
     }
 
 
@@ -269,7 +271,7 @@ def test_runtime_rejects_data_mining_with_side_effecting_boxy_tools() -> None:
 
 def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
     def handle(context):
-        result = call_boxy_tool(context, READ_ONLY_BOXY_TOOL_NAME, {"account_id": "acct-1"})
+        result = call_boxy_tool(context, READ_ONLY_BOXY_TOOL_NAME, {})
         return AgentResult(output=cast(dict[str, JsonValue], result))
 
     runtime = _runtime_with_default_catalog(
@@ -477,7 +479,40 @@ def test_runtime_rejects_invalid_capability_input_schema() -> None:
         call_boxy_tool(
             context,
             DEFAULT_BOXY_TOOL_NAME,
-            {"target": "chat-1", "message_content": 1, "idempotency_key": "idemp-1"},
+            {
+                "conversation_context": default_whatsapp_conversation_context(),
+                "message_content": 1,
+            },
+        )
+        return AgentResult(output={"ok": True})
+
+    runtime = _runtime_with_default_catalog(
+        agent_registry_loader=lambda: {
+            "main": discovered_agent(
+                name="main",
+                handler=handle,
+                capabilities=AgentCapabilities(
+                    data_queries=frozenset(),
+                    boxy_tools=frozenset({DEFAULT_BOXY_TOOL_NAME}),
+                    builtin_tools=frozenset(),
+                ),
+            )
+        }
+    )
+
+    with pytest.raises(CapabilitySchemaError, match="input"):
+        runtime.run("main", {"type": "start"})
+
+
+def test_runtime_rejects_unknown_tool_params() -> None:
+    def handle(context):
+        call_boxy_tool(
+            context,
+            DEFAULT_BOXY_TOOL_NAME,
+            {
+                **_default_tool_params(),
+                "unknown_param": "extra",
+            },
         )
         return AgentResult(output={"ok": True})
 

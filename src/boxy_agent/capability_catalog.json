@@ -5,19 +5,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "attendees": {
             "anyOf": [
               {
@@ -64,19 +51,6 @@
             "description": "Event end time as an RFC 3339 timestamp.",
             "title": "End",
             "type": "string"
-          },
-          "idempotency_key": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
-            "title": "Idempotency Key"
           },
           "location": {
             "anyOf": [
@@ -365,19 +339,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "calendar_id": {
             "anyOf": [
               {
@@ -860,19 +821,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -919,6 +867,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "conversation_identity": {
                 "anyOf": [
                   {
@@ -1000,18 +959,6 @@
                 "default": null,
                 "title": "Sender Type"
               },
-              "space_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Space Name"
-              },
               "text": {
                 "anyOf": [
                   {
@@ -1023,18 +970,6 @@
                 ],
                 "default": null,
                 "title": "Text"
-              },
-              "thread_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Name"
               }
             },
             "required": [
@@ -1055,6 +990,31 @@
               }
             },
             "title": "ChatMessagesData",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "FreshnessInfo": {
@@ -1351,19 +1311,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -1402,6 +1349,17 @@
           "ChatSpaceRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "display_name": {
                 "anyOf": [
                   {
@@ -1413,10 +1371,6 @@
                 ],
                 "default": null,
                 "title": "Display Name"
-              },
-              "space_name": {
-                "title": "Space Name",
-                "type": "string"
               },
               "space_threading_state": {
                 "anyOf": [
@@ -1443,9 +1397,6 @@
                 "title": "Space Type"
               }
             },
-            "required": [
-              "space_name"
-            ],
             "title": "ChatSpaceRead",
             "type": "object"
           },
@@ -1461,6 +1412,31 @@
               }
             },
             "title": "ChatSpaceReadData",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "FreshnessInfo": {
@@ -1711,7 +1687,7 @@
       "result_contract": "read_result"
     },
     {
-      "description": "Translate a selected google_chat_user IdentityRef into a stable Google Chat direct-message target before approval. For human names like 'Guyu', first use directory_search to find the right google_workspace/google_chat_user identity, then pass that full `identity` object as `recipient_identity`. Copy the returned `space` exactly to chat_send_direct_message or chat_send_message.",
+      "description": "Translate a selected google_chat_user IdentityRef into a stable Google Chat direct-message target before approval. For human names like 'Guyu', first use directory_search to find the right google_workspace/google_chat_user identity, then pass that full `identity` object as `recipient_identity`. Copy the returned `conversation_context` exactly to chat_send_direct_message or chat_send_message.",
       "input_schema": {
         "$defs": {
           "IdentityRef": {
@@ -1759,19 +1735,6 @@
         },
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "recipient_identity": {
             "$ref": "#/$defs/IdentityRef",
             "description": "Full google_workspace/google_chat_user IdentityRef selected from directory_search or directory_lookup_identity, for example {\"provider\":\"google_workspace\",\"kind\":\"google_chat_user\",\"value\":\"users/123\"}. Do not pass human names here; resolve names through the directory first."
@@ -1789,24 +1752,48 @@
           "ChatDirectMessageTargetData": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "recipient_identity": {
                 "$ref": "#/$defs/IdentityRef"
               },
               "recipient_user": {
                 "title": "Recipient User",
                 "type": "string"
-              },
-              "space": {
-                "title": "Space",
-                "type": "string"
               }
             },
             "required": [
               "recipient_identity",
               "recipient_user",
-              "space"
+              "conversation_context"
             ],
             "title": "ChatDirectMessageTargetData",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "FreshnessInfo": {
@@ -2099,142 +2086,41 @@
       "result_contract": "read_result"
     },
     {
-      "approval_metadata_contract": {
-        "key": "google_chat_message",
-        "prompt": "Use approval_metadata only for communication-card context that helps the user understand why this approved message is being proposed.\nAllowed fields are the selected tool's approval_metadata_contract.schema fields only.\nDo not include executable values already present in display_arguments or the approved tool arguments: draft/body/message text, email subject, Chat/WhatsApp targets, channel IDs, spaces, JIDs, or idempotency keys.\ntarget_label is required. It must be the human-facing destination or counterparty label the user should recognize, such as a person name, room name, group name, or '3 recipients'. Do not use opaque executable identifiers such as spaces/..., thread IDs, JIDs, raw channel IDs, tokens, or idempotency keys as target_label. Use a plain email address only when no better display name is available.\nFor approval tweaks or replacement approvals, preserve the same target_label from previous_approval.approval_metadata.target_label unless the user explicitly changes the destination.\nUse source_app, target_label, received_at, title, a scan-ready summary, reply_strategy, review_tags, incoming_kind/incoming_text from source_message_candidates, and context_used.\nFor incoming_kind=\"message\", incoming_text must be copied exactly from one source_message_candidates[].text value. Use incoming_kind=\"trigger\" and set incoming_text to null when there is no exact external source message.",
-        "schema": {
-          "additionalProperties": false,
-          "description": "Communication approval card context, excluding executable message fields.",
-          "properties": {
-            "context_used": {
-              "maxLength": 4000,
-              "minLength": 1,
-              "title": "Context Used",
-              "type": "string"
-            },
-            "incoming_kind": {
-              "enum": [
-                "message",
-                "trigger"
-              ],
-              "title": "Incoming Kind",
-              "type": "string"
-            },
-            "incoming_text": {
-              "anyOf": [
-                {
-                  "maxLength": 4000,
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Incoming Text"
-            },
-            "received_at": {
-              "anyOf": [
-                {
-                  "format": "date-time",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Received At"
-            },
-            "reply_strategy": {
-              "maxLength": 2000,
-              "minLength": 1,
-              "title": "Reply Strategy",
-              "type": "string"
-            },
-            "review_tags": {
-              "items": {
+      "communication_channel": "google_chat",
+      "description": "Send a Google Chat direct message to an already-resolved direct-message space. For human names like 'Guyu', first use directory_search to select a google_workspace/google_chat_user IdentityRef, then call the read-only chat_resolve_direct_message_recipient tool with that identity and copy its returned `conversation_context` exactly. This tool does not resolve names during execution. This mutates external state and requires user approval before execution.",
+      "input_schema": {
+        "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
                 "type": "string"
               },
-              "maxItems": 8,
-              "title": "Review Tags",
-              "type": "array"
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
             },
-            "source_app": {
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Source App",
-              "type": "string"
-            },
-            "summary": {
-              "maxLength": 500,
-              "minLength": 1,
-              "title": "Summary",
-              "type": "string"
-            },
-            "target_label": {
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Target Label",
-              "type": "string"
-            },
-            "title": {
-              "maxLength": 160,
-              "minLength": 1,
-              "title": "Title",
-              "type": "string"
-            }
-          },
-          "required": [
-            "source_app",
-            "target_label",
-            "received_at",
-            "title",
-            "summary",
-            "reply_strategy",
-            "review_tags",
-            "incoming_kind",
-            "incoming_text",
-            "context_used"
-          ],
-          "title": "CommunicationApprovalMetadata",
-          "type": "object"
-        }
-      },
-      "approval_presentation_kind": "google_chat_message",
-      "communication_channel": "google_chat",
-      "description": "Send a Google Chat direct message to an already-resolved direct-message space. For human names like 'Guyu', first use directory_search to select a google_workspace/google_chat_user IdentityRef, then call the read-only chat_resolve_direct_message_recipient tool with that identity and copy its returned `space` exactly. This tool does not resolve names during execution. This mutates external state and requires user approval before execution.",
-      "input_schema": {
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          }
+        },
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
-          "idempotency_key": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
-            "title": "Idempotency Key"
-          },
-          "space": {
-            "description": "Stable Google Chat direct-message space name where the message should be sent, for example 'spaces/DM_abc'. For human names, first use directory_search to select a google_workspace/google_chat_user IdentityRef, then pass that identity to chat_resolve_direct_message_recipient and copy its returned space. Do not pass a person name here.",
-            "title": "Space",
-            "type": "string"
+          "conversation_context": {
+            "$ref": "#/$defs/ConversationContext",
+            "description": "Google Chat direct-message space conversation_context copied from chat_resolve_direct_message_recipient. Do not pass a person name here."
           },
           "text": {
             "description": "Plain-text Google Chat message body.",
@@ -2243,7 +2129,7 @@
           }
         },
         "required": [
-          "space",
+          "conversation_context",
           "text"
         ],
         "title": "ChatSendDirectMessageToolInput",
@@ -2255,6 +2141,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "conversation_identity": {
                 "anyOf": [
                   {
@@ -2336,18 +2233,6 @@
                 "default": null,
                 "title": "Sender Type"
               },
-              "space_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Space Name"
-              },
               "text": {
                 "anyOf": [
                   {
@@ -2359,24 +2244,37 @@
                 ],
                 "default": null,
                 "title": "Text"
-              },
-              "thread_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Name"
               }
             },
             "required": [
               "message_name"
             ],
             "title": "ChatMessageRead",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "IdentityRef": {
@@ -2540,164 +2438,50 @@
       "side_effect": true
     },
     {
-      "approval_metadata_contract": {
-        "key": "google_chat_message",
-        "prompt": "Use approval_metadata only for communication-card context that helps the user understand why this approved message is being proposed.\nAllowed fields are the selected tool's approval_metadata_contract.schema fields only.\nDo not include executable values already present in display_arguments or the approved tool arguments: draft/body/message text, email subject, Chat/WhatsApp targets, channel IDs, spaces, JIDs, or idempotency keys.\ntarget_label is required. It must be the human-facing destination or counterparty label the user should recognize, such as a person name, room name, group name, or '3 recipients'. Do not use opaque executable identifiers such as spaces/..., thread IDs, JIDs, raw channel IDs, tokens, or idempotency keys as target_label. Use a plain email address only when no better display name is available.\nFor approval tweaks or replacement approvals, preserve the same target_label from previous_approval.approval_metadata.target_label unless the user explicitly changes the destination.\nUse source_app, target_label, received_at, title, a scan-ready summary, reply_strategy, review_tags, incoming_kind/incoming_text from source_message_candidates, and context_used.\nFor incoming_kind=\"message\", incoming_text must be copied exactly from one source_message_candidates[].text value. Use incoming_kind=\"trigger\" and set incoming_text to null when there is no exact external source message.",
-        "schema": {
-          "additionalProperties": false,
-          "description": "Communication approval card context, excluding executable message fields.",
-          "properties": {
-            "context_used": {
-              "maxLength": 4000,
-              "minLength": 1,
-              "title": "Context Used",
-              "type": "string"
-            },
-            "incoming_kind": {
-              "enum": [
-                "message",
-                "trigger"
-              ],
-              "title": "Incoming Kind",
-              "type": "string"
-            },
-            "incoming_text": {
-              "anyOf": [
-                {
-                  "maxLength": 4000,
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Incoming Text"
-            },
-            "received_at": {
-              "anyOf": [
-                {
-                  "format": "date-time",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Received At"
-            },
-            "reply_strategy": {
-              "maxLength": 2000,
-              "minLength": 1,
-              "title": "Reply Strategy",
-              "type": "string"
-            },
-            "review_tags": {
-              "items": {
+      "communication_channel": "google_chat",
+      "description": "Send a Google Chat message to the exact space or thread identified by a Google Chat conversation_context. Use the full conversation_context object from a prior read, resolver result, or source event. This mutates external state and requires user approval before execution.",
+      "input_schema": {
+        "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
                 "type": "string"
               },
-              "maxItems": 8,
-              "title": "Review Tags",
-              "type": "array"
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
             },
-            "source_app": {
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Source App",
-              "type": "string"
-            },
-            "summary": {
-              "maxLength": 500,
-              "minLength": 1,
-              "title": "Summary",
-              "type": "string"
-            },
-            "target_label": {
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Target Label",
-              "type": "string"
-            },
-            "title": {
-              "maxLength": 160,
-              "minLength": 1,
-              "title": "Title",
-              "type": "string"
-            }
-          },
-          "required": [
-            "source_app",
-            "target_label",
-            "received_at",
-            "title",
-            "summary",
-            "reply_strategy",
-            "review_tags",
-            "incoming_kind",
-            "incoming_text",
-            "context_used"
-          ],
-          "title": "CommunicationApprovalMetadata",
-          "type": "object"
-        }
-      },
-      "approval_presentation_kind": "google_chat_message",
-      "communication_channel": "google_chat",
-      "description": "Send a Google Chat message to a canonical space via the live Google Chat API. For default replies to Chat events, use the event `space_name` and omit `thread_name`; include `thread_name` only when the user explicitly asks for an in-thread reply in a named threaded space. This mutates external state and requires user approval before execution.",
-      "input_schema": {
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          }
+        },
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
-          "idempotency_key": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
-            "title": "Idempotency Key"
-          },
-          "space": {
-            "description": "Canonical Google Chat space resource name where the message should be sent, for example the `space_name` from a Chat event or a resolved direct-message `space`.",
-            "title": "Space",
-            "type": "string"
+          "conversation_context": {
+            "$ref": "#/$defs/ConversationContext",
+            "description": "Google Chat space or thread conversation_context copied as a full object from a prior Chat result, direct-message resolver result, or source event."
           },
           "text": {
             "description": "Plain-text Google Chat message body.",
             "title": "Text",
             "type": "string"
-          },
-          "thread_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google Chat thread resource name. Omit this for direct messages, group chats, and the default reply-to-space behavior. Only include it when the user explicitly asks for an in-thread reply in a named threaded space, using the form 'spaces/.../threads/...'.",
-            "title": "Thread Name"
           }
         },
         "required": [
-          "space",
+          "conversation_context",
           "text"
         ],
         "title": "ChatSendMessageToolInput",
@@ -2709,6 +2493,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "conversation_identity": {
                 "anyOf": [
                   {
@@ -2790,18 +2585,6 @@
                 "default": null,
                 "title": "Sender Type"
               },
-              "space_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Space Name"
-              },
               "text": {
                 "anyOf": [
                   {
@@ -2813,24 +2596,37 @@
                 ],
                 "default": null,
                 "title": "Text"
-              },
-              "thread_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Name"
               }
             },
             "required": [
               "message_name"
             ],
             "title": "ChatMessageRead",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "IdentityRef": {
@@ -2998,19 +2794,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "document_id": {
             "description": "Google Docs document ID to fetch from the live API.",
             "title": "Document Id",
@@ -3370,19 +3153,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "fields": {
             "anyOf": [
               {
@@ -3786,19 +3556,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -4218,19 +3975,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "format": {
             "anyOf": [
               {
@@ -4264,6 +4008,31 @@
       "name": "google_gmail.gmail_get_thread",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -4310,20 +4079,19 @@
           "GmailGetThreadData": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "messages": {
                 "items": {
                   "$ref": "#/$defs/GmailMessageRead"
                 },
                 "title": "Messages",
                 "type": "array"
-              },
-              "thread_id": {
-                "title": "Thread Id",
-                "type": "string"
               }
             },
             "required": [
-              "thread_id"
+              "conversation_context"
             ],
             "title": "GmailGetThreadData",
             "type": "object"
@@ -4356,6 +4124,17 @@
                 },
                 "title": "Cc",
                 "type": "array"
+              },
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "conversation_identity": {
                 "anyOf": [
@@ -4456,18 +4235,6 @@
                 ],
                 "default": null,
                 "title": "Subject"
-              },
-              "thread_id": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Id"
               },
               "to": {
                 "items": {
@@ -4734,19 +4501,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -4795,6 +4549,31 @@
       "name": "google_gmail.gmail_search_threads",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -4841,6 +4620,9 @@
           "GmailSearchThreadHit": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "history_id": {
                 "anyOf": [
                   {
@@ -4864,14 +4646,10 @@
                 ],
                 "default": null,
                 "title": "Snippet"
-              },
-              "thread_id": {
-                "title": "Thread Id",
-                "type": "string"
               }
             },
             "required": [
-              "thread_id"
+              "conversation_context"
             ],
             "title": "GmailSearchThreadHit",
             "type": "object"
@@ -5095,125 +4873,38 @@
       "result_contract": "read_result"
     },
     {
-      "approval_metadata_contract": {
-        "key": "email_message",
-        "prompt": "Use approval_metadata only for communication-card context that helps the user understand why this approved message is being proposed.\nAllowed fields are the selected tool's approval_metadata_contract.schema fields only.\nDo not include executable values already present in display_arguments or the approved tool arguments: draft/body/message text, email subject, Chat/WhatsApp targets, channel IDs, spaces, JIDs, or idempotency keys.\ntarget_label is required. It must be the human-facing destination or counterparty label the user should recognize, such as a person name, room name, group name, or '3 recipients'. Do not use opaque executable identifiers such as spaces/..., thread IDs, JIDs, raw channel IDs, tokens, or idempotency keys as target_label. Use a plain email address only when no better display name is available.\nFor approval tweaks or replacement approvals, preserve the same target_label from previous_approval.approval_metadata.target_label unless the user explicitly changes the destination.\nUse source_app, target_label, received_at, title, a scan-ready summary, reply_strategy, review_tags, incoming_kind/incoming_text from source_message_candidates, and context_used.\nFor incoming_kind=\"message\", incoming_text must be copied exactly from one source_message_candidates[].text value. Use incoming_kind=\"trigger\" and set incoming_text to null when there is no exact external source message.",
-        "schema": {
-          "additionalProperties": false,
-          "description": "Communication approval card context, excluding executable message fields.",
-          "properties": {
-            "context_used": {
-              "maxLength": 4000,
-              "minLength": 1,
-              "title": "Context Used",
-              "type": "string"
-            },
-            "incoming_kind": {
-              "enum": [
-                "message",
-                "trigger"
-              ],
-              "title": "Incoming Kind",
-              "type": "string"
-            },
-            "incoming_text": {
-              "anyOf": [
-                {
-                  "maxLength": 4000,
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Incoming Text"
-            },
-            "received_at": {
-              "anyOf": [
-                {
-                  "format": "date-time",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Received At"
-            },
-            "reply_strategy": {
-              "maxLength": 2000,
-              "minLength": 1,
-              "title": "Reply Strategy",
-              "type": "string"
-            },
-            "review_tags": {
-              "items": {
-                "type": "string"
-              },
-              "maxItems": 8,
-              "title": "Review Tags",
-              "type": "array"
-            },
-            "source_app": {
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Source App",
-              "type": "string"
-            },
-            "summary": {
-              "maxLength": 500,
-              "minLength": 1,
-              "title": "Summary",
-              "type": "string"
-            },
-            "target_label": {
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Target Label",
-              "type": "string"
-            },
-            "title": {
-              "maxLength": 160,
-              "minLength": 1,
-              "title": "Title",
-              "type": "string"
-            }
-          },
-          "required": [
-            "source_app",
-            "target_label",
-            "received_at",
-            "title",
-            "summary",
-            "reply_strategy",
-            "review_tags",
-            "incoming_kind",
-            "incoming_text",
-            "context_used"
-          ],
-          "title": "CommunicationApprovalMetadata",
-          "type": "object"
-        }
-      },
-      "approval_presentation_kind": "email_message",
       "communication_channel": "email",
       "description": "Send a Gmail email message to one or more recipients via the live Gmail API. This mutates external state and requires user approval before execution.",
       "input_schema": {
-        "additionalProperties": false,
-        "properties": {
-          "account_id": {
-            "anyOf": [
-              {
+        "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
                 "type": "string"
               },
-              {
-                "type": "null"
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
               }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
             ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
+            "title": "ConversationContext",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
           "bcc": {
             "anyOf": [
               {
@@ -5251,36 +4942,22 @@
             "description": "Optional CC recipient email addresses.",
             "title": "Cc"
           },
-          "idempotency_key": {
+          "conversation_context": {
             "anyOf": [
               {
-                "type": "string"
+                "$ref": "#/$defs/ConversationContext"
               },
               {
                 "type": "null"
               }
             ],
             "default": null,
-            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
-            "title": "Idempotency Key"
+            "description": "Optional Gmail thread conversation_context to reply within an existing thread. Copy the full object from a prior Gmail result; omit only for a brand-new email."
           },
           "subject": {
             "description": "Subject line for the outgoing Gmail message.",
             "title": "Subject",
             "type": "string"
-          },
-          "thread_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Gmail thread ID to reply within an existing thread.",
-            "title": "Thread Id"
           },
           "to": {
             "description": "Recipient email addresses for the outgoing Gmail message.",
@@ -5302,24 +4979,48 @@
       "name": "google_gmail.gmail_send_email",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "GmailSentMessageRead": {
             "additionalProperties": false,
             "properties": {
-              "message_id": {
-                "title": "Message Id",
-                "type": "string"
-              },
-              "thread_id": {
+              "conversation_context": {
                 "anyOf": [
                   {
-                    "type": "string"
+                    "$ref": "#/$defs/ConversationContext"
                   },
                   {
                     "type": "null"
                   }
                 ],
-                "default": null,
-                "title": "Thread Id"
+                "default": null
+              },
+              "message_id": {
+                "title": "Message Id",
+                "type": "string"
               }
             },
             "required": [
@@ -5451,19 +5152,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "range_a1": {
             "description": "A1 notation range to fetch from the spreadsheet.",
             "title": "Range A1",
@@ -5791,133 +5479,52 @@
       "result_contract": "read_result"
     },
     {
-      "approval_metadata_contract": {
-        "key": "whatsapp_message",
-        "prompt": "Use approval_metadata only for communication-card context that helps the user understand why this approved message is being proposed.\nAllowed fields are the selected tool's approval_metadata_contract.schema fields only.\nDo not include executable values already present in display_arguments or the approved tool arguments: draft/body/message text, email subject, Chat/WhatsApp targets, channel IDs, spaces, JIDs, or idempotency keys.\ntarget_label is required. It must be the human-facing destination or counterparty label the user should recognize, such as a person name, room name, group name, or '3 recipients'. Do not use opaque executable identifiers such as spaces/..., thread IDs, JIDs, raw channel IDs, tokens, or idempotency keys as target_label. Use a plain email address only when no better display name is available.\nFor approval tweaks or replacement approvals, preserve the same target_label from previous_approval.approval_metadata.target_label unless the user explicitly changes the destination.\nUse source_app, target_label, received_at, title, a scan-ready summary, reply_strategy, review_tags, incoming_kind/incoming_text from source_message_candidates, and context_used.\nFor incoming_kind=\"message\", incoming_text must be copied exactly from one source_message_candidates[].text value. Use incoming_kind=\"trigger\" and set incoming_text to null when there is no exact external source message.",
-        "schema": {
-          "additionalProperties": false,
-          "description": "Communication approval card context, excluding executable message fields.",
-          "properties": {
-            "context_used": {
-              "maxLength": 4000,
-              "minLength": 1,
-              "title": "Context Used",
-              "type": "string"
-            },
-            "incoming_kind": {
-              "enum": [
-                "message",
-                "trigger"
-              ],
-              "title": "Incoming Kind",
-              "type": "string"
-            },
-            "incoming_text": {
-              "anyOf": [
-                {
-                  "maxLength": 4000,
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Incoming Text"
-            },
-            "received_at": {
-              "anyOf": [
-                {
-                  "format": "date-time",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Received At"
-            },
-            "reply_strategy": {
-              "maxLength": 2000,
-              "minLength": 1,
-              "title": "Reply Strategy",
-              "type": "string"
-            },
-            "review_tags": {
-              "items": {
+      "communication_channel": "whatsapp",
+      "description": "Send one WhatsApp text message via whatsapp-runtime. This mutates external state and requires user approval before execution.",
+      "input_schema": {
+        "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
                 "type": "string"
               },
-              "maxItems": 8,
-              "title": "Review Tags",
-              "type": "array"
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
             },
-            "source_app": {
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Source App",
-              "type": "string"
-            },
-            "summary": {
-              "maxLength": 500,
-              "minLength": 1,
-              "title": "Summary",
-              "type": "string"
-            },
-            "target_label": {
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Target Label",
-              "type": "string"
-            },
-            "title": {
-              "maxLength": 160,
-              "minLength": 1,
-              "title": "Title",
-              "type": "string"
-            }
-          },
-          "required": [
-            "source_app",
-            "target_label",
-            "received_at",
-            "title",
-            "summary",
-            "reply_strategy",
-            "review_tags",
-            "incoming_kind",
-            "incoming_text",
-            "context_used"
-          ],
-          "title": "CommunicationApprovalMetadata",
-          "type": "object"
-        }
-      },
-      "approval_presentation_kind": "whatsapp_message",
-      "communication_channel": "whatsapp",
-      "description": "Send one WhatsApp text message via whatsapp-runtime. Uses idempotency_key as runtime clientMessageId and retries 409 conflicts using Retry-After. This mutates external state and requires user approval before execution.",
-      "input_schema": {
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          }
+        },
         "additionalProperties": false,
         "properties": {
-          "idempotency_key": {
-            "description": "Non-empty idempotency key mapped to runtime clientMessageId for safe retries.",
-            "title": "Idempotency Key",
-            "type": "string"
+          "conversation_context": {
+            "$ref": "#/$defs/ConversationContext",
+            "description": "WhatsApp chat conversation_context copied as a full object from a prior WhatsApp result or source event. The chat_jid inside the context is the send target."
           },
           "message_content": {
             "description": "Plain-text WhatsApp message body.",
             "maxLength": 4096,
             "title": "Message Content",
             "type": "string"
-          },
-          "target": {
-            "description": "Target phone number or chat JID accepted by whatsapp-runtime /messages/send.",
-            "title": "Target",
-            "type": "string"
           }
         },
         "required": [
-          "target",
-          "message_content",
-          "idempotency_key"
+          "conversation_context",
+          "message_content"
         ],
         "title": "WhatsappSendMessageInput",
         "type": "object"
@@ -5925,6 +5532,31 @@
       "name": "whatsapp.send_message",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "ResolutionInfo": {
             "additionalProperties": false,
             "properties": {
@@ -5971,17 +5603,16 @@
           "WhatsappSendMessageData": {
             "additionalProperties": false,
             "properties": {
-              "idempotent_replay": {
+              "conversation_context": {
                 "anyOf": [
                   {
-                    "type": "boolean"
+                    "$ref": "#/$defs/ConversationContext"
                   },
                   {
                     "type": "null"
                   }
                 ],
-                "default": null,
-                "title": "Idempotent Replay"
+                "default": null
               },
               "reason": {
                 "anyOf": [
@@ -6005,18 +5636,6 @@
                 ],
                 "default": null,
                 "title": "Retry After Seconds"
-              },
-              "retry_with_new_idempotency_key": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Retry With New Idempotency Key"
               },
               "scope": {
                 "anyOf": [
@@ -6190,19 +5809,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_cancelled": {
             "anyOf": [
               {
@@ -6660,19 +6266,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_cancelled": {
             "anyOf": [
               {
@@ -7162,19 +6755,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_cancelled": {
             "anyOf": [
               {
@@ -7688,19 +7268,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -7748,6 +7315,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "conversation_identity": {
                 "anyOf": [
                   {
@@ -7829,18 +7407,6 @@
                 "default": null,
                 "title": "Sender Type"
               },
-              "space_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Space Name"
-              },
               "text": {
                 "anyOf": [
                   {
@@ -7852,18 +7418,6 @@
                 ],
                 "default": null,
                 "title": "Text"
-              },
-              "thread_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Name"
               }
             },
             "required": [
@@ -7884,6 +7438,31 @@
               }
             },
             "title": "ChatMessagesData",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "FreshnessInfo": {
@@ -8180,19 +7759,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -8287,12 +7853,11 @@
           "ChatLexicalSearchMatchRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "document_record_id": {
                 "title": "Document Record Id",
-                "type": "string"
-              },
-              "group_key": {
-                "title": "Group Key",
                 "type": "string"
               },
               "latest_create_time": {
@@ -8329,35 +7894,11 @@
                 ],
                 "default": null,
                 "title": "Snippet"
-              },
-              "space_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Space Name"
-              },
-              "thread_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Name"
               }
             },
             "required": [
               "document_record_id",
-              "group_key",
+              "conversation_context",
               "score"
             ],
             "title": "ChatLexicalSearchMatchRead",
@@ -8366,6 +7907,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "conversation_identity": {
                 "anyOf": [
                   {
@@ -8447,18 +7999,6 @@
                 "default": null,
                 "title": "Sender Type"
               },
-              "space_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Space Name"
-              },
               "text": {
                 "anyOf": [
                   {
@@ -8470,24 +8010,37 @@
                 ],
                 "default": null,
                 "title": "Text"
-              },
-              "thread_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Name"
               }
             },
             "required": [
               "message_name"
             ],
             "title": "ChatMessageRead",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "FreshnessInfo": {
@@ -8784,19 +8337,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -8870,6 +8410,17 @@
           "ChatMessageRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "conversation_identity": {
                 "anyOf": [
                   {
@@ -8951,18 +8502,6 @@
                 "default": null,
                 "title": "Sender Type"
               },
-              "space_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Space Name"
-              },
               "text": {
                 "anyOf": [
                   {
@@ -8974,18 +8513,6 @@
                 ],
                 "default": null,
                 "title": "Text"
-              },
-              "thread_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Name"
               }
             },
             "required": [
@@ -9047,16 +8574,15 @@
           "ChatSemanticSearchMatchRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "evidence_chunks": {
                 "items": {
                   "$ref": "#/$defs/ChatSemanticEvidenceChunkRead"
                 },
                 "title": "Evidence Chunks",
                 "type": "array"
-              },
-              "group_key": {
-                "title": "Group Key",
-                "type": "string"
               },
               "latest_create_time": {
                 "anyOf": [
@@ -9080,37 +8606,38 @@
               "score": {
                 "title": "Score",
                 "type": "number"
-              },
-              "space_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Space Name"
-              },
-              "thread_name": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Name"
               }
             },
             "required": [
-              "group_key",
+              "conversation_context",
               "score"
             ],
             "title": "ChatSemanticSearchMatchRead",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "FreshnessInfo": {
@@ -9407,19 +8934,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -9459,6 +8973,9 @@
           "ChatSpaceSummary": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "latest_create_time": {
                 "anyOf": [
                   {
@@ -9510,14 +9027,10 @@
               "message_count": {
                 "title": "Message Count",
                 "type": "integer"
-              },
-              "space_name": {
-                "title": "Space Name",
-                "type": "string"
               }
             },
             "required": [
-              "space_name",
+              "conversation_context",
               "message_count"
             ],
             "title": "ChatSpaceSummary",
@@ -9535,6 +9048,31 @@
               }
             },
             "title": "ChatSpacesData",
+            "type": "object"
+          },
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
             "type": "object"
           },
           "FreshnessInfo": {
@@ -9789,19 +9327,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "document_id": {
             "description": "Google Docs document ID from a prior Docs search or document result.",
             "title": "Document Id",
@@ -10162,19 +9687,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -10539,19 +10051,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -10960,19 +10459,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -11405,19 +10891,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "file_id": {
             "description": "Google Drive file ID from a prior Drive search or file result.",
             "title": "File Id",
@@ -11809,19 +11282,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -12229,19 +11689,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -12681,19 +12128,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -13157,19 +12591,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "thread_id": {
             "description": "Gmail thread ID from a prior local Gmail search or thread result.",
             "title": "Thread Id",
@@ -13186,6 +12607,31 @@
       "name": "google_gmail.get_thread_local",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -13232,20 +12678,19 @@
           "GmailGetThreadData": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "messages": {
                 "items": {
                   "$ref": "#/$defs/GmailMessageRead"
                 },
                 "title": "Messages",
                 "type": "array"
-              },
-              "thread_id": {
-                "title": "Thread Id",
-                "type": "string"
               }
             },
             "required": [
-              "thread_id"
+              "conversation_context"
             ],
             "title": "GmailGetThreadData",
             "type": "object"
@@ -13278,6 +12723,17 @@
                 },
                 "title": "Cc",
                 "type": "array"
+              },
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "conversation_identity": {
                 "anyOf": [
@@ -13378,18 +12834,6 @@
                 ],
                 "default": null,
                 "title": "Subject"
-              },
-              "thread_id": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Id"
               },
               "to": {
                 "items": {
@@ -13656,19 +13100,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "thread_ids": {
             "description": "One or more Gmail thread IDs to fetch from local Gmail data.",
             "items": {
@@ -13690,6 +13121,31 @@
       "name": "google_gmail.get_threads_local",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -13775,6 +13231,17 @@
                 },
                 "title": "Cc",
                 "type": "array"
+              },
+              "conversation_context": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ConversationContext"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
               },
               "conversation_identity": {
                 "anyOf": [
@@ -13876,18 +13343,6 @@
                 "default": null,
                 "title": "Subject"
               },
-              "thread_id": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Thread Id"
-              },
               "to": {
                 "items": {
                   "type": "string"
@@ -13905,20 +13360,19 @@
           "GmailThreadRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "messages": {
                 "items": {
                   "$ref": "#/$defs/GmailMessageRead"
                 },
                 "title": "Messages",
                 "type": "array"
-              },
-              "thread_id": {
-                "title": "Thread Id",
-                "type": "string"
               }
             },
             "required": [
-              "thread_id"
+              "conversation_context"
             ],
             "title": "GmailThreadRead",
             "type": "object"
@@ -14174,19 +13628,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "before_internal_date": {
             "anyOf": [
               {
@@ -14271,6 +13712,31 @@
       "name": "google_gmail.list_threads_local",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -14331,6 +13797,9 @@
           "GmailThreadSummary": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "from_address": {
                 "anyOf": [
                   {
@@ -14401,14 +13870,10 @@
                 ],
                 "default": null,
                 "title": "Subject"
-              },
-              "thread_id": {
-                "title": "Thread Id",
-                "type": "string"
               }
             },
             "required": [
-              "thread_id",
+              "conversation_context",
               "message_count"
             ],
             "title": "GmailThreadSummary",
@@ -14623,19 +14088,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -14701,6 +14153,31 @@
       "name": "google_gmail.search_threads_lexical_local",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -14768,6 +14245,9 @@
           "GmailLexicalSearchMatchRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "from_address": {
                 "anyOf": [
                   {
@@ -14854,14 +14334,10 @@
                 ],
                 "default": null,
                 "title": "Subject"
-              },
-              "thread_id": {
-                "title": "Thread Id",
-                "type": "string"
               }
             },
             "required": [
-              "thread_id",
+              "conversation_context",
               "message_count",
               "score"
             ],
@@ -15077,19 +14553,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "limit": {
             "anyOf": [
               {
@@ -15155,6 +14618,31 @@
       "name": "google_gmail.search_threads_semantic_local",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -15227,6 +14715,9 @@
           "GmailSemanticSearchMatchRead": {
             "additionalProperties": false,
             "properties": {
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
+              },
               "evidence_chunks": {
                 "items": {
                   "$ref": "#/$defs/SemanticEvidenceChunkRead"
@@ -15308,14 +14799,10 @@
                 ],
                 "default": null,
                 "title": "Subject"
-              },
-              "thread_id": {
-                "title": "Thread Id",
-                "type": "string"
               }
             },
             "required": [
-              "thread_id",
+              "conversation_context",
               "message_count",
               "score"
             ],
@@ -15555,19 +15042,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "spreadsheet_id": {
             "description": "Google Sheets spreadsheet ID from a prior Sheets search or result.",
             "title": "Spreadsheet Id",
@@ -15928,19 +15402,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -16317,19 +15778,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -16738,19 +16186,6 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "account_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Optional Google account ID when multiple Google accounts are configured. Omit this to use the active account.",
-            "title": "Account Id"
-          },
           "include_removed": {
             "anyOf": [
               {
@@ -17242,6 +16677,31 @@
       "name": "whatsapp.chat_context",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -17510,9 +16970,8 @@
                 "default": null,
                 "title": "Before Ts Ms"
               },
-              "chat_jid": {
-                "title": "Chat Jid",
-                "type": "string"
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
               },
               "messages": {
                 "items": {
@@ -17523,7 +16982,7 @@
               }
             },
             "required": [
-              "chat_jid"
+              "conversation_context"
             ],
             "title": "WhatsappChatContextData",
             "type": "object"
@@ -17531,9 +16990,8 @@
           "WhatsappMessageRead": {
             "additionalProperties": false,
             "properties": {
-              "chat_jid": {
-                "title": "Chat Jid",
-                "type": "string"
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
               },
               "conversation_identity": {
                 "anyOf": [
@@ -17630,7 +17088,7 @@
               }
             },
             "required": [
-              "chat_jid",
+              "conversation_context",
               "message_id",
               "from_me",
               "sender_jid",
@@ -17774,6 +17232,31 @@
       "name": "whatsapp.list_chats_latest",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -17996,12 +17479,11 @@
                 "default": null,
                 "title": "Archived"
               },
-              "chat_jid": {
-                "title": "Chat Jid",
-                "type": "string"
-              },
               "chat_kind": {
                 "$ref": "#/$defs/WhatsappChatKind"
+              },
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
               },
               "conversation_timestamp_ms": {
                 "anyOf": [
@@ -18097,7 +17579,7 @@
               }
             },
             "required": [
-              "chat_jid",
+              "conversation_context",
               "chat_kind",
               "is_active",
               "updated_at_ms"
@@ -18705,6 +18187,31 @@
       "name": "whatsapp.list_directory_mapping_latest",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -18915,10 +18422,6 @@
           "WhatsappDirectoryMappingRead": {
             "additionalProperties": false,
             "properties": {
-              "chat_jid": {
-                "title": "Chat Jid",
-                "type": "string"
-              },
               "chat_kind": {
                 "$ref": "#/$defs/WhatsappChatKind"
               },
@@ -18933,6 +18436,9 @@
                 ],
                 "default": null,
                 "title": "Contact Jid"
+              },
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
               },
               "conversation_timestamp_ms": {
                 "anyOf": [
@@ -18995,7 +18501,7 @@
               }
             },
             "required": [
-              "chat_jid",
+              "conversation_context",
               "chat_kind",
               "is_active",
               "resolution_kind",
@@ -19157,6 +18663,31 @@
       "name": "whatsapp.search_local_chat_shards",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -19367,12 +18898,11 @@
           "WhatsappSearchChatShardRead": {
             "additionalProperties": false,
             "properties": {
-              "chat_jid": {
-                "title": "Chat Jid",
-                "type": "string"
-              },
               "chat_kind": {
                 "$ref": "#/$defs/WhatsappChatKind"
+              },
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
               },
               "doc_id": {
                 "title": "Doc Id",
@@ -19444,7 +18974,7 @@
               }
             },
             "required": [
-              "chat_jid",
+              "conversation_context",
               "chat_kind",
               "doc_id",
               "shard_index",
@@ -19601,6 +19131,31 @@
       "name": "whatsapp.search_local_chat_shards_semantic",
       "output_schema": {
         "$defs": {
+          "ConversationContext": {
+            "additionalProperties": false,
+            "description": "Stable grouping key for one provider conversation.",
+            "properties": {
+              "connector_id": {
+                "title": "Connector Id",
+                "type": "string"
+              },
+              "context_key": {
+                "title": "Context Key",
+                "type": "string"
+              },
+              "context_kind": {
+                "title": "Context Kind",
+                "type": "string"
+              }
+            },
+            "required": [
+              "connector_id",
+              "context_kind",
+              "context_key"
+            ],
+            "title": "ConversationContext",
+            "type": "object"
+          },
           "FreshnessInfo": {
             "additionalProperties": false,
             "properties": {
@@ -19835,12 +19390,11 @@
           "WhatsappSemanticSearchChatShardRead": {
             "additionalProperties": false,
             "properties": {
-              "chat_jid": {
-                "title": "Chat Jid",
-                "type": "string"
-              },
               "chat_kind": {
                 "$ref": "#/$defs/WhatsappChatKind"
+              },
+              "conversation_context": {
+                "$ref": "#/$defs/ConversationContext"
               },
               "doc_id": {
                 "title": "Doc Id",
@@ -19915,7 +19469,7 @@
               }
             },
             "required": [
-              "chat_jid",
+              "conversation_context",
               "chat_kind",
               "doc_id",
               "shard_index",

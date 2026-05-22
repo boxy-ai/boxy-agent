@@ -5,9 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal, cast
 
-from jsonschema import Draft202012Validator
-from jsonschema.exceptions import SchemaError
-
 from boxy_agent.types import JsonValue, ensure_json_value
 
 AgentType = Literal["automation", "data_mining"]
@@ -17,35 +14,6 @@ ResultContract = Literal[
     "mutation_result",
 ]
 CommunicationChannel = Literal["email", "google_chat", "whatsapp"]
-ApprovalPresentationKind = Literal["email_message", "google_chat_message", "whatsapp_message"]
-
-
-@dataclass(frozen=True)
-class ApprovalMetadataContract:
-    """Tool-owned JSON Schema for optional approval presentation metadata."""
-
-    key: str
-    schema: dict[str, JsonValue]
-    prompt: str = ""
-
-    def __post_init__(self) -> None:
-        _require_non_empty("approval metadata contract key", self.key)
-        if not isinstance(self.schema, dict):
-            raise TypeError("approval metadata contract schema must be a dict")
-        if not isinstance(self.prompt, str):
-            raise TypeError("approval metadata contract prompt must be a string")
-        for key, value in self.schema.items():
-            _require_non_empty("approval metadata schema key", key)
-            ensure_json_value(
-                value,
-                label=f"approval metadata schema value for {self.key}:{key}",
-            )
-        try:
-            Draft202012Validator.check_schema(self.schema)
-        except SchemaError as exc:
-            raise ValueError(
-                f"Invalid approval metadata JSON schema for {self.key}: {exc.message}"
-            ) from exc
 
 
 @dataclass(frozen=True)
@@ -94,8 +62,6 @@ class ToolDescriptor:
     result_contract: ResultContract = "raw"
     side_effect: bool = False
     communication_channel: CommunicationChannel | None = None
-    approval_presentation_kind: ApprovalPresentationKind | None = None
-    approval_metadata_contract: ApprovalMetadataContract | None = None
 
     def __post_init__(self) -> None:
         _require_non_empty("name", self.name)
@@ -106,15 +72,6 @@ class ToolDescriptor:
             self.communication_channel,
             label=f"communication channel for {self.name}",
         )
-        _require_optional_approval_presentation_kind(
-            self.approval_presentation_kind,
-            label=f"approval presentation kind for {self.name}",
-        )
-        if self.approval_metadata_contract is not None and not isinstance(
-            self.approval_metadata_contract,
-            ApprovalMetadataContract,
-        ):
-            raise TypeError("approval_metadata_contract must be an ApprovalMetadataContract")
         for key, value in self.input_schema.items():
             _require_non_empty("input schema key", key)
             ensure_json_value(value, label=f"input schema value for {self.name}:{key}")
@@ -253,17 +210,6 @@ def _require_optional_communication_channel(
     if value is None:
         return
     if value not in {"email", "google_chat", "whatsapp"}:
-        raise ValueError(f"Unsupported {label}: {value}")
-
-
-def _require_optional_approval_presentation_kind(
-    value: str | None,
-    *,
-    label: str,
-) -> None:
-    if value is None:
-        return
-    if value not in {"email_message", "google_chat_message", "whatsapp_message"}:
         raise ValueError(f"Unsupported {label}: {value}")
 
 

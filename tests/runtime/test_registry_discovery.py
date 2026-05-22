@@ -52,7 +52,12 @@ class _NoopBindings:
     def boxy_tool_execution_affinities(self) -> dict[str, ExecutionAffinity]:
         return {}
 
-    def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
+    def call_boxy_tool(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+    ) -> JsonValue:
+        _ = params
         raise AssertionError(f"registry discovery handler should not call boxy tool: {name}")
 
     def list_builtin_tools(self) -> list[models.ToolDescriptor]:

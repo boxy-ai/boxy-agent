@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from boxy_agent.sdk import boxy_tools, data_queries, decorators, models
 
 
@@ -17,6 +19,18 @@ def _chat_context_message_count(result: object) -> int:
     return len(messages)
 
 
+def _chat_conversation_context(result: object) -> dict[str, models.JsonValue]:
+    if not isinstance(result, dict):
+        raise ValueError("chat context result must be an object")
+    data = result.get("data")
+    if not isinstance(data, dict):
+        raise ValueError("chat context result data must be an object")
+    conversation_context = data.get("conversation_context")
+    if not isinstance(conversation_context, dict):
+        raise ValueError("chat context result must include conversation_context")
+    return cast(dict[str, models.JsonValue], conversation_context)
+
+
 @decorators.agent_main
 def handle(exec_ctx: models.AgentExecutionContext) -> models.AgentResult:
     """Run a single sequential automation pass."""
@@ -28,31 +42,27 @@ def handle(exec_ctx: models.AgentExecutionContext) -> models.AgentResult:
             }
         )
 
-    target_value = exec_ctx.event.payload.get("target")
     chat_jid_value = exec_ctx.event.payload.get("chat_jid")
-    if not isinstance(target_value, str) or not target_value.strip():
-        raise ValueError("target payload field must be a non-empty string")
     if not isinstance(chat_jid_value, str) or not chat_jid_value.strip():
         raise ValueError("chat_jid payload field must be a non-empty string")
-    target = target_value.strip()
     chat_jid = chat_jid_value.strip()
 
     chat_context = data_queries.query(exec_ctx, "whatsapp.chat_context", {"chat_jid": chat_jid})
     message_count = _chat_context_message_count(chat_context)
+    conversation_context = _chat_conversation_context(chat_context)
     send_result = boxy_tools.call(
         exec_ctx,
         "whatsapp.send_message",
         {
-            "target": target,
+            "conversation_context": conversation_context,
             "message_content": "Thanks for the update.",
-            "idempotency_key": f"reference-{exec_ctx.session_id}",
         },
     )
 
     return models.AgentResult(
         output={
             "status": "completed",
-            "target": target,
+            "chat_jid": chat_jid,
             "message_count": message_count,
             "send_result": send_result,
         }

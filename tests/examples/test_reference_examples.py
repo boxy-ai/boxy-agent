@@ -93,12 +93,12 @@ def test_reference_automation_agent_packaged_and_runs_end_to_end(tmp_path: Path)
         REFERENCE_AUTOMATION_AGENT_NAME,
         {
             "type": "chat.reply_request",
-            "payload": {"target": "chat-1", "chat_jid": "chat-1"},
+            "payload": {"chat_jid": "chat-1"},
         },
     )
 
     assert report.status == "idle"
     output = _require_dict(report.last_output)
     assert output["status"] == "completed"
-    assert output["target"] == "chat-1"
+    assert output["chat_jid"] == "chat-1"
     assert output["message_count"] == 1

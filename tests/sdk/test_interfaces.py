@@ -8,6 +8,7 @@ from test_helpers.capabilities import (
     boxy_tool_registry,
     builtin_tool_registry,
     data_query_registry,
+    default_whatsapp_conversation_context,
 )
 
 from boxy_agent.runtime.errors import CapabilityViolationError
@@ -59,7 +60,11 @@ class _FakeBindings:
     def boxy_tool_execution_affinities(self):
         return {}
 
-    def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
+    def call_boxy_tool(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+    ) -> JsonValue:
         if name != DEFAULT_BOXY_TOOL_NAME:
             raise CapabilityViolationError(f"forbidden boxy tool: {name}")
         return {"ok": True, "params": params}
@@ -132,16 +137,14 @@ def test_context_routes_calls_through_sdk_helpers() -> None:
         context,
         DEFAULT_BOXY_TOOL_NAME,
         {
-            "target": "chat-1",
+            "conversation_context": default_whatsapp_conversation_context(),
             "message_content": "hello",
-            "idempotency_key": "idemp-1",
         },
     ) == {
         "ok": True,
         "params": {
-            "target": "chat-1",
+            "conversation_context": default_whatsapp_conversation_context(),
             "message_content": "hello",
-            "idempotency_key": "idemp-1",
         },
     }
     with pytest.raises(CapabilityViolationError):

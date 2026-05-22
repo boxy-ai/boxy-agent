@@ -231,7 +231,11 @@ class _ContextRuntimeBindings:
             execution_affinities=self.boxy_tool_client.tool_execution_affinities(),
         )
 
-    def call_boxy_tool(self, name: str, params: dict[str, JsonValue]) -> JsonValue:
+    def call_boxy_tool(
+        self,
+        name: str,
+        params: dict[str, JsonValue],
+    ) -> JsonValue:
         self._ensure_capability(
             name=name,
             allowed=self.capabilities.boxy_tools,
