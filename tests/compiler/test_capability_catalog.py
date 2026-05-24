@@ -98,7 +98,21 @@ def test_load_capability_catalog_from_json_file(tmp_path: Path) -> None:
                         },
                         "side_effect": True,
                         "communication_channel": "email",
-                    }
+                    },
+                    {
+                        "name": "linkedin.send_message",
+                        "description": "Send LinkedIn message",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"message_content": {"type": "string"}},
+                        },
+                        "output_schema": {
+                            "type": "object",
+                            "properties": {"status": {"type": "string"}},
+                        },
+                        "side_effect": True,
+                        "communication_channel": "linkedin",
+                    },
                 ],
                 "builtin_tools": [
                     {
@@ -119,11 +133,12 @@ def test_load_capability_catalog_from_json_file(tmp_path: Path) -> None:
     catalog = load_capability_catalog(path)
 
     assert list(catalog.data_queries) == ["custom.messages"]
-    assert list(catalog.boxy_tools) == ["custom.send"]
+    assert list(catalog.boxy_tools) == ["custom.send", "linkedin.send_message"]
     assert list(catalog.builtin_tools) == ["custom.search"]
     assert catalog.data_queries["custom.messages"].max_limit == 25
     assert catalog.boxy_tools["custom.send"].side_effect is True
     assert catalog.boxy_tools["custom.send"].communication_channel == "email"
+    assert catalog.boxy_tools["linkedin.send_message"].communication_channel == "linkedin"
 
 
 def test_packaged_builtin_catalog_carries_builtin_tool_usage_guidance() -> None:

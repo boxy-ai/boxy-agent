@@ -13,7 +13,7 @@ ResultContract = Literal[
     "read_result",
     "mutation_result",
 ]
-CommunicationChannel = Literal["email", "google_chat", "whatsapp"]
+CommunicationChannel = Literal["email", "google_chat", "linkedin", "whatsapp"]
 
 
 @dataclass(frozen=True)
@@ -209,7 +209,7 @@ def _require_optional_communication_channel(
 ) -> None:
     if value is None:
         return
-    if value not in {"email", "google_chat", "whatsapp"}:
+    if value not in {"email", "google_chat", "linkedin", "whatsapp"}:
         raise ValueError(f"Unsupported {label}: {value}")
 
 

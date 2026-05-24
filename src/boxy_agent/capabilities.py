@@ -310,7 +310,7 @@ def _optional_communication_channel(
     value = data.get(key)
     if value is None:
         return None
-    if value not in {"email", "google_chat", "whatsapp"}:
+    if value not in {"email", "google_chat", "linkedin", "whatsapp"}:
         raise CapabilityCatalogError(f"{label}.{key} has unsupported value {value!r} ({source})")
     return cast(CommunicationChannel, value)
 
