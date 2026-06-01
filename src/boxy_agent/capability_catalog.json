@@ -5,6 +5,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "attendees": {
             "anyOf": [
               {
@@ -52,6 +57,19 @@
             "title": "End",
             "type": "string"
           },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
+            "title": "Idempotency Key"
+          },
           "location": {
             "anyOf": [
               {
@@ -77,6 +95,7 @@
           }
         },
         "required": [
+          "account_id",
           "summary",
           "start",
           "end"
@@ -339,6 +358,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "calendar_id": {
             "anyOf": [
               {
@@ -420,6 +444,9 @@
             "title": "Time Min"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "CalendarListEventsToolInput",
         "type": "object"
       },
@@ -821,6 +848,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -856,6 +888,7 @@
           }
         },
         "required": [
+          "account_id",
           "space"
         ],
         "title": "ChatListMessagesToolInput",
@@ -1311,6 +1344,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -1340,6 +1378,9 @@
             "title": "Page Token"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "ChatListSpacesToolInput",
         "type": "object"
       },
@@ -1735,12 +1776,18 @@
         },
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "recipient_identity": {
             "$ref": "#/$defs/IdentityRef",
             "description": "Full google_workspace/google_chat_user IdentityRef selected from directory_search or directory_lookup_identity, for example {\"provider\":\"google_workspace\",\"kind\":\"google_chat_user\",\"value\":\"users/123\"}. Do not pass human names here; resolve names through the directory first."
           }
         },
         "required": [
+          "account_id",
           "recipient_identity"
         ],
         "title": "ChatResolveDirectMessageRecipientToolInput",
@@ -2118,9 +2165,27 @@
         },
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "conversation_context": {
             "$ref": "#/$defs/ConversationContext",
             "description": "Google Chat direct-message space conversation_context copied from chat_resolve_direct_message_recipient. Do not pass a person name here."
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
+            "title": "Idempotency Key"
           },
           "text": {
             "description": "Plain-text Google Chat message body.",
@@ -2129,6 +2194,7 @@
           }
         },
         "required": [
+          "account_id",
           "conversation_context",
           "text"
         ],
@@ -2470,9 +2536,27 @@
         },
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "conversation_context": {
             "$ref": "#/$defs/ConversationContext",
             "description": "Google Chat space or thread conversation_context copied as a full object from a prior Chat result, direct-message resolver result, or source event."
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
+            "title": "Idempotency Key"
           },
           "text": {
             "description": "Plain-text Google Chat message body.",
@@ -2481,6 +2565,7 @@
           }
         },
         "required": [
+          "account_id",
           "conversation_context",
           "text"
         ],
@@ -2794,6 +2879,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "document_id": {
             "description": "Google Docs document ID to fetch from the live API.",
             "title": "Document Id",
@@ -2801,6 +2891,7 @@
           }
         },
         "required": [
+          "account_id",
           "document_id"
         ],
         "title": "DocsGetDocumentToolInput",
@@ -3153,6 +3244,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "fields": {
             "anyOf": [
               {
@@ -3173,6 +3269,7 @@
           }
         },
         "required": [
+          "account_id",
           "file_id"
         ],
         "title": "DriveGetFileToolInput",
@@ -3556,6 +3653,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -3598,6 +3700,9 @@
             "title": "Q"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "DriveSearchFilesToolInput",
         "type": "object"
       },
@@ -3975,6 +4080,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "format": {
             "anyOf": [
               {
@@ -4000,6 +4110,7 @@
           }
         },
         "required": [
+          "account_id",
           "thread_id"
         ],
         "title": "GmailGetThreadToolInput",
@@ -4501,6 +4612,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -4543,6 +4659,9 @@
             "title": "Query"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "GmailSearchThreadsToolInput",
         "type": "object"
       },
@@ -4874,7 +4993,7 @@
     },
     {
       "communication_channel": "email",
-      "description": "Send a Gmail email message to one or more recipients via the live Gmail API. This mutates external state and requires user approval before execution.",
+      "description": "Send a Gmail email message to one or more raw email-address recipients via the live Gmail API. Recipient fields must contain only email address tokens, not display names or surrounding request text. This mutates external state and requires user approval before execution.",
       "input_schema": {
         "$defs": {
           "ConversationContext": {
@@ -4905,10 +5024,16 @@
         },
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "bcc": {
             "anyOf": [
               {
                 "items": {
+                  "pattern": "^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$",
                   "type": "string"
                 },
                 "type": "array"
@@ -4918,7 +5043,7 @@
               }
             ],
             "default": null,
-            "description": "Optional BCC recipient email addresses.",
+            "description": "Optional BCC recipient email addresses. Each item must be only the raw ASCII email address token.",
             "title": "Bcc"
           },
           "body_text": {
@@ -4930,6 +5055,7 @@
             "anyOf": [
               {
                 "items": {
+                  "pattern": "^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$",
                   "type": "string"
                 },
                 "type": "array"
@@ -4939,7 +5065,7 @@
               }
             ],
             "default": null,
-            "description": "Optional CC recipient email addresses.",
+            "description": "Optional CC recipient email addresses. Each item must be only the raw ASCII email address token.",
             "title": "Cc"
           },
           "conversation_context": {
@@ -4954,14 +5080,28 @@
             "default": null,
             "description": "Optional Gmail thread conversation_context to reply within an existing thread. Copy the full object from a prior Gmail result; omit only for a brand-new email."
           },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional idempotency key for orchestrator-provided deduplication and safe retries.",
+            "title": "Idempotency Key"
+          },
           "subject": {
             "description": "Subject line for the outgoing Gmail message.",
             "title": "Subject",
             "type": "string"
           },
           "to": {
-            "description": "Recipient email addresses for the outgoing Gmail message.",
+            "description": "Recipient email addresses for the outgoing Gmail message. Each item must be only the raw ASCII email address token, such as person@example.com; do not include display names, labels, punctuation, or surrounding request text.",
             "items": {
+              "pattern": "^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$",
               "type": "string"
             },
             "title": "To",
@@ -4969,6 +5109,7 @@
           }
         },
         "required": [
+          "account_id",
           "to",
           "subject",
           "body_text"
@@ -5152,6 +5293,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "range_a1": {
             "description": "A1 notation range to fetch from the spreadsheet.",
             "title": "Range A1",
@@ -5164,6 +5310,7 @@
           }
         },
         "required": [
+          "account_id",
           "spreadsheet_id",
           "range_a1"
         ],
@@ -5809,6 +5956,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_cancelled": {
             "anyOf": [
               {
@@ -5864,6 +6016,9 @@
             "title": "Time Min"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "CalendarListEventsLocalInput",
         "type": "object"
       },
@@ -6266,6 +6421,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_cancelled": {
             "anyOf": [
               {
@@ -6327,6 +6487,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "CalendarSearchEventsLexicalLocalInput",
@@ -6755,6 +6916,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_cancelled": {
             "anyOf": [
               {
@@ -6816,6 +6982,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "CalendarSearchEventsSemanticLocalInput",
@@ -7268,6 +7435,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -7303,6 +7475,7 @@
           }
         },
         "required": [
+          "account_id",
           "space_name"
         ],
         "title": "ChatGetSpaceMessagesLocalInput",
@@ -7759,6 +7932,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -7820,6 +7998,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "ChatSearchMessagesLocalInput",
@@ -8337,6 +8516,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -8398,6 +8582,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "ChatSearchMessagesSemanticLocalInput",
@@ -8934,6 +9119,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -8963,6 +9153,9 @@
             "title": "Text"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "ChatSearchSpacesLocalInput",
         "type": "object"
       },
@@ -9327,6 +9520,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "document_id": {
             "description": "Google Docs document ID from a prior Docs search or document result.",
             "title": "Document Id",
@@ -9334,6 +9532,7 @@
           }
         },
         "required": [
+          "account_id",
           "document_id"
         ],
         "title": "DocsGetDocumentLocalInput",
@@ -9687,6 +9886,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -9716,6 +9920,9 @@
             "title": "Limit"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "DocsListDocumentsLocalInput",
         "type": "object"
       },
@@ -10051,6 +10258,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -10086,6 +10298,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "DocsSearchDocumentsLexicalLocalInput",
@@ -10459,6 +10672,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -10494,6 +10712,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "DocsSearchDocumentsSemanticLocalInput",
@@ -10891,6 +11110,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "file_id": {
             "description": "Google Drive file ID from a prior Drive search or file result.",
             "title": "File Id",
@@ -10898,6 +11122,7 @@
           }
         },
         "required": [
+          "account_id",
           "file_id"
         ],
         "title": "DriveGetFileLocalInput",
@@ -11282,6 +11507,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -11311,6 +11541,9 @@
             "title": "Limit"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "DriveListFilesLocalInput",
         "type": "object"
       },
@@ -11689,6 +11922,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -11724,6 +11962,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "DriveSearchFilesLexicalLocalInput",
@@ -12128,6 +12367,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -12163,6 +12407,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "DriveSearchFilesSemanticLocalInput",
@@ -12591,6 +12836,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "thread_id": {
             "description": "Gmail thread ID from a prior local Gmail search or thread result.",
             "title": "Thread Id",
@@ -12598,6 +12848,7 @@
           }
         },
         "required": [
+          "account_id",
           "thread_id"
         ],
         "title": "GmailGetThreadLocalInput",
@@ -13100,6 +13351,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "thread_ids": {
             "description": "One or more Gmail thread IDs to fetch from local Gmail data.",
             "items": {
@@ -13112,6 +13368,7 @@
           }
         },
         "required": [
+          "account_id",
           "thread_ids"
         ],
         "title": "GmailGetThreadsLocalInput",
@@ -13628,6 +13885,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "before_internal_date": {
             "anyOf": [
               {
@@ -13705,6 +13967,9 @@
             "title": "Unread"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "GmailListThreadsLocalInput",
         "type": "object"
       },
@@ -14088,6 +14353,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -14144,6 +14414,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "GmailSearchThreadsLexicalLocalInput",
@@ -14553,6 +14824,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "limit": {
             "anyOf": [
               {
@@ -14609,6 +14885,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "GmailSearchThreadsSemanticLocalInput",
@@ -15042,6 +15319,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "spreadsheet_id": {
             "description": "Google Sheets spreadsheet ID from a prior Sheets search or result.",
             "title": "Spreadsheet Id",
@@ -15049,6 +15331,7 @@
           }
         },
         "required": [
+          "account_id",
           "spreadsheet_id"
         ],
         "title": "SheetsGetSpreadsheetLocalInput",
@@ -15402,6 +15685,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -15431,6 +15719,9 @@
             "title": "Limit"
           }
         },
+        "required": [
+          "account_id"
+        ],
         "title": "SheetsListSpreadsheetsLocalInput",
         "type": "object"
       },
@@ -15778,6 +16069,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -15813,6 +16109,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "SheetsSearchSpreadsheetsLexicalLocalInput",
@@ -16186,6 +16483,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "account_id": {
+            "description": "Canonical Google account ID for this operation. This field is required for every Google account-scoped call. Use the exact account_id from the selected account-aware self_identity entry; ask the user when the account is ambiguous.",
+            "title": "Account Id",
+            "type": "string"
+          },
           "include_removed": {
             "anyOf": [
               {
@@ -16221,6 +16523,7 @@
           }
         },
         "required": [
+          "account_id",
           "text"
         ],
         "title": "SheetsSearchSpreadsheetsSemanticLocalInput",

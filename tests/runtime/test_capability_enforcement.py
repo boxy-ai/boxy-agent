@@ -40,6 +40,7 @@ from boxy_agent.sdk import llm as llm_sdk
 from boxy_agent.types import JsonValue
 
 READ_ONLY_BOXY_TOOL_NAME = "google_gmail.gmail_search_threads"
+DEFAULT_GOOGLE_ACCOUNT_ID = "google-acct-1"
 
 
 def _runtime_with_default_catalog(**kwargs) -> AgentRuntime:
@@ -271,7 +272,11 @@ def test_runtime_rejects_data_mining_with_side_effecting_boxy_tools() -> None:
 
 def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
     def handle(context):
-        result = call_boxy_tool(context, READ_ONLY_BOXY_TOOL_NAME, {})
+        result = call_boxy_tool(
+            context,
+            READ_ONLY_BOXY_TOOL_NAME,
+            {"account_id": DEFAULT_GOOGLE_ACCOUNT_ID},
+        )
         return AgentResult(output=cast(dict[str, JsonValue], result))
 
     runtime = _runtime_with_default_catalog(
@@ -302,7 +307,7 @@ def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
                             "next_page_token": None,
                         },
                         "resolution": {
-                            "account_id": "acct-1",
+                            "account_id": DEFAULT_GOOGLE_ACCOUNT_ID,
                         },
                     }
                 },
@@ -320,7 +325,7 @@ def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
             "next_page_token": None,
         },
         "resolution": {
-            "account_id": "acct-1",
+            "account_id": DEFAULT_GOOGLE_ACCOUNT_ID,
         },
     }
 
