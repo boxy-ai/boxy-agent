@@ -5665,6 +5665,7 @@
           "message_content": {
             "description": "Plain-text WhatsApp message body.",
             "maxLength": 4096,
+            "minLength": 1,
             "title": "Message Content",
             "type": "string"
           }
@@ -5806,9 +5807,9 @@
               "runtime_transport_error",
               "runtime_inflight_conflict",
               "runtime_not_ready",
+              "rate_limited",
               "deterministic_runtime_rejection",
-              "runtime_request_failed",
-              "local_rate_limited"
+              "runtime_request_failed"
             ],
             "type": "string"
           },
