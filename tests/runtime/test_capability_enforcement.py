@@ -39,7 +39,7 @@ from boxy_agent.runtime.providers import StaticDataQueryClient, StaticToolClient
 from boxy_agent.sdk import llm as llm_sdk
 from boxy_agent.types import JsonValue
 
-READ_ONLY_BOXY_TOOL_NAME = "google_gmail.gmail_search_threads"
+READ_ONLY_BOXY_TOOL_NAME = "google_sheets.sheets_get_values"
 DEFAULT_GOOGLE_ACCOUNT_ID = "google-acct-1"
 
 
@@ -275,7 +275,11 @@ def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
         result = call_boxy_tool(
             context,
             READ_ONLY_BOXY_TOOL_NAME,
-            {"account_id": DEFAULT_GOOGLE_ACCOUNT_ID},
+            {
+                "account_id": DEFAULT_GOOGLE_ACCOUNT_ID,
+                "spreadsheet_id": "sheet-1",
+                "range_a1": "A1:B2",
+            },
         )
         return AgentResult(output=cast(dict[str, JsonValue], result))
 
@@ -301,13 +305,15 @@ def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
                 execution_results={
                     READ_ONLY_BOXY_TOOL_NAME: {
                         "data": {
-                            "threads": [],
-                        },
-                        "page_info": {
-                            "next_page_token": None,
+                            "values": {
+                                "spreadsheet_id": "sheet-1",
+                                "range_a1": "A1:B2",
+                                "values": [],
+                            },
                         },
                         "resolution": {
                             "account_id": DEFAULT_GOOGLE_ACCOUNT_ID,
+                            "target": "sheet-1",
                         },
                     }
                 },
@@ -319,13 +325,15 @@ def test_runtime_allows_data_mining_with_read_only_boxy_tools() -> None:
 
     assert report.last_output == {
         "data": {
-            "threads": [],
-        },
-        "page_info": {
-            "next_page_token": None,
+            "values": {
+                "spreadsheet_id": "sheet-1",
+                "range_a1": "A1:B2",
+                "values": [],
+            },
         },
         "resolution": {
             "account_id": DEFAULT_GOOGLE_ACCOUNT_ID,
+            "target": "sheet-1",
         },
     }
 

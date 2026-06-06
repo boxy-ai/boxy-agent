@@ -11,8 +11,9 @@ def test_packaged_capability_catalog_contains_shipping_connector_and_builtin_cap
 
     assert "google_gmail.list_threads_local" in catalog.data_queries
     assert "google_gmail.get_thread_local" in catalog.data_queries
-    assert "google_gmail.gmail_search_threads" in catalog.boxy_tools
-    assert catalog.boxy_tools["google_gmail.gmail_search_threads"].side_effect is False
+    assert "google_gmail.gmail_search_threads" not in catalog.boxy_tools
+    assert "google_sheets.sheets_get_values" in catalog.boxy_tools
+    assert catalog.boxy_tools["google_sheets.sheets_get_values"].side_effect is False
     assert "whatsapp.chat_context" in catalog.data_queries
     assert "whatsapp.send_message" in catalog.boxy_tools
     assert catalog.boxy_tools["whatsapp.send_message"].side_effect is True

@@ -20,7 +20,7 @@ from boxy_agent.compiler.compile import CompilationError
 from boxy_agent.compiler.metadata import MetadataValidationError
 from boxy_agent.compiler.models import MANIFEST_SCHEMA_VERSION
 
-READ_ONLY_BOXY_TOOL_NAME = "google_gmail.gmail_search_threads"
+READ_ONLY_BOXY_TOOL_NAME = "google_sheets.sheets_get_values"
 
 BASE_SOURCE = (
     "from boxy_agent.sdk import decorators, models\n"
